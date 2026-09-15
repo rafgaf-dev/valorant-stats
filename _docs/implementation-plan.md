@@ -257,9 +257,16 @@ IPv4 resources can continue generating charges.
 ## 11. Decisions to make before coding
 
 - Which Riot-supported region/account identity and queue(s) are in scope?
+(europe, the list of accounts should be variable in a file, only competitive queue is necessary)
 - Is recent performance the last 20 matches or a time-based window?
+(last 15 matches)
 - Should KDA be `(K+A)/D`, and how should zero deaths be displayed?
+(0 deaths should count as 1, kda is just k/d but have the K/D/A there too)
 - Is the database single-AZ acceptable for this personal app?
+(yes)
 - Will a custom domain be used, or will CloudFront/API-generated URLs suffice?
+(for now generated one is fine, custom domains costs $$$)
 - Which Neon image source and attribution are permitted?
+(official valorant free to use and open source)
 - How will the Riot API key be supplied initially without committing it to git?
+(locally through environment, in the app through secret manager)
