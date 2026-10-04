@@ -1,0 +1,20 @@
+{
+  "player": { "id": "neon-main", "displayName": "The Neon Menace", "agent": "Neon" },
+  "metrics": {
+    "kda": {
+      "recent": 1.42,
+      "lifetime": 1.18,
+      "recentKills": 156,
+      "recentDeaths": 110,
+      "recentAssists": 74,
+      "lifetimeKills": 1842,
+      "lifetimeDeaths": 1561,
+      "lifetimeAssists": 903,
+      "recentSampleSize": 15,
+      "lifetimeSampleSize": 312
+    },
+    "winRate": { "recent": 0.6, "lifetime": 0.51, "recentSampleSize": 15, "lifetimeSampleSize": 312 },
+    "headshotPercentage": { "recent": 0.23, "lifetime": 0.19, "recentSampleSize": 15, "lifetimeSampleSize": 312 }
+  },
+  "lastUpdatedAt": "2026-09-15T12:00:00Z"
+}

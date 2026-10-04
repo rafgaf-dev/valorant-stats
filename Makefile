@@ -1,42 +1,66 @@
-.PHONY: help install dev api frontend build check clean
+.PHONY: help install dev lint format typecheck test build validate-infra check clean
 
 PYTHON ?= python3
 NPM ?= corepack npm
-API_HOST ?= 127.0.0.1
-API_PORT ?= 8000
+TERRAFORM ?= terraform
 FRONTEND_HOST ?= 127.0.0.1
 FRONTEND_PORT ?= 5173
 
+VENV := collector/.venv
+VENV_STAMP := $(VENV)/.installed
+NODE_STAMP := frontend/node_modules/.package-lock.json
+
+export COREPACK_ENABLE_DOWNLOAD_PROMPT := 0
+
 help:
 	@printf '%s\n' \
-		'make install   Install frontend dependencies' \
-		'make dev       Run the local API and React app' \
-		'make api       Run only the local API' \
-		'make frontend  Run only the Vite frontend' \
-		'make build     Create a production frontend build' \
-		'make check     Run syntax and formatting checks'
+		'make install         Install collector and frontend dependencies' \
+		'make dev             Run the frontend with sample data from frontend/dev-data' \
+		'make lint            Lint and format-check all code' \
+		'make format          Apply formatters (ruff, terraform fmt)' \
+		'make typecheck       Type-check the frontend' \
+		'make test            Run collector and frontend tests' \
+		'make build           Create a production frontend build' \
+		'make validate-infra  Run terraform validate without a backend' \
+		'make check           Run everything CI runs'
 
-install:
-	$(NPM) --prefix frontend install
+install: $(VENV_STAMP) $(NODE_STAMP)
 
-api:
-	API_HOST=$(API_HOST) API_PORT=$(API_PORT) $(PYTHON) lambda/api/local_server.py
+$(VENV_STAMP): collector/requirements-dev.txt
+	$(PYTHON) -m venv $(VENV)
+	$(VENV)/bin/python -m pip install -r collector/requirements-dev.txt
+	touch $@
 
-frontend:
-	VITE_API_BASE_URL=http://$(API_HOST):$(API_PORT) $(NPM) --prefix frontend run dev -- --host $(FRONTEND_HOST) --port $(FRONTEND_PORT)
+$(NODE_STAMP): frontend/package-lock.json
+	$(NPM) --prefix frontend ci
 
-dev: install
-	@set -e; \
-	API_HOST=$(API_HOST) API_PORT=$(API_PORT) $(PYTHON) lambda/api/local_server.py & api_pid=$$!; \
-	trap 'kill $$api_pid 2>/dev/null || true' EXIT INT TERM; \
-	VITE_API_BASE_URL=http://$(API_HOST):$(API_PORT) $(NPM) --prefix frontend run dev -- --host $(FRONTEND_HOST) --port $(FRONTEND_PORT)
+dev: $(NODE_STAMP)
+	$(NPM) --prefix frontend run dev -- --host $(FRONTEND_HOST) --port $(FRONTEND_PORT)
 
-build:
+lint: install
+	cd collector && .venv/bin/ruff check . && .venv/bin/ruff format --check .
+	$(NPM) --prefix frontend run lint
+	$(TERRAFORM) -chdir=infrastructure fmt -check -recursive
+
+format: $(VENV_STAMP)
+	cd collector && .venv/bin/ruff check --fix . && .venv/bin/ruff format .
+	$(TERRAFORM) -chdir=infrastructure fmt -recursive
+
+typecheck: $(NODE_STAMP)
+	$(NPM) --prefix frontend run typecheck
+
+test: install
+	cd collector && .venv/bin/pytest --cov --cov-report=term-missing
+	$(NPM) --prefix frontend test
+
+build: $(NODE_STAMP)
 	$(NPM) --prefix frontend run build
 
-check:
-	git diff --check
-	$(PYTHON) -m compileall -q lambda
+validate-infra:
+	$(TERRAFORM) -chdir=infrastructure init -backend=false -input=false
+	$(TERRAFORM) -chdir=infrastructure validate
+
+check: lint typecheck test build validate-infra
 
 clean:
-	rm -rf frontend/dist frontend/.vite
+	rm -rf frontend/dist frontend/node_modules $(VENV) collector/.pytest_cache collector/.ruff_cache collector/.coverage
