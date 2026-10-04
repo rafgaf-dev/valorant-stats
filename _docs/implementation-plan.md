@@ -2,271 +2,479 @@
 
 ## 1. Product goal
 
-Build a small gag-style dashboard for one or more friends' Valorant statistics.
-The first supported profile is the friend who primarily plays Neon. The first
-screen should show:
+A small, playful dashboard showing a friend's Valorant performance. The first
+profile is a friend who mostly plays Neon. The page shows:
 
-- Neon artwork and the friend's display name.
-- KDA, with recent and lifetime values.
-- Win rate, with recent and lifetime values.
-- Headshot percentage, with recent and lifetime values.
+- Neon artwork, the player's display name, region (EU), and queue (Competitive).
+- **K/D**, with the full K/D/A totals beside it.
+- **Win rate**, with the W–L–D record.
+- **Headshot %**.
 
-"Recent" should have one explicit definition, such as the last 20 competitive
-matches or the last 30 days. The initial recommendation is the last 20 matches,
-because it remains meaningful when the player takes a break. "Lifetime" means
-all stored matches in the selected supported game mode, starting at the first
-successful import. Display the sample size and the time of the last refresh so
-the comparison is not misleading.
+Each metric compares **Recent** (the last 15 completed competitive matches)
+with **Since tracking** (all stored competitive matches since the first
+successful import). Every metric shows its sample size, and the page shows
+when the data was last refreshed.
 
-The browser must never call the Riot API. It calls the application's read API,
-which serves data collected and cached by the backend.
+The browser never calls the Riot API. A scheduled collector fetches data from
+Riot, stores it, and publishes a precomputed JSON summary that the frontend
+reads as a static file.
 
-## 2. Target architecture
+### Non-goals
+
+- No arbitrary player lookup, search, or user accounts.
+- No match history browser. The page shows only the summary.
+- No custom domain for now. The generated CloudFront URL is enough.
+- No multi-environment setup (dev/stage/prod). There is one environment.
+
+## 2. Gate zero: confirm Riot API access
+
+Everything else depends on this, so do it before writing any more backend code.
+
+1. Check the Riot Developer Portal for the key types that can call
+   `val-match-v1` (match data). Valorant match endpoints have historically
+   required an approved **production** key. Valorant products have also been
+   required to use **Riot Sign On (RSO)**, so each tracked player opts in
+   themselves. Development keys expire every 24 hours, so a scheduled collector
+   can't run on one.
+2. Register the app honestly as a small, noncommercial fan dashboard for a
+   friend group, and apply for the key type that the portal says is required.
+3. Once you have a working key, fetch one real account, match list, and match
+   by hand. Save the sanitized responses as test fixtures
+   (`collector/tests/fixtures/`). All parsing code is written against these
+   files, not against assumptions.
+4. Ask the friend for consent. Their Riot ID, their stats, and the jokes about
+   them will be on a public URL. If RSO is required, they have to opt in anyway.
+
+**If access is denied or requires RSO**, stop and choose one of these before
+continuing:
+
+- Add an RSO opt-in flow as an extra milestone. This needs a small callback
+  endpoint (one Lambda function URL) and token storage.
+- Use a third-party Valorant data API as the data source. Read its terms first.
+  Only the `riot.py` client module would change.
+
+### Riot endpoint facts to verify against the fixtures
+
+| Purpose | Host | Path |
+| --- | --- | --- |
+| Riot ID → PUUID | `europe.api.riotgames.com` (account-v1 uses regional routing) | `/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}` |
+| Match list | `eu.api.riotgames.com` (Valorant uses shard routing) | `/val/match/v1/matchlists/by-puuid/{puuid}` |
+| Match detail | `eu.api.riotgames.com` | `/val/match/v1/matches/{matchId}` |
+
+- Competitive matches have `matchInfo.queueId == "competitive"`.
+- Remakes and abandoned games have `matchInfo.isCompleted == false`. Exclude them.
+- Wins come from `teams[].won`. If no team won, the match was a draw. Confirm
+  how draws appear in the fixture.
+- **Headshots are not in `players[].stats`.** They are per round, under
+  `roundResults[].playerStats[]` (the entry matching the player's PUUID) →
+  `damage[]` → `headshots`, `bodyshots`, `legshots`. These are *hits*, not
+  shots fired.
+- The match list returns recent history only, not the player's full career.
+  That is why the long-term metric is labelled "Since tracking", not "Career".
+
+## 3. Architecture
 
 ```text
-Browser (React)
-        |
-        v
-CloudFront -> private S3 bucket (static frontend)
-        |
-        +--> API Gateway HTTP API -> API Lambda -> PostgreSQL (private subnets)
+                    ┌──────────────── CloudFront (HTTPS, generated URL) ───────────────┐
+Browser ──────────► │  /*        → S3 site bucket (private, OAC)   long cache, hashed   │
+                    │  /data/*   → S3 data bucket (private, OAC)   max-age 300s         │
+                    └──────────────────────────────────────────────────────────────────┘
+                                                        ▲
+                                                        │ PutObject summary.json
+EventBridge Scheduler (every 6h) ──► Collector Lambda ──┤
+                                         │  │           └──► DynamoDB (matches, import runs)
+                                         │  └──► Riot API (europe / eu hosts)
+                                         └──► Secrets Manager (Riot API key)
 
-EventBridge Scheduler -> Collector Lambda -> Riot API
-                                      |
-                                      v
-                              PostgreSQL (private subnets)
-
-API and Collector Lambdas -> Secrets Manager (Riot API key/database credentials)
-CloudWatch Logs/Metrics/Alarms monitor both Lambdas and the API
+CloudWatch: collector errors, "no successful run in 12h" alarm → SNS email
+AWS Budgets: monthly budget alert → email
 ```
+
+Why this design:
+
+- **No VPC, no NAT Gateway, no RDS.** A NAT Gateway alone costs about
+  $32/month, and Lambdas in private subnets would also need a NAT or interface
+  endpoints to reach Secrets Manager. The data is a few hundred matches, so a
+  relational database isn't needed.
+- **No read API.** The summary only changes when the collector runs. A static
+  JSON file behind CloudFront is faster, cheaper, has no cold starts, and needs
+  no CORS because it is served from the same origin as the frontend.
+- **One Lambda with no third-party runtime dependencies.** The collector uses
+  the standard library (`urllib.request`) and `boto3`, which the Lambda runtime
+  already provides. Packaging is a plain zip, so there are no platform-specific
+  wheels to build on Windows.
 
 ### AWS components
 
-1. **S3** stores the built React assets. Keep the bucket private and expose it
-   through CloudFront using Origin Access Control. Add a custom error response
-   or SPA fallback for client-side routes if routes are added later.
-2. **CloudFront** provides HTTPS, caching, compression, and the public frontend
-   entry point. Use an ACM certificate in `us-east-1` if a custom domain is used.
-3. **API Gateway HTTP API** exposes a small read-only API. Configure CORS for the
-   CloudFront origin, throttling, access logs, and a stage with an environment
-   specific API URL.
-4. **API Lambda** validates request parameters, queries PostgreSQL, and returns
-   the latest precomputed metrics. It does not call Riot.
-5. **Collector Lambda** runs on a schedule, calls Riot's supported endpoints,
-   calculates/upserts match data, and records an import run. It is the only
-   component that needs the Riot API key.
-6. **RDS PostgreSQL** is the relational store. Use private subnets and a security
-   group that permits database traffic only from the Lambda security group. For
-   the learning project, begin with a small single-AZ instance and automated
-   backups; consider Multi-AZ only when availability is a real requirement.
-7. **VPC networking** includes private application/database subnets, route
-   tables, and the smallest egress design needed by the collector. A Lambda in
-   private subnets needs controlled outbound access to Riot, commonly through a
-   NAT Gateway. Document the NAT hourly and data-processing cost before enabling
-   it. An alternative is a public collector Lambda with no inbound access, but
-   private subnets are the cleaner production shape.
-8. **EventBridge Scheduler** invokes the collector, for example hourly or every
-   six hours. Use a Lambda resource policy so only the scheduler can invoke it.
-9. **Secrets Manager** stores the Riot key and database secret. Never place
-   either value in React code, Terraform variables committed to git, logs, or
-   Lambda responses. Grant each Lambda only the secret reads it needs.
-10. **CloudWatch** collects logs and metrics. Alarm on collector failures,
-    API 5xx responses, database storage/CPU pressure, and stale data.
+| Component | Configuration |
+| --- | --- |
+| S3 site bucket | Private, Block Public Access on, versioning off, served only through CloudFront OAC. |
+| S3 data bucket | Private, Block Public Access on, versioning on (cheap rollback of a bad summary), OAC. |
+| CloudFront | Default behavior → site bucket. `/data/*` → data bucket with a 5-minute TTL. `index.html` gets `no-cache`. Hashed assets get `immutable`. Security headers via a response headers policy. |
+| DynamoDB | One table, on-demand billing, PITR on, TTL attribute for import-run records. |
+| Collector Lambda | Python 3.13, arm64, 256 MB, 5-minute timeout, reserved concurrency 1 (runs never overlap), no VPC. |
+| EventBridge Scheduler | `rate(6 hours)`, configurable. Retry policy: 0 retries (the next scheduled run is the retry). |
+| Secrets Manager | One secret, the Riot API key. Terraform creates the secret *container* only. The value is set with the AWS CLI, so it never enters Terraform state or git. |
+| CloudWatch | Log group with 14-day retention. Custom metrics: `SuccessfulRuns`, `MatchesImported`, `RiotErrors`. |
+| SNS | One email subscription for alarms. |
+| AWS Budgets | Monthly budget (for example $5), with alerts at 80% actual and 100% forecast. |
 
-## 3. Backend contract
+Region: `eu-west-1`, close to the EU Riot hosts. Budgets and CloudFront are
+global.
 
-Start with these endpoints:
+## 4. Data model (DynamoDB, single table)
 
-### `GET /v1/players/{playerId}/summary`
+| Item | PK | SK | Attributes |
+| --- | --- | --- | --- |
+| Match | `PLAYER#<playerId>` | `MATCH#<playedAt ISO-8601 UTC>#<matchId>` | `matchId`, `queue`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `parserVersion` |
+| Import run | `PLAYER#<playerId>` | `RUN#<startedAt ISO-8601 UTC>` | `status` (`success`/`partial`/`failed`), `matchesFound`, `matchesImported`, `errorCode`, `durationMs`, `expiresAt` (TTL, 90 days) |
 
-Returns the display profile, selected agent, three metric comparisons, sample
-counts, and refresh metadata:
+- The sort key starts with the timestamp, so "latest 15 matches" is one
+  `Query` with `ScanIndexForward=false`.
+- Riot fills in `playedAt` and `matchId`, so the key is the same on every
+  import. Writes use `PutItem` with `attribute_not_exists(SK)`, which makes
+  re-imports idempotent.
+- `parserVersion` makes it possible to re-parse stored matches if the parsing
+  logic changes. For that, also store the raw match JSON in the data bucket
+  under `raw/<matchId>.json` (not served by CloudFront).
+- PUUIDs are not secret and don't need encryption. They are resolved from the
+  Riot ID on every run and never stored or published.
+
+### Player configuration
+
+The tracked players live in `config/players.json`. This file is **gitignored**
+because it contains real Riot IDs. `config/players.example.json` is committed
+to show the format:
+
+```json
+[
+  {
+    "id": "neon-main",
+    "gameName": "Example",
+    "tagLine": "EUW",
+    "displayName": "The Neon Menace",
+    "agent": "Neon"
+  }
+]
+```
+
+Terraform reads the file with `jsondecode(file(...))` and passes it to the
+Lambda as the `PLAYERS` environment variable. CI falls back to the example file
+so that `terraform validate` works without the real one.
+
+## 5. Metric definitions
+
+All metrics use **completed competitive matches only**. Both windows are
+computed from summed totals, never by averaging per-match ratios.
+
+| Metric | Formula | Edge cases |
+| --- | --- | --- |
+| K/D | `Σkills / max(Σdeaths, 1)` | Zero deaths count as one. K/D/A totals are shown beside it. |
+| Win rate | `wins / completed matches` | Draws count as matches but not wins. The W–L–D record is shown. |
+| Headshot % | `Σheadshot hits / Σ(head + body + leg hits)` | No hits → `null`. |
+
+- **Recent** = the 15 most recent matches. **Since tracking** = all stored
+  matches, plus the date of the earliest one.
+- A window with zero matches publishes `null` values, not `0`. The UI shows
+  "not enough data".
+- Values are published unrounded. Rounding is a display concern handled by the
+  frontend.
+- The definitions live in one module (`collector/src/collector/metrics.py`),
+  are unit-tested, and are explained in a small info note in the UI.
+
+## 6. Published contract: `/data/players/{playerId}/summary.json`
 
 ```json
 {
-  "player": { "id": "neon-main", "displayName": "Example", "agent": "Neon" },
-  "metrics": {
-    "kda": { "recent": 1.42, "lifetime": 1.18, "recentSampleSize": 20, "lifetimeSampleSize": 312 },
-    "winRate": { "recent": 0.55, "lifetime": 0.51, "recentSampleSize": 20, "lifetimeSampleSize": 312 },
-    "headshotPercentage": { "recent": 0.23, "lifetime": 0.19, "recentSampleSize": 20, "lifetimeSampleSize": 312 }
+  "schemaVersion": 1,
+  "player": { "id": "neon-main", "displayName": "The Neon Menace", "agent": "Neon", "region": "eu" },
+  "queue": "competitive",
+  "generatedAt": "2026-10-04T12:00:00Z",
+  "windows": {
+    "recent": {
+      "matches": 15, "wins": 9, "losses": 5, "draws": 1,
+      "kills": 156, "deaths": 110, "assists": 74,
+      "headshots": 120, "bodyshots": 380, "legshots": 22,
+      "kd": 1.4181818, "winRate": 0.6, "headshotRate": 0.2298850
+    },
+    "sinceTracking": {
+      "since": "2026-06-01T18:22:00Z",
+      "matches": 312, "wins": 160, "losses": 148, "draws": 4,
+      "kills": 1842, "deaths": 1561, "assists": 903,
+      "headshots": 1400, "bodyshots": 5600, "legshots": 400,
+      "kd": 1.1800128, "winRate": 0.5128205, "headshotRate": 0.1891892
+    }
   },
-  "lastUpdatedAt": "2026-09-15T12:00:00Z"
+  "lastImport": { "status": "success", "finishedAt": "2026-10-04T12:00:00Z" }
 }
 ```
 
-Use stable JSON field names and return `404` for an unknown player, `503` when
-cached data is unavailable, and `500` only for unexpected failures. Add a health
-endpoint that checks application availability without exposing database details.
+- The summary is written with `Cache-Control: public, max-age=300` and
+  `Content-Type: application/json`.
+- The schema is defined once as a TypeScript type in `frontend/src/api.ts` and
+  checked by a contract test: the collector's output for a fixture is compared
+  with `collector/tests/fixtures/summary.expected.json`, and the frontend tests
+  load the same file.
+- The frontend treats `generatedAt` older than 24 hours as **stale** and shows
+  a banner, but still renders the numbers.
+- Any change to the schema increments `schemaVersion`.
 
-Do not allow arbitrary SQL, Riot endpoint proxying, or arbitrary player lookup
-from the browser. Start with an allowlisted internal `playerId` and add more
-profiles deliberately.
+## 7. Collector behavior
 
-## 4. Relational data model
+Code layout: pure logic is kept separate from I/O so that most of it can be
+tested without AWS or Riot.
 
-Use migrations rather than having the Lambda silently create tables at runtime.
-The initial schema can be:
+```text
+collector/src/collector/
+  riot.py      HTTP client: auth header, timeouts, rate limits, error mapping
+  parse.py     match JSON → MatchRecord (pure)
+  metrics.py   list[MatchRecord] → windows (pure)
+  store.py     DynamoDB reads and writes
+  publish.py   writes summary.json and raw match JSON to S3
+  handler.py   orchestration, structured logging, metrics
+```
 
-- `players`: internal ID, Riot region, encrypted/secret-managed PUUID reference,
-  display name, preferred agent, enabled flag, created/updated timestamps.
-- `matches`: Riot match ID, player ID, queue/mode, played timestamp, win flag,
-  kills, deaths, assists, headshots, shots if available, and raw-source version.
-  Add a unique constraint on `(player_id, riot_match_id)` for idempotent imports.
-- `import_runs`: start/end time, status, matches discovered/updated, and a
-  sanitized error code/message for operational visibility.
-- Optional `metric_snapshots`: player ID, recent-window definition, calculated
-  values, sample sizes, and calculation timestamp. This makes API reads cheap
-  and gives a reproducible cache record.
+For each run:
 
-Define the formulas explicitly in code and documentation:
+1. Read the Riot key from Secrets Manager (cached for the life of the Lambda
+   container) and load `PLAYERS`.
+2. For each player, handled **independently** so that one failure doesn't
+   affect the others:
+   1. Resolve the Riot ID to a PUUID.
+   2. Fetch the match list and keep competitive entries whose IDs aren't stored
+      yet.
+   3. Fetch the details for at most `MAX_DETAILS_PER_RUN` (default 30) new
+      matches, oldest first. The backfill finishes over several runs instead of
+      exceeding rate limits.
+   4. Parse, skip incomplete matches, and write them idempotently.
+   5. Query all of the player's matches, compute both windows, and publish
+      `summary.json`. If nothing new was imported and a summary exists, skip
+      the publish.
+   6. Write an import-run item.
+3. Emit one structured JSON log line per player and per run, and the CloudWatch
+   metrics through Embedded Metric Format (no extra API calls).
+4. The run status is `success` if all players succeeded, `partial` if some
+   did, and `failed` if none did. The handler raises only on `failed`, so the
+   Lambda error metric means something.
 
-- KDA: `(kills + assists) / deaths`, with a documented zero-deaths rule.
-- Win rate: wins divided by completed matches.
-- Headshot percentage: headshots divided by recorded shots or the Riot-provided
-  headshot denominator, depending on the endpoint's actual fields.
+### Riot error handling
 
-Do not mix queues, modes, or incomplete matches without making that choice
-visible in the response. Store UTC timestamps and calculate the recent window
-using UTC.
+| Response | Behavior |
+| --- | --- |
+| `200` | Continue. |
+| `404` on account lookup | Mark this player failed (`riot_account_not_found`) and continue with the next player. |
+| `401` / `403` | Key is invalid, expired, or lacks access. Stop the whole run, status `failed`, error code `riot_auth`. Don't retry. |
+| `429` | Wait for `Retry-After` once if it is ≤ 10s. Otherwise stop the run cleanly. Previously published summaries stay unchanged. |
+| `5xx` / timeout | Up to 2 retries with exponential backoff and jitter, then fail this player. |
 
-## 5. Riot API and compliance requirements
+The previous `summary.json` is only overwritten after a successful computation,
+so the site always shows the last good data.
 
-Before implementation, confirm the current Riot Developer Portal policies and
-Valorant API availability for the intended region and data. The collector should:
+### Data deletion
 
-- Keep the developer/API key server-side and rotate it through Secrets Manager.
-- Identify the application honestly and follow Riot's rate limits, headers, and
-  endpoint-specific terms.
-- Cache responses and use incremental match imports instead of repeatedly
-  downloading the same history.
-- Implement retries with exponential backoff for transient responses, but do not
-  retry rate-limit or authorization failures aggressively.
-- Stop or alert on `401`, `403`, and sustained `429` responses.
-- Store only the minimum player/match data needed for this private dashboard and
-  support deleting a player's cached data.
-- Display a visible, accurate Riot/Valorant attribution and a disclaimer that
-  the app is unofficial and not endorsed by Riot Games. Do not use Riot logos or
-  assets as though the app were official.
-- Use Neon artwork only from an asset source whose usage is permitted for this
-  personal project, and keep attribution/license notes with the asset.
+`make delete-player PLAYER=<id>` runs a script that deletes the player's
+DynamoDB items and their objects under `data/players/<id>/`, then invalidates
+`/data/players/<id>/*` in CloudFront. Removing the player from
+`config/players.json` stops future collection.
 
-The noncommercial intent does not replace compliance with Riot's current terms.
-Re-check those terms before deploying and whenever the API or app scope changes.
+## 8. Frontend plan
 
-## 6. Collector behavior
+- **Data loading:** `api.ts` fetches `/data/players/${PLAYER_ID}/summary.json`
+  as a relative URL, so there is no API base URL to configure.
+  `VITE_PLAYER_ID` selects the profile at build time.
+- **Local development:** a small dev-only Vite middleware in `vite.config.ts`
+  serves `frontend/dev-data/` under `/data`. It contains sample summaries for
+  the normal, empty (`null` metrics), and stale states. This replaces
+  `lambda/api/local_server.py`, and `make dev` becomes just `vite`.
+- **Components:**
+  - `PlayerHeader`: art, name, and metadata (region, queue, last updated),
+    taken from the summary instead of hardcoded.
+  - `StatCard`: recent value, since-tracking value, delta, sample size, and
+    K/D/A or W–L–D detail.
+  - `MetricNotes`: replaces `RecentGames`, which is really a footnote. It
+    explains the formulas and the zero-death rule.
+  - `Verdict`: the playful "cooking/trolling" ruling. Its logic lives in a
+    tested pure function.
+- **States:** loading, error (fetch failed or unknown schema version), empty
+  (no matches yet), stale (older than 24h), and normal.
+- **Artwork:** download the Neon portrait into `frontend/src/assets/` and add
+  `frontend/src/assets/ASSETS.md` with its source and the attribution. Don't
+  hotlink a community CDN. The art belongs to Riot and is used under Riot's
+  fan-content policy ("Legal Jibber Jabber"), which allows free fan projects
+  with the disclaimer. It is not open source.
+- **Footer disclaimer** (required wording style): "valorant-stats isn't
+  endorsed by Riot Games and doesn't reflect the views or opinions of Riot
+  Games or anyone officially involved in producing or managing Riot Games
+  properties. Riot Games and all associated properties are trademarks or
+  registered trademarks of Riot Games, Inc."
+- **Accessibility:** use real `<table>` or `<dl>` semantics for the numbers,
+  give deltas a text label (don't rely on colour alone), make the info note
+  keyboard-accessible, and support `prefers-reduced-motion` for decorative
+  effects.
+- **Tooling:** move `vite`, `typescript`, and `@vitejs/plugin-react` to
+  `devDependencies`. Add ESLint (typescript-eslint, react-hooks) and Vitest
+  with Testing Library.
 
-1. Scheduler invokes the collector with a configured player allowlist.
-2. Collector reads its secret and opens a database connection using a bounded
-   connection strategy. Reuse a connection during one invocation where safe.
-3. For each enabled player, resolve the configured Riot identity and fetch only
-   new match IDs/details after the newest stored match, subject to rate limits.
-4. Normalize API responses into the `matches` table with idempotent upserts.
-5. Recalculate the recent and lifetime snapshots in one transaction per player.
-6. Write an `import_runs` record, emit structured logs, and return a summary.
-7. On partial failure, leave prior snapshots available and mark the import run
-   failed or partial. The API should continue serving the last known good cache.
+## 9. Repository layout
 
-Use a small connection pool or a managed proxy if connection pressure becomes a
-problem. Do not add RDS Proxy at the beginning unless testing demonstrates the
-need; it adds cost and another AWS concept to learn.
+```text
+.github/workflows/
+  ci.yml                  lint, test, build, terraform fmt/validate on every PR and push to main
+  deploy.yml              manual dispatch: terraform apply + frontend publish via OIDC
+_docs/implementation-plan.md
+collector/
+  pyproject.toml          ruff, pytest, moto (dev only); no runtime deps
+  src/collector/...
+  tests/
+    fixtures/             sanitized real Riot responses + expected summary
+config/
+  players.example.json    committed; players.json is gitignored
+frontend/
+  dev-data/               sample summaries for local development
+  src/...
+infrastructure/
+  bootstrap/              one-time: state bucket (local state, run once)
+  versions.tf             terraform + provider pins, S3 backend (use_lockfile = true)
+  variables.tf  outputs.tf
+  storage.tf              DynamoDB table, site + data buckets
+  secrets.tf
+  collector.tf            Lambda, its IAM role/policy, log group
+  scheduler.tf            schedule + its IAM role
+  frontend.tf             CloudFront, OAC, bucket policies, cache/headers policies
+  monitoring.tf           SNS, alarms, budget
+  github_oidc.tf          OIDC provider + deploy role scoped to this repo's main branch
+scripts/
+  delete_player.py
+LICENSE                   MIT
+Makefile
+README.md
+```
 
-## 7. Frontend plan
+Changes from the current tree:
 
-Build the React app as a single responsive dashboard with a deliberately playful
-presentation that still makes the numbers easy to scan:
+- `lambda/` moves to `collector/`.
+- `lambda/api/`, `lambda/schema.sql`, `scripts/build.sh`, and
+  `scripts/deploy.sh` are deleted.
+- The empty `api.tf`, `database.tf`, `lambdas.tf`, `iam.tf`, and
+  `providers.tf` are deleted. `terraform.tf` becomes `versions.tf`.
 
-- `PlayerHeader`: Neon image, player name, queue/window labels, and last update.
-- `StatCard`: one card each for KDA, win rate, and headshot percentage; show
-  recent value prominently, lifetime value beside it, delta, and sample size.
-- `RecentGames`: optional compact table/list of the latest imported matches for
-  context, with no direct Riot calls.
-- `api.ts`: typed fetch client with a configured API base URL and explicit error
-  state handling.
-- `App.tsx`: loading, stale data, empty data, API error, and normal states.
+## 10. Terraform
 
-Format percentages consistently, explain the zero-death KDA rule in a small
-accessible label or tooltip, and make the layout usable on a phone. Keep the
-Riot attribution in the page footer or about area. Do not put the Riot API key,
-database credentials, or raw private configuration into the Vite/React bundle.
+- Format with `terraform fmt` (2-space indentation). Pin the provider with a
+  `~>` constraint and commit `.terraform.lock.hcl`.
+- **Bootstrap once:** `infrastructure/bootstrap/` creates the versioned,
+  encrypted state bucket with local state. The main config uses an S3 backend
+  with `use_lockfile = true`, so no DynamoDB lock table is needed.
+- **IAM is defined next to its resource,** with the narrowest scope possible:
+  - Collector: `secretsmanager:GetSecretValue` on one secret ARN, DynamoDB
+    read/write on one table, and `s3:PutObject` on `data/players/*` and
+    `raw/*` of the data bucket.
+  - Scheduler: `lambda:InvokeFunction` on the collector only.
+  - Bucket policies allow `s3:GetObject` only from this CloudFront
+    distribution (OAC with an `AWS:SourceArn` condition).
+- **The Riot key never touches state.** After the first apply, set it with
+  `aws secretsmanager put-secret-value --secret-id <output> --secret-string file://-`.
+- **CI deploys without access keys.** GitHub OIDC assumes a role restricted to
+  `repo:<owner>/valorant-stats:ref:refs/heads/main`. No long-lived AWS keys are
+  stored in GitHub.
+- **Lambda packaging** uses the `archive_file` data source over
+  `collector/src/`, with `source_code_hash` so a change in the code triggers a
+  redeploy.
+- Default tags on every resource: `Project = valorant-stats`, `ManagedBy = terraform`.
+- **Teardown:** `terraform destroy` removes everything except the state bucket.
+  Empty the versioned data bucket first (`force_destroy = true` on both
+  buckets is acceptable for this project).
 
-## 8. Terraform learning sequence
+### Expected cost
 
-Implement the existing Terraform files in this order, committing each working
-milestone separately:
+| Item | Monthly |
+| --- | --- |
+| Lambda, Scheduler, DynamoDB on-demand, S3, CloudFront (low traffic) | ~$0 (free tier or cents) |
+| Secrets Manager (1 secret) | $0.40 |
+| CloudWatch logs and custom metrics (3) | ~$0.90 |
+| **Total** | **≈ $1–2** |
 
-1. `versions.tf`, `providers.tf`, `variables.tf`, and `outputs.tf`: pin versions,
-   define environment/region/domain inputs, and expose URLs and identifiers.
-2. `iam.tf`: least-privilege execution roles for API, collector, scheduler, and
-   deployment. Validate policies with plan review before applying.
-3. `database.tf`: VPC/subnets/security groups, RDS PostgreSQL, backups, and
-   parameter groups. Keep credentials out of state where possible and understand
-   the remaining state-management risk.
-4. `secrets.tf`: Secrets Manager resources and explicit Lambda read permissions.
-5. `lambdas.tf`: package/deploy both functions, environment variables, logging,
-   VPC attachment, and source hashes for repeatable updates.
-6. `api.tf`: API Gateway routes, integrations, CORS, stage, throttling, and logs.
-7. `scheduler.tf`: EventBridge schedule, invocation permission, and configurable
-   interval.
-8. `frontend.tf`: S3 bucket, CloudFront distribution, origin access control,
-   cache policy, and optional DNS/ACM resources.
-9. `monitoring.tf`: log groups, metric filters, alarms, and notification wiring.
+The budget alarm catches anything unexpected.
 
-Use separate state and variable values per environment, enable state locking,
-review `terraform plan`, and keep Terraform state in a protected remote backend.
-Add a destroy/cost checklist because RDS, NAT Gateway, CloudFront, and public
-IPv4 resources can continue generating charges.
+## 11. Quality gates
 
-## 9. Testing and acceptance criteria
+### CI (`ci.yml`, required to pass before merging)
 
-### Local tests
+- Collector: `ruff check`, `ruff format --check`, `pytest` (with coverage report).
+- Frontend: `npm ci`, `eslint`, `tsc --noEmit`, `vitest run`, `vite build`.
+- Infrastructure: `terraform fmt -check -recursive`, `terraform init -backend=false`, `terraform validate`.
+- Dependabot for npm, pip, GitHub Actions, and Terraform.
 
-- Unit test each metric formula, including zero deaths, zero matches, and missing
-  denominators.
-- Test Riot response normalization and idempotent match upserts with fixtures.
-- Test collector handling for success, pagination, `401`, `403`, `429`, timeout,
-  and partial-player failure.
-- Test API response shape, validation, unknown player, stale cache, and database
-  failure behavior.
-- Test React loading, empty, stale, error, and populated states with mocked API
-  responses.
+### Tests
+
+- **`metrics.py`:** zero deaths, zero matches (`null`s), zero hits, fewer than
+  15 matches, draws, and sums vs per-match ratios.
+- **`parse.py`:** the real fixtures, an incomplete match (skipped), a draw,
+  per-round headshot aggregation, and the player not found in the match
+  (error, not a silent zero).
+- **`riot.py`:** 401/403/404/429 (with and without `Retry-After`), 5xx with
+  retries, and timeouts. Uses a stubbed opener, with no network access.
+- **`handler.py`:** with moto for DynamoDB, S3, and Secrets Manager. Checks
+  idempotent re-runs (no duplicates), partial failure (one player fails, the
+  other publishes), the per-run detail cap, and that the summary isn't
+  overwritten on failure.
+- **Contract:** the collector output for the fixtures equals
+  `summary.expected.json`, and the frontend renders that same file.
+- **Frontend:** loading, error, empty, stale, and normal states, plus the
+  verdict function.
 
 ### Deployment checks
 
-- `terraform fmt -check`, `terraform validate`, and a reviewed `terraform plan`.
-- Build the frontend and verify its API base URL is injected at build time.
-- Invoke the collector against a non-production/test player or fixture before
-  enabling the schedule.
-- Verify browser requests go only to the application API and that no secret is
-  present in generated frontend assets or logs.
-- Confirm CloudFront serves the app over HTTPS and API CORS is restricted to the
-  expected origin.
-- Confirm a failed collector leaves the last good metrics visible and raises an
-  alarm.
+- `terraform plan` is reviewed before each apply. The deploy workflow prints it.
+- The first collector run is invoked manually (`make invoke`) before the
+  schedule is enabled. Check the logs and the published summary.
+- `grep` the built `dist/` for the Riot key prefix (`RGAPI-`) in CI. The build
+  must not contain it.
+- Revoke the key or point `PLAYERS` at a bad Riot ID. The `failed` run should
+  raise the alarm email and the site should keep showing the last summary.
+- Check CloudFront response headers: HTTPS redirect, caching as specified, and
+  security headers present.
 
-## 10. Suggested delivery milestones
+## 12. Milestones
 
-1. Define the metric/window contract and obtain a permitted Neon asset.
-2. Build the metric calculations and collector against recorded fixtures.
-3. Build the API Lambda against a local PostgreSQL database or test container.
-4. Build the React dashboard against mocked API data.
-5. Implement the database, secrets, Lambda, and scheduler Terraform modules.
-6. Deploy the API and collector, run an initial import, then deploy the frontend.
-7. Add monitoring, rate-limit handling, deletion support, and cost controls.
-8. Re-check Riot policy/attribution requirements before sharing the URL.
+Each milestone is one or more small PRs that pass CI.
 
-## 11. Decisions to make before coding
+0. **Riot access:** key approved, consent obtained, real fixtures captured
+   (section 2).
+1. **Repo hygiene:**
+   - LICENSE, the new layout, `pyproject.toml`, and ESLint/Vitest.
+   - `ci.yml`.
+   - Fix `.gitignore`: remove the duplicated Terraform block and overly broad
+     patterns (`build/`, `*.bin`, `env/`), and add `config/players.json`.
+2. **Collector core:** `parse.py` and `metrics.py` against the fixtures, with
+   tests.
+3. **Collector I/O:** `riot.py`, `store.py`, `publish.py`, and `handler.py`
+   with moto tests. A `make collect-local` target runs the collector against
+   real Riot data with `RIOT_API_KEY` from the shell environment and writes the
+   summary to `frontend/dev-data/`.
+4. **Frontend:** move to the new contract and dev data, update the components,
+   add the states, local art and ASSETS.md, and tests.
+5. **Infrastructure:** bootstrap, storage, secrets, collector, and scheduler
+   (disabled). Apply, set the secret, invoke manually.
+6. **Delivery:** CloudFront, the frontend publish (`aws s3 sync --delete`
+   on the site bucket plus an `index.html` invalidation), and the GitHub OIDC
+   deploy workflow.
+7. **Operations:** alarms, budget, and the delete-player script. Enable the
+   schedule.
+8. **README:** architecture diagram, screenshot, how to run locally, how to
+   deploy, cost, disclaimer. Re-check the Riot policies before sharing the URL.
 
-- Which Riot-supported region/account identity and queue(s) are in scope?
-(europe, the list of accounts should be variable in a file, only competitive queue is necessary)
-- Is recent performance the last 20 matches or a time-based window?
-(last 15 matches)
-- Should KDA be `(K+A)/D`, and how should zero deaths be displayed?
-(0 deaths should count as 1, kda is just k/d but have the K/D/A there too)
-- Is the database single-AZ acceptable for this personal app?
-(yes)
-- Will a custom domain be used, or will CloudFront/API-generated URLs suffice?
-(for now generated one is fine, custom domains costs $$$)
-- Which Neon image source and attribution are permitted?
-(official valorant free to use and open source)
-- How will the Riot API key be supplied initially without committing it to git?
-(locally through environment, in the app through secret manager)
+## 13. Decision log
+
+| Decision | Choice | Reason |
+| --- | --- | --- |
+| Region / queue | EU, Competitive only | Where the friend plays; the other queues aren't comparable. |
+| Player list | `config/players.json` (gitignored) | Editable list without committing real Riot IDs. |
+| Recent window | Last 15 completed matches | Still meaningful after a break, unlike a time window. |
+| Main stat | K/D (`max(deaths,1)`), K/D/A shown | Chosen by the owner. Named `kd`, never "KDA". |
+| Long-term window | "Since tracking", not "Career" | Riot's match list doesn't return full history. |
+| Storage | DynamoDB + static summary JSON | ~$1/month. No VPC, NAT, RDS, or read API needed for this data volume. |
+| Riot key | Shell env locally, Secrets Manager in AWS | Never in git, the bundle, or Terraform state. |
+| Domain | CloudFront-generated URL | A custom domain isn't worth the cost yet. |
+| Artwork | Local copy under Riot's fan-content policy | Avoids hotlinking. Licensing is stated accurately. |
+| Database availability | N/A (DynamoDB is multi-AZ by default) | Replaces the earlier single-AZ RDS decision. |
