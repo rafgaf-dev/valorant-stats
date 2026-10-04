@@ -1,8 +1,5 @@
-from __future__ import annotations
-
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
-
 
 RECENT_MATCH_COUNT = 15
 
@@ -33,12 +30,12 @@ def calculate_metrics(matches: list[Match]) -> dict:
         shots = _sum(window, "shots")
         completed = len(window)
         return {
-            "kda": round(kills / max(deaths, 1), 2),
+            "kda": kills / max(deaths, 1),
             "kills": kills,
             "deaths": deaths,
             "assists": assists,
-            "winRate": round(sum(match.won for match in window) / completed, 4) if completed else 0,
-            "headshotPercentage": round(headshots / shots, 4) if shots else 0,
+            "winRate": sum(match.won for match in window) / completed if completed else 0,
+            "headshotPercentage": headshots / shots if shots else 0,
             "sampleSize": completed,
         }
 

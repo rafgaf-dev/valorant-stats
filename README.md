@@ -8,21 +8,38 @@ the frontend reads through CloudFront.
 
 The implementation and infrastructure plan lives in [_docs/implementation-plan.md](_docs/implementation-plan.md).
 
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `collector/` | Python collector Lambda (source in `src/collector/`, tests in `tests/`) |
+| `frontend/` | React + Vite dashboard; `dev-data/` holds sample summaries for local development |
+| `infrastructure/` | Terraform for AWS |
+| `config/` | `players.example.json`; copy it to the gitignored `players.json` with real Riot IDs |
+
 ## Local development
 
-Install GNU Make in WSL if needed, then run:
+Requirements (Linux, macOS, or WSL on Windows): GNU Make, Node.js 22.12+ with
+Corepack, Python 3.13+ with `venv`, and Terraform 1.16+.
 
 ```bash
 make dev
 ```
 
-Open http://127.0.0.1:5173. This starts a local development API with sample
-metrics on port 8000 and the React frontend on port 5173. The local API is only
-for viewing and developing the interface; production data comes from the Riot
-collector and PostgreSQL backend.
+Open http://127.0.0.1:5173. Vite serves the React app and, in development only,
+the sample summary in `frontend/dev-data/` under `/data`, the same path the
+production app reads from CloudFront.
 
-Useful targets are `make api`, `make frontend`, `make build`, and `make check`.
+Before pushing, run the same checks as CI:
 
-Vite is the frontend development tool used by this project. It starts the local
-development server, serves the React source with fast updates while you edit,
-and bundles the optimized static files for production with `make build`.
+```bash
+make check
+```
+
+Run `make help` for the individual targets (`lint`, `format`, `test`,
+`typecheck`, `build`, `validate-infra`).
+
+## License
+
+[MIT](LICENSE). This is an unofficial fan project and is not endorsed by Riot
+Games. VALORANT and all related imagery are property of Riot Games, Inc.
