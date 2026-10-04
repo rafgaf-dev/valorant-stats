@@ -20,10 +20,8 @@ export type PlayerSummary = {
 	lastUpdatedAt: string;
 };
 
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
-
 export async function getPlayerSummary(playerId: string): Promise<PlayerSummary> {
-	const response = await fetch(`${apiBaseUrl}/v1/players/${encodeURIComponent(playerId)}/summary`);
+	const response = await fetch(`/data/players/${encodeURIComponent(playerId)}/summary.json`);
 	if (!response.ok) {
 		const body = await response.json().catch(() => ({}));
 		throw new Error(body.error ?? `Stats request failed (${response.status})`);
