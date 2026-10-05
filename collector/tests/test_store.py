@@ -118,3 +118,14 @@ def test_dynamodb_errors_other_than_the_condition_are_raised(table, monkeypatch)
 
     with pytest.raises(ClientError):
         DynamoMatchStore(table).put_match("neon-main", V4)
+
+
+def test_account_hash_round_trip_and_is_not_a_match(store):
+    assert store.get_account("neon-main") is None
+
+    store.put_account("neon-main", "hash-1")
+    store.put_match("neon-main", V4)
+
+    assert store.get_account("neon-main") == "hash-1"
+    assert store.get_account("someone-else") is None
+    assert store.list_matches("neon-main") == [V4]

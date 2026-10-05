@@ -6,6 +6,7 @@ the run. A summary is only published after a successful import, so the site alwa
 the last good data.
 """
 
+import hashlib
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -102,7 +103,8 @@ def collect_player(
         )
         publisher.publish(player.id, build_summary(player, records, run, finished_at))
     except Exception as error:  # isolate players; the cause is logged and recorded
-        error_code = error.code if isinstance(error, ApiError) else "internal_error"
+        has_code = isinstance(error, ApiError | AccountChangedError)
+        error_code = error.code if has_code else "internal_error"
         log.exception("player_failed", extra={"player": player.id, "error_code": error_code})
         run = ImportRun(
             player.id,
@@ -127,12 +129,43 @@ def collect_player(
     return run
 
 
+class AccountChangedError(Exception):
+    """The player's Riot ID now resolves to a different account than their stored matches."""
+
+    code = "account_changed"
+
+    def __init__(self, player_id: str) -> None:
+        super().__init__(
+            f"player {player_id!r} now points at a different Riot account; run "
+            f"`make delete-player PLAYER={player_id}` to clear the old account's data first"
+        )
+
+
+def account_hash(puuid: str) -> str:
+    return hashlib.sha256(puuid.encode()).hexdigest()
+
+
+def _check_account(player: PlayerConfig, puuid: str, store: MatchStore) -> None:
+    """Stops a changed Riot ID from mixing two accounts' matches under one player id.
+
+    The first run records the account. Data from before this check existed is adopted as
+    belonging to the current account.
+    """
+    recorded = store.get_account(player.id)
+    current = account_hash(puuid)
+    if recorded is None:
+        store.put_account(player.id, current)
+    elif recorded != current:
+        raise AccountChangedError(player.id)
+
+
 def _import_matches(progress: _Import, client: MatchSource, store: MatchStore) -> None:
     player = progress.player
     puuid = client.account(player.game_name, player.tag_line).get("puuid")
     if not isinstance(puuid, str):
         raise ParseError("account response has no puuid")
     progress.puuid = puuid
+    _check_account(player, puuid, store)
 
     existing = {record.match_id: record for record in store.list_matches(player.id)}
     if not existing:  # first run: backfill the stored history once

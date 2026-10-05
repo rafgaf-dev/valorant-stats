@@ -1,13 +1,14 @@
 import json
 from dataclasses import replace
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
-from collector.collect import collect_all, collect_player
+from collector.collect import account_hash, collect_all, collect_player
 from collector.henrikdev import AuthError, NotFoundError, RateLimitedError, ServerError
 from collector.publish import DirectoryPublisher
-from collector.records import RunStatus, Source
+from collector.records import MatchRecord, Result, RunStatus, Source
 from collector.store import DynamoMatchStore, JsonFileMatchStore
 
 EXPECTED_SUMMARY = Path(__file__).parent / "fixtures" / "summary.expected.json"
@@ -196,3 +197,52 @@ def test_account_without_a_puuid_fails_the_player(player, henrikdev, store, publ
     run = collect_player(player, henrikdev, store, publisher, clock)
 
     assert (run.status, run.error_code) == (RunStatus.FAILED, "internal_error")
+
+
+def test_first_run_records_a_hash_of_the_account_not_the_puuid(
+    player, henrikdev, store, publisher, clock
+):
+    collect_player(player, henrikdev, store, publisher, clock)
+
+    recorded = store.get_account("neon-main")
+    assert recorded == account_hash(henrikdev.account_data["puuid"])
+    assert henrikdev.account_data["puuid"] not in recorded
+
+
+def test_changed_account_fails_without_touching_the_stored_data(
+    player, henrikdev, store, publisher, clock
+):
+    collect_player(player, henrikdev, store, publisher, clock)
+    before = published(publisher)
+    henrikdev.account_data = {**henrikdev.account_data, "puuid": "puuid-someone-else"}
+    henrikdev.calls.clear()
+
+    run = collect_player(player, henrikdev, store, publisher, clock)
+
+    assert (run.status, run.error_code) == (RunStatus.FAILED, "account_changed")
+    assert henrikdev.calls == {"account": 1}  # stopped before fetching any matches
+    assert len(store.list_matches("neon-main")) == STORED_RECORDS
+    assert published(publisher) == before
+
+
+def test_data_from_before_the_guard_is_adopted(player, henrikdev, store, publisher, clock):
+    # Matches stored by a collector that predates the account check, with no account item.
+    legacy = MatchRecord(
+        "match-legacy",
+        datetime(2026, 1, 1, tzinfo=UTC),
+        Result.WIN,
+        "Neon",
+        10,
+        5,
+        3,
+        4,
+        15,
+        1,
+        Source.STORED,
+    )
+    store.put_match("neon-main", legacy)
+
+    run = collect_player(player, henrikdev, store, publisher, clock)
+
+    assert run.status is RunStatus.SUCCESS
+    assert store.get_account("neon-main") == account_hash(henrikdev.account_data["puuid"])

@@ -4,7 +4,9 @@ One DynamoDB table holds everything for a player under `PK = PLAYER#<id>`:
 
 - matches at `SK = MATCH#<matchId>`; writes only replace a missing or `stored`-source item,
   so re-imports are idempotent and a full v4 record supersedes a backfilled one;
-- import runs at `SK = RUN#<startedAt>`, expiring after 90 days.
+- import runs at `SK = RUN#<startedAt>`, expiring after 90 days;
+- the account the player id belongs to at `SK = ACCOUNT`, as a SHA-256 hash of the PUUID,
+  so a changed Riot ID can't mix two accounts' matches.
 
 `JsonFileMatchStore` applies the same rules to a local file for `make collect-local`.
 """
@@ -32,9 +34,22 @@ class MatchStore(Protocol):
 
     def put_import_run(self, run: ImportRun) -> None: ...
 
+    def get_account(self, player_id: str) -> str | None:
+        """The account hash recorded for the player, if any."""
+        ...
+
+    def put_account(self, player_id: str, account_hash: str) -> None: ...
+
+
+ACCOUNT_SORT_KEY = "ACCOUNT"
+
 
 def _partition_key(player_id: str) -> str:
     return f"PLAYER#{player_id}"
+
+
+def _account_item(player_id: str, account_hash: str) -> dict[str, Any]:
+    return {"PK": _partition_key(player_id), "SK": ACCOUNT_SORT_KEY, "accountHash": account_hash}
 
 
 def _match_item(player_id: str, record: MatchRecord) -> dict[str, Any]:
@@ -123,6 +138,14 @@ class DynamoMatchStore:
     def put_import_run(self, run: ImportRun) -> None:
         self._table.put_item(Item=_import_run_item(run))
 
+    def get_account(self, player_id: str) -> str | None:
+        key = {"PK": _partition_key(player_id), "SK": ACCOUNT_SORT_KEY}
+        item = self._table.get_item(Key=key, ConsistentRead=True).get("Item")
+        return item["accountHash"] if item else None
+
+    def put_account(self, player_id: str, account_hash: str) -> None:
+        self._table.put_item(Item=_account_item(player_id, account_hash))
+
 
 class JsonFileMatchStore:
     """A single-file stand-in for DynamoDB with the same write rules."""
@@ -151,6 +174,17 @@ class JsonFileMatchStore:
         items = self._load()
         item = _import_run_item(run)
         items[f"{item['PK']}|{item['SK']}"] = item
+        self._save(items)
+
+    def get_account(self, player_id: str) -> str | None:
+        item = self._load().get(f"{_partition_key(player_id)}|{ACCOUNT_SORT_KEY}")
+        return item["accountHash"] if item else None
+
+    def put_account(self, player_id: str, account_hash: str) -> None:
+        items = self._load()
+        items[f"{_partition_key(player_id)}|{ACCOUNT_SORT_KEY}"] = _account_item(
+            player_id, account_hash
+        )
         self._save(items)
 
     def _load(self) -> dict[str, dict[str, Any]]:
