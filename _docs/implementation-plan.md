@@ -156,7 +156,7 @@ Why this design:
 | S3 data bucket | Private, Block Public Access on, versioning on (cheap rollback of a bad summary), OAC. |
 | CloudFront | Default behavior → site bucket. `/data/*` → data bucket with a 5-minute TTL. `index.html` gets `no-cache`. Hashed assets get `immutable`. Security headers via a response headers policy. |
 | DynamoDB | One table, on-demand billing, PITR on, TTL attribute for import-run records. |
-| Collector Lambda | Python 3.13, arm64, 256 MB, 5-minute timeout, reserved concurrency 1 (runs never overlap), no VPC. |
+| Collector Lambda | Python 3.13, arm64, 256 MB, 5-minute timeout, no VPC. No reserved concurrency: new accounts often can't reserve any (the unreserved pool must stay at 10 or more), and six-hourly runs with a 5-minute timeout can't overlap. |
 | EventBridge Scheduler | `rate(6 hours)`, configurable. Retry policy: 0 retries (the next scheduled run is the retry). |
 | Secrets Manager | One secret, the HenrikDev API key. Terraform creates the secret *container* only. The value is set with the AWS CLI, so it never enters Terraform state or git. |
 | CloudWatch | Log group with 14-day retention. Custom metrics: `SuccessfulRuns`, `MatchesImported`, `FailedPlayers`. |
@@ -437,7 +437,7 @@ infrastructure/
   bootstrap/              one-time: state bucket (local state, run once)
   versions.tf             terraform + provider pins, S3 backend (use_lockfile = true)
   variables.tf  outputs.tf
-  storage.tf              DynamoDB table, site + data buckets
+  storage.tf              DynamoDB table and data bucket (site bucket: frontend.tf)
   secrets.tf
   collector.tf            Lambda, its IAM role/policy, log group
   scheduler.tf            schedule + its IAM role
@@ -465,7 +465,10 @@ Changes from the current tree:
   `~>` constraint and commit `.terraform.lock.hcl`.
 - **Bootstrap once:** `infrastructure/bootstrap/` creates the versioned,
   encrypted state bucket with local state. The main config uses an S3 backend
-  with `use_lockfile = true`, so no DynamoDB lock table is needed.
+  with `use_lockfile = true`, so no DynamoDB lock table is needed. The backend
+  settings live in a gitignored `backend.hcl` written by `make infra-bootstrap`,
+  because the bucket name contains the AWS account ID, which the public
+  repository shouldn't publish.
 - **IAM is defined next to its resource,** with the narrowest scope possible:
   - Collector: `secretsmanager:GetSecretValue` on one secret ARN, DynamoDB
     read/write on one table, and `s3:PutObject` on `data/players/*` of the
@@ -559,13 +562,15 @@ Each milestone is one or more small PRs that pass CI.
    Milestone 4 lets the dev server read from there.
 4. **Frontend:** move to the new contract and dev data, update the components,
    add the states, local art and ASSETS.md, and tests.
-5. **Infrastructure:** bootstrap, storage, secrets, collector, and scheduler
-   (disabled). Apply, set the secret, invoke manually.
+5. **Infrastructure:** bootstrap, storage, secrets, collector, scheduler
+   (disabled), alarms, and the monthly budget (moved here from milestone 7 so
+   it exists before anything can cost money). Apply, set the secret, invoke
+   manually, then enable the schedule. Steps: `infrastructure/README.md`.
 6. **Delivery:** CloudFront, the frontend publish (`aws s3 sync --delete`
    on the site bucket plus an `index.html` invalidation), and the GitHub OIDC
    deploy workflow.
-7. **Operations:** alarms, budget, and the delete-player script. Enable the
-   schedule.
+7. **Operations:** the delete-player script, and any alarm tuning after the
+   first weeks of scheduled runs.
 8. **README:** architecture diagram, screenshot, how to run locally, how to
    deploy, cost, data source, disclaimer. Get the friend's consent, and
    re-check Riot's fan-content policy and HenrikDev's terms, before sharing the
