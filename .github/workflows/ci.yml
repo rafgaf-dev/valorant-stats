@@ -68,3 +68,6 @@ jobs:
       - run: terraform fmt -check -recursive
       - run: terraform init -backend=false -input=false
       - run: terraform validate
+      - name: Validate the state-bucket bootstrap
+        working-directory: infrastructure/bootstrap
+        run: terraform init -backend=false -input=false && terraform validate

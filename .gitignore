@@ -39,8 +39,10 @@ htmlcov/
 # Lambda packaging output
 *.zip
 
-# Terraform (.terraform.lock.hcl is committed)
+# Terraform (.terraform.lock.hcl is committed; backend.hcl names a bucket containing the account ID)
 .terraform/
+infrastructure/backend.hcl
+infrastructure/.build/
 *.tfstate
 *.tfstate.*
 *.tfplan
