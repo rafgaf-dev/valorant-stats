@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import contract from "../../collector/tests/fixtures/summary.expected.json";
 import type { PlayerSummary, Window } from "./api";
-import { formatDelta, formatMetric, formatMonth, getVerdict, isStale, metricDelta } from "./summary";
+import { formatDate, formatDelta, formatMetric, formatMonth, isStale, metricDelta } from "./summary";
 
 const summary = contract as PlayerSummary;
 
@@ -32,6 +32,7 @@ describe("formatting", () => {
 		expect(formatDelta("kd", 0.0704)).toBe("+0.07");
 		expect(formatDelta("winRate", -0.0333)).toBe("−3.3 pts");
 		expect(formatDelta("kd", 0)).toBe("±0.00");
+		expect(formatDelta("kd", null)).toBe("—");
 	});
 
 	it("formats the since-tracking month in UTC", () => {
@@ -39,41 +40,11 @@ describe("formatting", () => {
 		expect(formatMonth("2022-02-01T00:30:00Z")).toBe("Feb 2022");
 	});
 
+	it("formats the footer date", () => {
+		expect(formatDate("2026-10-05T12:00:02Z")).toBe("5 Oct 2026");
+	});
+
 	it("has no delta when either side has no value", () => {
 		expect(metricDelta("headshotRate", window({ headshotRate: null }), summary.windows.recent)).toBeNull();
-	});
-});
-
-describe("getVerdict", () => {
-	const baseline = { ...summary.windows.sinceTracking, kd: 1, winRate: 0.5, headshotRate: 0.3 };
-
-	it("is cooking when at least two metrics improved", () => {
-		const recent = window({ kd: 1.2, winRate: 0.6, headshotRate: 0.2 });
-		expect(getVerdict({ recent, sinceTracking: baseline })?.mood).toBe("cooking");
-	});
-
-	it("is trolling when at least two metrics got worse", () => {
-		const recent = window({ kd: 0.8, winRate: 0.4, headshotRate: 0.35 });
-		expect(getVerdict({ recent, sinceTracking: baseline })?.mood).toBe("trolling");
-	});
-
-	it("is chaos when the metrics disagree", () => {
-		const recent = window({ kd: 1.2, winRate: 0.4, headshotRate: 0.3 });
-		expect(getVerdict({ recent, sinceTracking: baseline })?.mood).toBe("chaos");
-	});
-
-	it("ignores metrics without data", () => {
-		const recent = window({ kd: 1.2, winRate: 0.6, headshotRate: null });
-		expect(getVerdict({ recent, sinceTracking: baseline })?.mood).toBe("cooking");
-	});
-
-	it("gives no verdict without recent matches", () => {
-		const recent = window({ matches: 0, kd: null, winRate: null, headshotRate: null });
-		expect(getVerdict({ recent, sinceTracking: baseline })).toBeNull();
-	});
-
-	it("rules on the contract fixture", () => {
-		// Recent K/D and win rate are up, headshot rate is down: cooking.
-		expect(getVerdict(summary.windows)?.title).toBe("HE'S COOKING");
 	});
 });

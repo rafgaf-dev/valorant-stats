@@ -12,8 +12,9 @@ Desktop.ini
 !.env.example
 *.pem
 
-# Real tracked players (Riot IDs); config/players.example.json is committed
+# Real tracked players (Riot IDs) and their photos; config/players.example.json is committed
 config/players.json
+config/photos/
 
 # Logs
 *.log

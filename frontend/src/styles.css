@@ -1,74 +1,673 @@
-/* Fonts are bundled from @fontsource (see main.tsx); the page makes no third-party requests. */
-:root { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; color: #f1f3f2; background: #101719; font-synthesis: none; }
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #101719; }
-a { color: inherit; }
-:focus-visible { outline: 2px solid #a6f769; outline-offset: 3px; }
-.app-shell { min-height: 100vh; overflow: hidden; background: radial-gradient(circle at 80% 10%, #293b37 0, transparent 34%), linear-gradient(125deg, #101719, #1b2727 54%, #101719); position: relative; }
-.grain { position: absolute; inset: 0; opacity: .1; pointer-events: none; background-image: repeating-linear-gradient(115deg, transparent 0 7px, #b4d2bf 8px, transparent 9px 22px); mask-image: linear-gradient(135deg, transparent, #000 30%, transparent 80%); }
-.dashboard { position: relative; width: min(1180px, calc(100% - 48px)); margin: auto; padding: 52px 0 28px; }
-.eyebrow, .kicker, .section-heading, .metadata, .stat-label, .stat-baseline, .stale-banner, .metric-notes summary, footer { font-family: "Space Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
-.eyebrow { margin: 0; color: #a6f769; font-size: 11px; border-bottom: 1px solid #53665f; padding-bottom: 17px; }
-.stale-banner { margin: 18px 0 0; padding: 12px 16px; border: 1px solid #f6a55f; color: #f6a55f; font-size: 11px; }
-.player-header { display: grid; grid-template-columns: 320px 1fr; min-height: 330px; align-items: end; gap: 58px; padding: 56px 0 42px; }
-.agent-art { align-self: stretch; position: relative; overflow: hidden; border-left: 2px solid #a6f769; background: linear-gradient(155deg, #314b43, #172220); }
-.agent-art img { display: block; width: 100%; height: 100%; min-height: 280px; object-fit: cover; object-position: center top; filter: saturate(.85) contrast(1.1); }
-.agent-art span { position: absolute; bottom: 13px; left: 16px; padding: 3px 8px; background: #101719d9; color: #a6f769; font: 11px "Space Mono", monospace; }
-.player-copy { padding-bottom: 6px; }
-.kicker { color: #f6a55f; font-size: 11px; margin: 0 0 12px; }
-h1 { font-size: clamp(4rem, 10vw, 8.5rem); font-weight: 800; line-height: .8; letter-spacing: -.03em; margin: 0; color: #f5f0df; overflow-wrap: anywhere; }
-.dek { max-width: 410px; margin: 30px 0 25px; color: #b7c0b9; font-size: 20px; line-height: 1.1; }
-.metadata { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0; padding: 0; list-style: none; color: #91a49a; font-size: 10px; }
-.section-heading { display: flex; justify-content: space-between; gap: 10px; margin: 0; border-top: 1px solid #53665f; padding: 15px 0; color: #a6f769; font-size: 10px; font-weight: 400; }
-.verdict { display: flex; justify-content: space-between; gap: 28px; align-items: end; margin: 0 0 18px; padding: 22px 25px; border: 2px solid #f6a55f; background: #f6a55f; color: #101719; transform: rotate(-.5deg); box-shadow: 7px 7px 0 #101719, 8px 8px 0 #f6a55f; }
-.verdict.cooking { border-color: #a6f769; background: #a6f769; box-shadow: 7px 7px 0 #101719, 8px 8px 0 #a6f769; }
-.verdict.trolling { border-color: #ff7a6b; background: #ff7a6b; box-shadow: 7px 7px 0 #101719, 8px 8px 0 #ff7a6b; }
-.verdict-stamp { display: block; margin-bottom: 7px; font: 10px "Space Mono", monospace; letter-spacing: .08em; }
-.verdict strong { display: block; font-size: clamp(2.5rem, 6vw, 5rem); line-height: .8; letter-spacing: -.03em; }
-.verdict p { max-width: 290px; margin: 0; font-size: 20px; font-weight: 600; line-height: 1; }
-.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.stat-card { min-height: 230px; padding: 23px; border: 1px solid #4b5b54; background: #172220cc; transition: transform .2s ease, border-color .2s ease; }
-.stat-card:hover { transform: translateY(-4px); border-color: #a6f769; }
-.stat-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: #b7c0b9; font-size: 10px; }
-.stat-label h3 { margin: 0; font: inherit; }
-.delta { color: #b7c0b9; text-align: right; }
-.delta.up { color: #a6f769; }
-.delta.down { color: #f6a55f; }
-.delta-value { white-space: nowrap; }
-.stat-main { margin: 25px 0 10px; color: #f5f0df; font-size: 72px; font-weight: 700; line-height: .85; }
-.stat-main.empty { font-size: 32px; color: #91a49a; }
-.stat-baseline { display: flex; justify-content: space-between; gap: 12px; margin: 0; color: #73847b; font-size: 10px; }
-.stat-baseline div { display: flex; gap: 8px; }
-.stat-baseline dt { margin: 0; }
-.stat-baseline dd { margin: 0; color: #d3ddd4; }
-.stat-detail { margin: 25px 0 0; color: #a3b3aa; font: 11px "Space Mono", monospace; }
-.metric-notes { border-bottom: 1px solid #53665f; padding: 19px 0; color: #a8b4ac; }
-.metric-notes summary { cursor: pointer; color: #f6a55f; font-size: 11px; }
-.metric-notes ul { margin: 14px 0 0; padding-left: 20px; display: grid; gap: 8px; font-size: 17px; line-height: 1.2; }
-.metric-notes b { color: #f5f0df; font-weight: 600; }
-.state-panel { display: grid; gap: 9px; padding: 100px 0; color: #a8b4ac; }
-.state-panel strong { color: #f5f0df; font-size: 42px; }
-.state-panel span { font: 12px "Space Mono", monospace; }
-.loading { animation: pulse 1.7s ease-in-out infinite; }
-footer { margin-top: 60px; color: #7d8f86; font-size: 9px; line-height: 1.6; }
-footer p { margin: 0 0 8px; max-width: 760px; }
-@keyframes pulse { 50% { opacity: .45; } }
-@media (prefers-reduced-motion: reduce) {
-  .loading { animation: none; }
-  .stat-card { transition: none; }
-  .stat-card:hover { transform: none; }
-  .verdict { transform: none; }
+/*
+ * A slide show in the 2007 office-suite style: the default theme palette, a Calibri-metric
+ * font (Carlito, bundled), and type sized in container units so a slide scales like a slide.
+ * Sizes follow the template defaults on a 720pt-wide slide: 44pt titles, 20pt body, 12pt
+ * footers, i.e. 6.1 / 2.8 / 1.67 percent of the slide's width.
+ */
+:root {
+	--navy: #1f497d;
+	--accent-1: #4f81bd;
+	--accent-2: #c0504d;
+	--accent-3: #9bbb59;
+	--accent-6: #f79646;
+	--light-2: #eeece1;
+	--draw: #a5a5a5;
+	--text: #262626;
+	--muted: #595959;
+	font-family: "Carlito", "Calibri", "Segoe UI", sans-serif;
+	color: var(--text);
+	background: #000;
+	font-synthesis: none;
 }
-@media (max-width: 700px) {
-  .dashboard { width: min(100% - 28px, 560px); padding-top: 28px; }
-  .player-header { grid-template-columns: 1fr; gap: 28px; padding: 35px 0; }
-  .agent-art { height: 250px; min-height: 0; }
-  .agent-art img { min-height: 0; }
-  .stats-grid { grid-template-columns: 1fr; }
-  .stat-card { min-height: 195px; }
-  .stat-main { font-size: 62px; }
-  h1 { font-size: 22vw; }
-  .section-heading span:last-child { text-align: right; }
-  .verdict { display: block; padding: 19px; }
-  .verdict p { margin-top: 18px; }
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	min-width: 320px;
+	background: #000;
+}
+
+a {
+	color: var(--navy);
+}
+
+button {
+	font: inherit;
+}
+
+:focus-visible {
+	outline: 2px dotted currentColor;
+	outline-offset: 3px;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* --- Stage: the black slide-show screen ------------------------------------------------ */
+
+.stage {
+	display: flex;
+	min-height: 100svh;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 16px;
+}
+
+.viewport,
+.message-bar,
+.speaker-notes {
+	width: min(100%, 1100px, calc((100svh - 150px) * 4 / 3));
+}
+
+.viewport {
+	position: relative;
+}
+
+/* --- Slides ------------------------------------------------------------------------------ */
+
+.slide {
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	aspect-ratio: 4 / 3;
+	overflow: hidden;
+	background: #fff;
+	container-type: inline-size;
+}
+
+.slide h2:focus {
+	outline: none; /* focused programmatically on each new slide, never by Tab */
+}
+
+.title-band {
+	margin: 0;
+	padding: 2.4cqi 5cqi 2cqi;
+	border-bottom: 0.7cqi solid var(--accent-6);
+	background: linear-gradient(180deg, #6f9fd9 0%, var(--accent-1) 42%, var(--navy) 100%);
+	color: #fff;
+	font-size: clamp(24px, 5.6cqi, 60px);
+	font-weight: 700;
+	line-height: 1.05;
+}
+
+.word-art {
+	margin: 4cqi 5cqi 3cqi;
+	color: #c55a11;
+	font-size: clamp(30px, 6.6cqi, 72px);
+	font-weight: 700;
+	line-height: 1.05;
+	text-align: center;
+	-webkit-box-reflect: below -0.4cqi linear-gradient(transparent 62%, rgb(255 255 255 / 0.3));
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+	.word-art {
+		background: linear-gradient(180deg, #f79646 0%, #e46c0a 48%, #b65708 52%, #7f3d06 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		-webkit-text-stroke: 0.14cqi #4a2203;
+		filter: drop-shadow(0.35cqi 0.45cqi 0 rgb(0 0 0 / 0.22));
+	}
+}
+
+.slide-body {
+	min-height: 0;
+	padding: 2.4cqi 5cqi 1cqi;
+	font-size: clamp(16px, 2.8cqi, 30px);
+	line-height: 1.25;
+}
+
+.slide-body h3 {
+	margin: 1.6cqi 0 0.6cqi;
+	color: var(--navy);
+	font-size: 1.1em;
+}
+
+.slide-body p {
+	margin: 0 0 1.2cqi;
+}
+
+.slide-subtitle {
+	color: var(--muted);
+}
+
+.slide-note {
+	color: var(--muted);
+	font-size: clamp(13px, 2cqi, 20px);
+}
+
+.slide-footer {
+	display: grid;
+	grid-template-columns: 1fr 2.4fr 1fr;
+	gap: 2cqi;
+	align-items: end;
+	padding: 1.2cqi 5cqi 1.6cqi;
+	color: #7f7f7f;
+	font-size: clamp(10px, 1.67cqi, 16px);
+}
+
+.slide-footer span:nth-child(2) {
+	text-align: center;
+}
+
+.slide-footer span:last-child {
+	text-align: right;
+}
+
+/* --- Slide 1: the question ------------------------------------------------------------- */
+
+.question {
+	display: grid;
+	grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+	gap: 6cqi;
+	align-items: center;
+	height: 100%;
+	padding-bottom: 3cqi;
+}
+
+.picture-frame {
+	margin: 0;
+	justify-self: center;
+	width: min(100%, 29cqi);
+}
+
+.picture-frame img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 5;
+	object-fit: cover;
+	object-position: center top;
+	border: 0.8cqi solid #fff;
+	border-radius: 2.4cqi;
+	background: linear-gradient(160deg, #dbe5f1, #b8cce4);
+	box-shadow: 0 0.6cqi 1.6cqi rgb(0 0 0 / 0.35);
+	-webkit-box-reflect: below 0.6cqi linear-gradient(transparent 72%, rgb(255 255 255 / 0.38));
+}
+
+.picture-placeholder,
+.content-placeholder {
+	display: grid;
+	place-content: center;
+	gap: 1cqi;
+	border: 2px dashed #a6a6a6;
+	color: #7f7f7f;
+	text-align: center;
+}
+
+.picture-placeholder {
+	justify-self: center;
+	width: min(100%, 29cqi);
+	aspect-ratio: 4 / 5;
+}
+
+.answers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3cqi;
+	justify-content: center;
+}
+
+/* Buttons in the glossy two-tone style of the era, with the blue hover glow. */
+.office-button {
+	min-width: 12ch;
+	padding: 0.5em 1.4em;
+	border: 1px solid #707070;
+	border-radius: 4px;
+	background: linear-gradient(180deg, #f6f6f6 0%, #ebebeb 50%, #dcdcdc 51%, #cfcfcf 100%);
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.75);
+	color: var(--text);
+	font-size: clamp(18px, 3.6cqi, 40px);
+	cursor: pointer;
+}
+
+.office-button:hover {
+	border-color: #3c7fb1;
+	background: linear-gradient(180deg, #eaf6fd 0%, #d9f0fc 50%, #bee6fd 51%, #a7d9f5 100%);
+}
+
+.office-button:active {
+	border-color: #2c628b;
+	background: linear-gradient(180deg, #e5f4fc 0%, #c4e5f6 50%, #98d1ef 51%, #68b3db 100%);
+}
+
+.office-button.green {
+	border-color: #5f7a32;
+	background: linear-gradient(180deg, #c8e09f 0%, #aecd74 50%, #8db04a 51%, #9bbb59 100%);
+	color: #fff;
+	font-weight: 700;
+	text-shadow: 0 1px 1px rgb(0 0 0 / 0.45);
+}
+
+.office-button.green:hover {
+	border-color: #4e6629;
+	background: linear-gradient(180deg, #d6eab3 0%, #bcd88a 50%, #9cc157 51%, #a9c96e 100%);
+}
+
+.office-button:disabled {
+	cursor: default;
+}
+
+/* --- The answer: thumbs-up "Newsflash", then a checkerboard ----------------------------- */
+
+.celebration {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-content: center;
+	justify-items: center;
+	background: rgb(255 255 255 / 0.86);
+	container-type: inline-size;
+}
+
+.thumbs-up {
+	width: 38cqi;
+	animation: newsflash 900ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.correct {
+	margin: 1cqi 0 0;
+	color: var(--navy);
+	font-size: clamp(22px, 5cqi, 54px);
+	font-weight: 700;
+	animation: appear 200ms 900ms both;
+}
+
+.celebration.still .thumbs-up,
+.celebration.still .correct {
+	animation: none;
+}
+
+@keyframes newsflash {
+	from {
+		transform: scale(0) rotate(-720deg);
+	}
+	to {
+		transform: scale(1) rotate(0);
+	}
+}
+
+@keyframes appear {
+	from {
+		opacity: 0;
+	}
+}
+
+.checkerboard {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	overflow: hidden;
+	grid-template-columns: repeat(8, 1fr);
+	grid-template-rows: repeat(6, 1fr);
+	pointer-events: none;
+}
+
+.checkerboard span {
+	margin: -1px; /* overlap neighbours so sub-pixel seams don't show */
+	background: #fff;
+	animation: checker 340ms linear both;
+}
+
+@keyframes checker {
+	from {
+		clip-path: inset(0 0 0 0);
+	}
+	to {
+		clip-path: inset(0 0 0 100%);
+	}
+}
+
+/* --- Review table, in the medium banded table style ------------------------------------ */
+
+.table-scroll {
+	overflow-x: auto;
+}
+
+.office-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: clamp(13px, 2.1cqi, 22px);
+	line-height: 1.2;
+}
+
+.office-table th,
+.office-table td {
+	padding: 0.9cqi 1.2cqi;
+	border: 1px solid #fff;
+	text-align: left;
+	vertical-align: top;
+}
+
+.office-table thead th {
+	background: var(--accent-1);
+	color: #fff;
+}
+
+.office-table tbody tr {
+	background: #d0d8e8;
+}
+
+.office-table tbody tr:nth-child(even) {
+	background: #e9edf4;
+}
+
+.office-table td:nth-child(2),
+.office-table td:nth-child(3),
+.office-table td:nth-child(4) {
+	white-space: nowrap;
+}
+
+/* --- Outcomes: the obligatory 3D pie chart --------------------------------------------- */
+
+.outcomes {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 5cqi;
+	align-items: center;
+	height: 100%;
+}
+
+.pie-3d {
+	position: relative;
+	width: min(100%, 50cqi);
+	aspect-ratio: 1 / 0.64;
+	justify-self: center;
+}
+
+.pie-top,
+.pie-side {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 86%;
+	border-radius: 50%;
+}
+
+.pie-side {
+	top: 14%;
+	filter: brightness(0.7);
+}
+
+.pie-top {
+	top: 0;
+	box-shadow: inset 0 0.6cqi 1.4cqi rgb(255 255 255 / 0.35);
+}
+
+.chart-legend {
+	display: grid;
+	gap: 1.2cqi;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.swatch {
+	display: inline-block;
+	width: 0.8em;
+	height: 0.8em;
+	margin-right: 0.3em;
+	vertical-align: -0.05em;
+}
+
+.swatch-win {
+	background: var(--accent-3);
+}
+
+.swatch-loss {
+	background: var(--accent-2);
+}
+
+.swatch-draw {
+	background: var(--draw);
+}
+
+/* --- Takeaways and closing ------------------------------------------------------------- */
+
+.rating {
+	font-size: 1.15em;
+}
+
+.rating-bad {
+	color: var(--accent-2);
+}
+
+.rating-worse {
+	color: #943634;
+}
+
+.office-bullets {
+	margin: 0;
+	padding-left: 1.2em;
+}
+
+.office-bullets li {
+	margin-bottom: 0.6cqi;
+}
+
+.office-bullets li::marker {
+	color: var(--accent-1);
+}
+
+.content-placeholder {
+	height: 100%;
+	padding: 4cqi;
+}
+
+.placeholder-prompt {
+	font-size: 1.6em;
+}
+
+.closing .legal {
+	color: #7f7f7f;
+	font-size: clamp(11px, 1.67cqi, 16px);
+}
+
+/* --- Around the slide: controls, notes, message bar, end screen ------------------------ */
+
+.show-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	color: #bfbfbf;
+	font-size: 15px;
+}
+
+.show-controls button {
+	padding: 6px 14px;
+	border: 1px solid rgb(255 255 255 / 0.28);
+	border-radius: 4px;
+	background: rgb(255 255 255 / 0.1);
+	color: #f2f2f2;
+	cursor: pointer;
+}
+
+.show-controls button:hover {
+	background: rgb(255 255 255 / 0.2);
+}
+
+.speaker-notes {
+	padding: 12px 18px;
+	border-top: 4px solid var(--draw);
+	background: #fff;
+	font-size: 16px;
+	line-height: 1.35;
+}
+
+.speaker-notes ul {
+	margin: 0;
+	padding-left: 1.2em;
+}
+
+.speaker-notes p {
+	margin: 0;
+}
+
+.message-bar {
+	margin: 0;
+	padding: 8px 14px;
+	border: 1px solid #c9b45d;
+	background: #fff8c5;
+	color: var(--text);
+	font-size: 15px;
+}
+
+.message-bar b {
+	margin-right: 0.6em;
+}
+
+/* As in the original: one line of small text at the top of an otherwise black screen. */
+.end-of-show {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding: 10px;
+	border: 0;
+	background: #000;
+	color: #fff;
+	font-size: 15px;
+	cursor: pointer;
+}
+
+/* --- Loading and errors ---------------------------------------------------------------- */
+
+.loading {
+	display: grid;
+	justify-items: center;
+	gap: 10px;
+	color: #f2f2f2;
+	font-size: 17px;
+}
+
+.loading p {
+	margin: 0;
+}
+
+.progress {
+	width: 240px;
+	height: 14px;
+	overflow: hidden;
+	border: 1px solid #8a8a8a;
+	border-radius: 3px;
+	background: #e6e6e6;
+}
+
+.progress span {
+	display: block;
+	width: 30%;
+	height: 100%;
+	background: linear-gradient(180deg, #cff3c4 0%, #5ccf5c 50%, #37a737 51%, #6fd96f 100%);
+	animation: marquee 1.4s linear infinite;
+}
+
+@keyframes marquee {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(340%);
+	}
+}
+
+.dialog {
+	width: min(100%, 460px);
+	border: 1px solid #4a4a4a;
+	border-radius: 6px 6px 0 0;
+	background: #f0f0f0;
+	box-shadow: 0 8px 28px rgb(0 0 0 / 0.6);
+}
+
+.dialog-titlebar {
+	margin: 0;
+	padding: 6px 12px;
+	border-radius: 6px 6px 0 0;
+	background: linear-gradient(180deg, #dfeaf7 0%, #b9d1ea 100%);
+	font-size: 14px;
+}
+
+.dialog-body {
+	padding: 18px 20px 16px;
+	display: grid;
+	gap: 10px;
+}
+
+.dialog-body h1 {
+	margin: 0;
+	color: #003399;
+	font-size: 19px;
+	font-weight: 400;
+}
+
+.dialog-body p {
+	margin: 0;
+}
+
+.dialog-body .office-button {
+	justify-self: end;
+	font-size: 16px;
+}
+
+/* --- Motion and small screens ---------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.progress span {
+		width: 100%;
+		animation: none;
+	}
+}
+
+@media (max-width: 720px) {
+	.stage {
+		justify-content: flex-start;
+	}
+
+	.viewport,
+	.message-bar,
+	.speaker-notes {
+		width: 100%;
+	}
+
+	.slide {
+		aspect-ratio: auto;
+		min-height: calc(100svh - 110px);
+	}
+
+	.question,
+	.outcomes {
+		grid-template-columns: 1fr;
+		gap: 24px;
+	}
+
+	.picture-frame,
+	.picture-placeholder {
+		width: min(70%, 260px);
+	}
+
+	.pie-3d {
+		width: min(100%, 300px);
+	}
+
+	.slide-footer {
+		grid-template-columns: 1fr auto;
+	}
+
+	.slide-footer span:nth-child(2) {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		text-align: left;
+	}
 }
