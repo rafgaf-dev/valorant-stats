@@ -132,16 +132,35 @@ def test_empty_riot_ids_are_not_treated_as_identifiers():
     assert pseudonymizer.find_leaks(document) == []
 
 
-def test_trim_drops_unused_v4_sections_only():
+def test_trim_drops_kills_and_keeps_only_the_tracked_players_starting_weapons():
     responses = make_responses()
-    responses["matches-v4.json"]["data"][0]["rounds"] = [{"stats": []}]
+    responses["matches-v4.json"]["data"][0]["rounds"] = [
+        {
+            "winning_team": "Red",
+            "stats": [
+                {
+                    "player": {"puuid": TRACKED["puuid"], "name": "RealFriend", "team": "Red"},
+                    "economy": {"loadout_value": 3900, "weapon": {"id": "w", "name": "Odin"}},
+                    "damage_events": [{"damage": 140}],
+                },
+                {"player": {"puuid": "p2"}, "economy": {"weapon": None}},
+            ],
+        }
+    ]
 
     trimmed = trim(responses)
 
     match = trimmed["matches-v4.json"]["data"][0]
-    assert sorted(match) == ["metadata", "players"]
+    assert sorted(match) == ["metadata", "players", "rounds"]
+    assert match["rounds"] == [
+        {
+            "stats": [
+                {"player": {"puuid": TRACKED["puuid"]}, "economy": {"weapon": {"name": "Odin"}}},
+            ]
+        }
+    ]
     assert trimmed["stored-matches.json"] == responses["stored-matches.json"]
-    assert "kills" in responses["matches-v4.json"]["data"][0]
+    assert "kills" in responses["matches-v4.json"]["data"][0]  # the input is untouched
 
 
 def test_trim_also_trims_match_details():
@@ -151,4 +170,6 @@ def test_trim_also_trims_match_details():
 
     trimmed = trim(responses)
 
-    assert trimmed["match-details-v4.json"]["data"] == [{"metadata": {}, "players": []}]
+    assert trimmed["match-details-v4.json"]["data"] == [
+        {"metadata": {}, "players": [], "rounds": []}
+    ]

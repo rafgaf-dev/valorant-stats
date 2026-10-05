@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -116,4 +117,24 @@ def test_to_dict_matches_the_published_contract_keys():
         "kd": 12.0,
         "winRate": 1.0,
         "headshotRate": 0.25,
+        "matchesWithDetails": 0,
+        "bottomFrags": 0,
+        "odinOrOperatorMains": 0,
     }
+
+
+def test_details_counts_cover_only_matches_with_details():
+    detailed = [
+        replace(record(0), bottom_fragged=True, main_weapon="Odin"),
+        replace(record(1), bottom_fragged=False, main_weapon="Operator"),
+        replace(record(2), bottom_fragged=True, main_weapon="Vandal"),
+        replace(record(3), bottom_fragged=False, main_weapon=None),
+    ]
+    window = Window.of([*detailed, record(4)])  # the last has no details
+
+    assert (window.matches, window.with_details) == (5, 4)
+    assert window.bottom_frags == 2
+    assert window.heavy_weapon_mains == 2
+    published = window.to_dict()
+    counts = ("matchesWithDetails", "bottomFrags", "odinOrOperatorMains")
+    assert [published[key] for key in counts] == [4, 2, 2]

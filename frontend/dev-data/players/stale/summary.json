@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "player": {
     "id": "stale",
     "displayName": "The Neon Menace",
@@ -22,7 +22,10 @@
       "legshots": 20,
       "kd": 1.482233502538071,
       "winRate": 0.4666666666666667,
-      "headshotRate": 0.318118948824343
+      "headshotRate": 0.318118948824343,
+      "matchesWithDetails": 15,
+      "bottomFrags": 0,
+      "odinOrOperatorMains": 0
     },
     "sinceTracking": {
       "since": "2026-08-02T00:32:50Z",
@@ -38,7 +41,10 @@
       "legshots": 29,
       "kd": 1.411764705882353,
       "winRate": 0.45,
-      "headshotRate": 0.3229946524064171
+      "headshotRate": 0.3229946524064171,
+      "matchesWithDetails": 15,
+      "bottomFrags": 0,
+      "odinOrOperatorMains": 0
     }
   },
   "lastImport": {

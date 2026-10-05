@@ -12,6 +12,7 @@ from typing import Any
 from collector.records import MatchRecord, Result
 
 RECENT_MATCH_COUNT = 15
+HEAVY_WEAPONS = frozenset({"Odin", "Operator"})  # the weapons he gets roasted for
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,10 @@ class Window:
     bodyshots: int
     legshots: int
     since: datetime | None
+    # Counted only over matches with full details (see MatchRecord.has_details).
+    with_details: int = 0
+    bottom_frags: int = 0
+    heavy_weapon_mains: int = 0
 
     @classmethod
     def of(cls, records: Iterable[MatchRecord]) -> "Window":
@@ -43,6 +48,9 @@ class Window:
             bodyshots=sum(record.bodyshots for record in records),
             legshots=sum(record.legshots for record in records),
             since=min((record.played_at for record in records), default=None),
+            with_details=sum(record.has_details for record in records),
+            bottom_frags=sum(record.bottom_fragged is True for record in records),
+            heavy_weapon_mains=sum(record.main_weapon in HEAVY_WEAPONS for record in records),
         )
 
     @property
@@ -76,6 +84,9 @@ class Window:
             "kd": self.kd,
             "winRate": self.win_rate,
             "headshotRate": self.headshot_rate,
+            "matchesWithDetails": self.with_details,
+            "bottomFrags": self.bottom_frags,
+            "odinOrOperatorMains": self.heavy_weapon_mains,
         }
 
 

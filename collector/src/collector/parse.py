@@ -8,6 +8,7 @@ Two shapes are parsed:
   from Valorant's rules; scores those rules can't decide (surrenders) need the v4 details.
 """
 
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -68,7 +69,31 @@ def parse_v4_match(match: dict[str, Any], puuid: str) -> MatchRecord | Skipped:
         bodyshots=_field(stats, "bodyshots", int),
         legshots=_field(stats, "legshots", int),
         source=Source.V4,
+        bottom_fragged=_bottom_fragged(match["players"], player, own_team),
+        main_weapon=_main_weapon(match.get("rounds"), puuid),
     )
+
+
+def _bottom_fragged(players: list[dict[str, Any]], player: dict[str, Any], team: str) -> bool:
+    """Whether his combat score was the lowest on his team (a tie for last counts)."""
+    teammates = [p for p in players if p.get("team_id") == team]
+    lowest = min(_field(_field(p, "stats", dict), "score", int) for p in teammates)
+    return _field(_field(player, "stats", dict), "score", int) == lowest
+
+
+def _main_weapon(rounds: Any, puuid: str) -> str | None:
+    """The weapon he started the most rounds with; ties go to the one he used first."""
+    if not isinstance(rounds, list):
+        return None
+    weapons: Counter[str] = Counter()
+    for round_ in rounds:
+        for entry in round_.get("stats", []):
+            if entry.get("player", {}).get("puuid") != puuid:
+                continue
+            weapon = ((entry.get("economy") or {}).get("weapon") or {}).get("name")
+            if isinstance(weapon, str) and weapon:
+                weapons[weapon] += 1
+    return weapons.most_common(1)[0][0] if weapons else None
 
 
 def parse_stored_match(record: dict[str, Any]) -> MatchRecord | Skipped | NeedsDetails:

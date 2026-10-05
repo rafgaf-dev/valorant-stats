@@ -49,7 +49,7 @@ def test_collects_into_the_local_directory(local_repo, monkeypatch, capsys):
     assert json.loads(summary.read_text())["windows"]["sinceTracking"]["matches"] == 20
     assert (local_repo / "collector" / ".local" / "store.json").exists()
     err = capsys.readouterr().err
-    assert "neon-main: success, 25 imported of 25 found" in err
+    assert "neon-main: success, 25 found, 34 written" in err
     assert "collector/.local/data/players/neon-main/summary.json" in err
 
 
@@ -74,4 +74,4 @@ def test_failed_player_returns_an_error_code(local_repo, monkeypatch, henrikdev,
     henrikdev.errors["account"] = AuthError(403, "Invalid API Key (code 0)")
 
     assert run(monkeypatch, "--player", "neon-main") == 1
-    assert "neon-main: failed, 0 imported of 0 found (api_auth)" in capsys.readouterr().err
+    assert "neon-main: failed, 0 found, 0 written (api_auth)" in capsys.readouterr().err
