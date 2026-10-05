@@ -79,15 +79,50 @@ describe("App", () => {
 
 		const slide = currentSlide();
 		expect(slide).toHaveAccessibleName("Slide 2 of 5: Performance review: The Neon Menace");
-		const rows = within(slide).getAllByRole("row");
-		expect(within(rows[1]).getAllByRole("cell").map((cell) => cell.textContent)).toEqual([
-			"1.48",
-			"1.41",
-			"+0.07",
-			"Up, which management attributes to the enemy team being AFK.",
-		]);
-		expect(within(slide).getByText(/all 20 since Aug 2026/)).toBeInTheDocument();
+		expect(slide).toHaveTextContent("Last 15: 1.48");
+		expect(slide).toHaveTextContent("Since Aug 2026: 1.41");
+		expect(slide).toHaveTextContent("+0.07");
+		expect(slide).toHaveTextContent("Somebody carried him.");
+		expect(slide).toHaveTextContent("Since Aug 2026: 20 games.");
 		expect(within(slide).getByRole("heading", { level: 2 })).toHaveFocus();
+	});
+
+	it("starts the Neon spin only once the reveal has finished", async () => {
+		stubFetch([200, contract]);
+		render(<App />);
+		fireEvent.click((await screen.findAllByRole("button", { name: "No" }))[1]);
+		await act(() => vi.advanceTimersByTimeAsync(CELEBRATE_MS));
+
+		expect(document.querySelector(".viewport")).not.toHaveClass("presenting");
+		await act(() => vi.advanceTimersByTimeAsync(REVEAL_MS));
+		expect(document.querySelector(".viewport")).toHaveClass("presenting");
+	});
+
+	it("tallies bottom frags and Odin or Operator games when the details are known", async () => {
+		const recent = { ...contract.windows.recent, matchesWithDetails: 15, bottomFrags: 6, odinOrOperatorMains: 2 };
+		stubFetch([200, { ...contract, schemaVersion: 2, windows: { ...contract.windows, recent } }]);
+		render(<App />);
+		await answerNo();
+
+		const slide = currentSlide();
+		expect(slide).toHaveTextContent("6 of 15 games bottom-fragged");
+		expect(slide).toHaveTextContent("2 of 15 games with an Odin or Operator as his main gun");
+		expect(slide.querySelectorAll(".cell-loss")).toHaveLength(6);
+		expect(slide.querySelectorAll(".cell-warning")).toHaveLength(2);
+
+		fireEvent.keyDown(window, { key: "ArrowRight" });
+		fireEvent.keyDown(window, { key: "ArrowRight" });
+		expect(currentSlide()).toHaveTextContent("Do better.Lock in.Put the Odin down.");
+	});
+
+	it("leaves the tallies out for summaries without detail counts", async () => {
+		const recent: Record<string, unknown> = { ...contract.windows.recent };
+		for (const key of ["matchesWithDetails", "bottomFrags", "odinOrOperatorMains"]) delete recent[key];
+		stubFetch([200, { ...contract, schemaVersion: 1, windows: { ...contract.windows, recent } }]);
+		render(<App />);
+		await answerNo();
+
+		expect(currentSlide()).not.toHaveTextContent("bottom-fragged");
 	});
 
 	it("skips the animation when reduced motion is requested", async () => {
@@ -109,13 +144,18 @@ describe("App", () => {
 		await answerNo();
 
 		fireEvent.keyDown(window, { key: "ArrowRight" });
-		expect(currentSlide()).toHaveAccessibleName("Slide 3 of 5: Match outcomes, last 15");
-		expect(screen.getByRole("list", { name: "15 matches" })).toHaveTextContent("Wins: 7 Losses: 7 Draws: 1");
+		expect(currentSlide()).toHaveAccessibleName("Slide 3 of 5: Games thrown vs not thrown, last 15");
+		expect(screen.getByRole("list", { name: "15 games" })).toHaveTextContent("Not thrown: 7 Thrown: 8");
+		expect(currentSlide()).toHaveTextContent("Draws count as thrown.");
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		const takeaways = currentSlide();
 		expect(takeaways).toHaveAccessibleName("Slide 4 of 5: Key takeaways");
-		expect(takeaways).toHaveTextContent("Overall rating: Needs improvement");
+		expect(within(takeaways).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+			"Do better.",
+			"Lock in.",
+			"Touch grass.",
+		]);
 
 		fireEvent.keyDown(window, { key: "End" });
 		const closing = currentSlide();
@@ -125,8 +165,7 @@ describe("App", () => {
 			"https://docs.henrikdev.xyz",
 		);
 
-		fireEvent.click(screen.getByRole("button", { name: "Speaker notes" }));
-		expect(screen.getByRole("complementary", { name: "Speaker notes" })).toHaveTextContent("Do not take questions.");
+		expect(screen.queryByRole("button", { name: /speaker notes/i })).not.toBeInTheDocument();
 
 		fireEvent.click(screen.getByRole("button", { name: "End show" }));
 		fireEvent.click(screen.getByRole("button", { name: "End of slide show, click to exit." }));
@@ -134,18 +173,6 @@ describe("App", () => {
 
 		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		expect(screen.getAllByRole("button", { name: "No" })).toHaveLength(2);
-	});
-
-	it("explains the calculations in the review's speaker notes", async () => {
-		stubFetch([200, contract]);
-		render(<App />);
-		await answerNo();
-
-		fireEvent.click(screen.getByRole("button", { name: "Speaker notes" }));
-
-		expect(screen.getByRole("complementary", { name: "Speaker notes" })).toHaveTextContent(
-			"Zero deaths count as one",
-		);
 	});
 
 	it("shows a warning bar when the data is over a day old", async () => {

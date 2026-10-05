@@ -65,8 +65,7 @@ button {
 }
 
 .viewport,
-.message-bar,
-.speaker-notes {
+.message-bar {
 	width: min(100%, 1100px, calc((100svh - 150px) * 4 / 3));
 }
 
@@ -138,9 +137,6 @@ button {
 	margin: 0 0 1.2cqi;
 }
 
-.slide-subtitle {
-	color: var(--muted);
-}
 
 .slide-note {
 	color: var(--muted);
@@ -328,47 +324,207 @@ button {
 	}
 }
 
-/* --- Review table, in the medium banded table style ------------------------------------ */
+/* --- Slide 2: the performance review ---------------------------------------------------- */
 
-.table-scroll {
-	overflow-x: auto;
+.review {
+	display: grid;
+	grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+	gap: 3cqi;
+	align-items: center;
+	height: 100%;
 }
 
-.office-table {
+/* Neon, tilted off-kilter; she spins into place once the slide is on screen. */
+.neon-spin {
+	position: relative;
+	margin: 0;
+	align-self: stretch;
+	display: grid;
+	align-content: center;
+}
+
+.neon-spin img {
+	display: block;
 	width: 100%;
-	border-collapse: collapse;
-	font-size: clamp(13px, 2.1cqi, 22px);
+	height: auto;
+	transform: rotate(-24deg);
+	filter: drop-shadow(0.6cqi 0.8cqi 0.6cqi rgb(0 0 0 / 0.3));
+}
+
+.viewport.presenting .neon-spin img {
+	animation: neon-spin 1100ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+@keyframes neon-spin {
+	from {
+		transform: rotate(-744deg) scale(0.2);
+	}
+	to {
+		transform: rotate(-24deg) scale(1);
+	}
+}
+
+/* A speech-bubble callout, the era's favourite shape. */
+.callout {
+	position: relative;
+	margin: -4cqi 0 0 6cqi;
+	padding: 1.2cqi 1.6cqi;
+	border: 2px solid var(--navy);
+	border-radius: 1.4cqi;
+	background: #fff;
+	color: var(--navy);
+	font-size: clamp(13px, 2cqi, 20px);
+	font-weight: 700;
 	line-height: 1.2;
+	box-shadow: 0.4cqi 0.4cqi 0 rgb(31 73 125 / 0.25);
 }
 
-.office-table th,
-.office-table td {
-	padding: 0.9cqi 1.2cqi;
-	border: 1px solid #fff;
-	text-align: left;
-	vertical-align: top;
+.callout::before {
+	content: "";
+	position: absolute;
+	top: -2.2cqi;
+	left: 3cqi;
+	border: 1.1cqi solid transparent;
+	border-bottom: 1.1cqi solid var(--navy);
 }
 
-.office-table thead th {
+.review-charts {
+	display: grid;
+	gap: 2cqi;
+}
+
+/* Clustered bar chart: last 15 against the long-term value for each metric. */
+.bars {
+	display: grid;
+	gap: 1.4cqi;
+	font-size: clamp(13px, 2cqi, 20px);
+}
+
+.bars-legend {
+	display: flex;
+	gap: 2.4cqi;
+	margin: 0;
+	color: var(--muted);
+}
+
+.key::before {
+	content: "";
+	display: inline-block;
+	width: 0.8em;
+	height: 0.8em;
+	margin-right: 0.35em;
+	vertical-align: -0.05em;
+}
+
+.key-recent::before {
 	background: var(--accent-1);
-	color: #fff;
 }
 
-.office-table tbody tr {
-	background: #d0d8e8;
+.key-baseline::before {
+	background: var(--draw);
 }
 
-.office-table tbody tr:nth-child(even) {
-	background: #e9edf4;
+.bar-row {
+	display: grid;
+	grid-template-columns: 9em minmax(0, 1fr) 5.5em;
+	gap: 1.4cqi;
+	align-items: center;
 }
 
-.office-table td:nth-child(2),
-.office-table td:nth-child(3),
-.office-table td:nth-child(4) {
+.bar-label {
+	font-weight: 700;
+}
+
+.bar-pair {
+	display: grid;
+	gap: 0.4cqi;
+	padding-left: 0.2cqi;
+	border-left: 1px solid #bfbfbf;
+}
+
+.bar {
+	display: flex;
+	align-items: center;
+	gap: 0.8cqi;
+	height: 1.5em;
+}
+
+.bar-fill {
+	height: 100%;
+	min-width: 2px;
+	border-radius: 0 2px 2px 0;
+}
+
+.bar-recent .bar-fill {
+	background: linear-gradient(180deg, #8eb4e3 0%, var(--accent-1) 45%, #3a6aa5 100%);
+}
+
+.bar-baseline .bar-fill {
+	background: linear-gradient(180deg, #d0d0d0 0%, var(--draw) 45%, #8c8c8c 100%);
+}
+
+.bar-value {
 	white-space: nowrap;
 }
 
-/* --- Outcomes: the obligatory 3D pie chart --------------------------------------------- */
+.bar-delta {
+	color: var(--muted);
+	white-space: nowrap;
+}
+
+.bar-delta.up {
+	color: #4f6228;
+}
+
+.bar-delta.down {
+	color: var(--accent-2);
+}
+
+/* One square per game: the tallies of shame. */
+.tallies {
+	display: grid;
+	gap: 1.2cqi;
+	font-size: clamp(13px, 2cqi, 20px);
+}
+
+.tally-label {
+	margin: 0 0 0.5cqi;
+}
+
+.tally-label strong {
+	font-size: 1.3em;
+}
+
+.tally-cells {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5cqi;
+}
+
+.cell {
+	width: 2.2cqi;
+	min-width: 12px;
+	aspect-ratio: 1;
+	border: 1px solid #bfbfbf;
+	background: #f2f2f2;
+}
+
+.cell-loss {
+	border-color: #943634;
+	background: var(--accent-2);
+}
+
+.cell-warning {
+	border-color: #b65708;
+	background: var(--accent-6);
+}
+
+.cell-unknown {
+	border-style: dashed;
+	background: transparent;
+}
+
+/* --- Slide 3: thrown vs not thrown, on a properly solid 3D disc ------------------------ */
 
 .outcomes {
 	display: grid;
@@ -381,26 +537,22 @@ button {
 .pie-3d {
 	position: relative;
 	width: min(100%, 50cqi);
-	aspect-ratio: 1 / 0.64;
+	aspect-ratio: 1 / 0.66;
 	justify-self: center;
 }
 
-.pie-top,
-.pie-side {
+/* Stacked copies of the disc, each a little lower and darker, form its edge. */
+.pie-layer {
 	position: absolute;
 	left: 0;
 	width: 100%;
-	height: 86%;
+	height: 84%;
 	border-radius: 50%;
-}
-
-.pie-side {
-	top: 14%;
-	filter: brightness(0.7);
+	filter: brightness(0.68);
 }
 
 .pie-top {
-	top: 0;
+	filter: none;
 	box-shadow: inset 0 0.6cqi 1.4cqi rgb(255 255 255 / 0.35);
 }
 
@@ -410,6 +562,12 @@ button {
 	margin: 0;
 	padding: 0;
 	list-style: none;
+}
+
+.chart-note {
+	margin: 1.6cqi 0 0;
+	color: var(--muted);
+	font-size: clamp(12px, 1.8cqi, 18px);
 }
 
 .swatch {
@@ -428,35 +586,20 @@ button {
 	background: var(--accent-2);
 }
 
-.swatch-draw {
-	background: var(--draw);
-}
-
 /* --- Takeaways and closing ------------------------------------------------------------- */
 
-.rating {
-	font-size: 1.15em;
+.takeaways {
+	display: grid;
+	gap: 2.4cqi;
+	margin: 2cqi 0 0;
+	padding-left: 1.1em;
+	font-size: clamp(26px, 6.1cqi, 64px);
+	font-weight: 700;
+	line-height: 1.05;
 }
 
-.rating-bad {
-	color: var(--accent-2);
-}
-
-.rating-worse {
-	color: #943634;
-}
-
-.office-bullets {
-	margin: 0;
-	padding-left: 1.2em;
-}
-
-.office-bullets li {
-	margin-bottom: 0.6cqi;
-}
-
-.office-bullets li::marker {
-	color: var(--accent-1);
+.takeaways li::marker {
+	color: var(--accent-6);
 }
 
 .content-placeholder {
@@ -496,23 +639,6 @@ button {
 
 .show-controls button:hover {
 	background: rgb(255 255 255 / 0.2);
-}
-
-.speaker-notes {
-	padding: 12px 18px;
-	border-top: 4px solid var(--draw);
-	background: #fff;
-	font-size: 16px;
-	line-height: 1.35;
-}
-
-.speaker-notes ul {
-	margin: 0;
-	padding-left: 1.2em;
-}
-
-.speaker-notes p {
-	margin: 0;
 }
 
 .message-bar {
@@ -628,6 +754,10 @@ button {
 		width: 100%;
 		animation: none;
 	}
+
+	.viewport.presenting .neon-spin img {
+		animation: none;
+	}
 }
 
 @media (max-width: 720px) {
@@ -636,8 +766,7 @@ button {
 	}
 
 	.viewport,
-	.message-bar,
-	.speaker-notes {
+	.message-bar {
 		width: 100%;
 	}
 
@@ -647,9 +776,24 @@ button {
 	}
 
 	.question,
-	.outcomes {
+	.outcomes,
+	.review {
 		grid-template-columns: 1fr;
 		gap: 24px;
+	}
+
+	.neon-spin {
+		width: min(55%, 220px);
+		justify-self: center;
+	}
+
+	.outcomes {
+		height: auto;
+		align-content: start;
+	}
+
+	.bar-row {
+		grid-template-columns: 6.5em minmax(0, 1fr) 4.8em;
 	}
 
 	.picture-frame,

@@ -19,7 +19,6 @@ export function Deck({ summary }: { summary: PlayerSummary }) {
 	const reducedMotion = usePrefersReducedMotion();
 	const [phase, setPhase] = useState<Phase>("asking");
 	const [index, setIndex] = useState(0);
-	const [notesOpen, setNotesOpen] = useState(false);
 	const viewport = useRef<HTMLDivElement>(null);
 	const date = formatDate(summary.generatedAt);
 	const { player } = summary;
@@ -89,7 +88,8 @@ export function Deck({ summary }: { summary: PlayerSummary }) {
 
 	return (
 		<>
-			<div className="viewport" ref={viewport}>
+			{/* "presenting" starts slide animations (the Neon spin) once the reveal has finished. */}
+			<div className={phase === "presenting" ? "viewport presenting" : "viewport"} ref={viewport}>
 				{current === null ? (
 					<Slide number={1} total={total} title={`Do you think ${player.displayName} played well recently?`} date={date} layout="title" wordArt>
 						<div className="question">
@@ -105,7 +105,14 @@ export function Deck({ summary }: { summary: PlayerSummary }) {
 						</div>
 					</Slide>
 				) : (
-					<Slide number={index + 1} total={total} title={current.title} date={date} wordArt={current.wordArt}>
+					<Slide
+						key={index} // a fresh element per slide, so its animations replay on every visit
+						number={index + 1}
+						total={total}
+						title={current.title}
+						date={date}
+						wordArt={current.wordArt}
+					>
 						{current.body}
 					</Slide>
 				)}
@@ -138,15 +145,7 @@ export function Deck({ summary }: { summary: PlayerSummary }) {
 					<button type="button" onClick={() => goTo(index + 1)}>
 						{index + 1 === total ? "End show" : "Next"}
 					</button>
-					<button type="button" aria-expanded={notesOpen} onClick={() => setNotesOpen(!notesOpen)}>
-						{notesOpen ? "Hide speaker notes" : "Speaker notes"}
-					</button>
 				</nav>
-			)}
-			{phase === "presenting" && current && notesOpen && (
-				<aside className="speaker-notes" aria-label="Speaker notes">
-					{current.notes}
-				</aside>
 			)}
 		</>
 	);
