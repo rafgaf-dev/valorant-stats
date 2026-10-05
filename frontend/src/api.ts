@@ -1,6 +1,7 @@
 // The published summary contract (plan section 6). The collector writes it; the contract
 // fixture in collector/tests/fixtures/summary.expected.json is tested on both sides.
-export const SCHEMA_VERSION = 1;
+// Version 2 added the detail counts; version 1 summaries still render, without them.
+export const SUPPORTED_SCHEMA_VERSIONS = [1, 2] as const;
 
 export type Window = {
 	matches: number;
@@ -16,12 +17,16 @@ export type Window = {
 	kd: number | null;
 	winRate: number | null;
 	headshotRate: number | null;
+	// Schema 2: counted over matches with full details only (normally all of the recent ones).
+	matchesWithDetails?: number;
+	bottomFrags?: number;
+	odinOrOperatorMains?: number;
 };
 
 export type SinceTrackingWindow = Window & { since: string | null };
 
 export type PlayerSummary = {
-	schemaVersion: typeof SCHEMA_VERSION;
+	schemaVersion: (typeof SUPPORTED_SCHEMA_VERSIONS)[number];
 	player: { id: string; displayName: string; agent: string; region: string };
 	queue: string;
 	generatedAt: string;
@@ -66,7 +71,10 @@ export async function getPlayerSummary(playerId: string, signal?: AbortSignal): 
 	} catch {
 		throw new SummaryError("unavailable", "The stats file is damaged.");
 	}
-	if (!isRecord(body) || body.schemaVersion !== SCHEMA_VERSION || !isRecord(body.windows)) {
+	const supported = (SUPPORTED_SCHEMA_VERSIONS as readonly unknown[]).includes(
+		isRecord(body) ? body.schemaVersion : undefined,
+	);
+	if (!isRecord(body) || !supported || !isRecord(body.windows)) {
 		throw new SummaryError("unsupported", "This page is out of date. Reload to get the latest version.");
 	}
 	return body as PlayerSummary;
