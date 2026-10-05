@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 
-from collector.telemetry import JsonFormatter, emit_metrics
+from collector.telemetry import JsonFormatter, configure_logging, emit_metrics
 
 
 def test_json_formatter_includes_extra_fields_and_exceptions():
@@ -40,3 +40,16 @@ def test_emit_metrics_writes_an_embedded_metric_format_document():
         1,
         3,
     )
+
+
+def test_configure_logging_quiets_aws_sdk_internals(monkeypatch):
+    root = logging.getLogger()
+    monkeypatch.setattr(root, "handlers", list(root.handlers))
+    monkeypatch.setattr(root, "level", root.level)
+    for name in ("boto3", "botocore", "urllib3"):
+        monkeypatch.setattr(logging.getLogger(name), "level", logging.NOTSET)
+
+    configure_logging()
+
+    assert logging.getLogger("botocore.credentials").getEffectiveLevel() == logging.WARNING
+    assert logging.getLogger("collector.collect").getEffectiveLevel() == logging.INFO
