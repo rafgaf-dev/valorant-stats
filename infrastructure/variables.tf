@@ -38,8 +38,18 @@ variable "schedule_enabled" {
   default     = false
 }
 
-variable "github_repository" {
-  description = "owner/name of the GitHub repository whose production environment may deploy."
+variable "github_oidc_subject_prefix" {
+  description = <<-EOT
+    Prefix of the OIDC `sub` claim for this repository, in GitHub's immutable-subject format:
+    repo:<owner>@<owner id>/<repo>@<repo id>. The numeric IDs (public, not secrets) mean a
+    deleted and recreated repository with the same name can't assume the deploy role. Find
+    it with: gh api repos/<owner>/<repo>/actions/oidc/customization/sub
+  EOT
   type        = string
-  default     = "rafgaf-dev/valorant-stats"
+  default     = "repo:rafgaf-dev@329276944/valorant-stats@1370670436"
+
+  validation {
+    condition     = can(regex("^repo:[^/@]+@[0-9]+/[^/@]+@[0-9]+$", var.github_oidc_subject_prefix))
+    error_message = "Use the immutable format repo:<owner>@<owner id>/<repo>@<repo id>."
+  }
 }
