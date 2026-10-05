@@ -10,7 +10,7 @@ from collector.metrics import calculate_windows
 from collector.parse import COMPETITIVE
 from collector.records import ImportRun, MatchRecord
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2: matchesWithDetails, bottomFrags, odinOrOperatorMains
 
 
 def build_summary(

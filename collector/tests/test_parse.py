@@ -55,7 +55,10 @@ def test_v4_and_stored_records_agree_for_the_same_matches(v4_matches, stored_rec
         from_v4 = parse_v4_match(match, TRACKED_PUUID)
         from_stored = parse_stored_match(stored_by_id[match["metadata"]["match_id"]])
         assert isinstance(from_stored, MatchRecord)
-        assert replace(from_stored, source=Source.V4) == from_v4
+        assert not from_stored.has_details
+        # Everything stored records carry agrees; only v4 adds the details.
+        details = {"bottom_fragged": from_v4.bottom_fragged, "main_weapon": from_v4.main_weapon}
+        assert replace(from_stored, source=Source.V4, **details) == from_v4
 
 
 @pytest.fixture
@@ -160,7 +163,7 @@ def test_stored_fixture_records_split_into_decided_and_surrender(stored_records)
 def test_surrender_is_decided_by_its_match_details(stored_records, match_details):
     surrender = next(r for r in stored_records if r["meta"]["started_at"] == SURRENDER_STARTED_AT)
     needs_details = parse_stored_match(surrender)
-    (details,) = match_details
+    details = next(m for m in match_details if m["metadata"]["match_id"] == needs_details.match_id)
 
     record = parse_v4_match(details, TRACKED_PUUID)
 
@@ -250,3 +253,89 @@ def test_stored_unknown_team_is_an_error():
 )
 def test_result_from_score(own, opponent, expected):
     assert result_from_score(own, opponent) is expected
+
+
+# --- details: bottom frags and main weapons -----------------------------------------------
+
+
+def test_v4_fixture_details(v4_matches):
+    records = [parse_v4_match(match, TRACKED_PUUID) for match in v4_matches]
+
+    # The captured account never finished last and always played the Vandal.
+    assert all(record.has_details for record in records)
+    assert {record.bottom_fragged for record in records} == {False}
+    assert {record.main_weapon for record in records} == {"Vandal"}
+
+
+def set_scores(match, own_score, teammate_scores):
+    me = next(p for p in match["players"] if p["puuid"] == TRACKED_PUUID)
+    me["stats"]["score"] = own_score
+    teammates = [p for p in match["players"] if p["team_id"] == me["team_id"] and p is not me]
+    for teammate, score in zip(teammates, teammate_scores, strict=True):
+        teammate["stats"]["score"] = score
+    for opponent in (p for p in match["players"] if p["team_id"] != me["team_id"]):
+        opponent["stats"]["score"] = 1  # the other team's scores don't matter
+
+
+@pytest.mark.parametrize(
+    ("own", "teammates", "expected"),
+    [
+        (1000, [2000, 3000, 4000, 5000], True),
+        (1000, [1000, 3000, 4000, 5000], True),  # tied for last still counts
+        (2000, [1000, 3000, 4000, 5000], False),
+    ],
+)
+def test_bottom_frag_is_the_lowest_score_on_his_team(v4_match, own, teammates, expected):
+    set_scores(v4_match, own, teammates)
+
+    assert parse_v4_match(v4_match, TRACKED_PUUID).bottom_fragged is expected
+
+
+def rounds_with(weapons):
+    return [
+        {"stats": [{"player": {"puuid": TRACKED_PUUID}, "economy": {"weapon": {"name": w}}}]}
+        for w in weapons
+    ]
+
+
+@pytest.mark.parametrize(
+    ("weapons", "expected"),
+    [
+        (["Odin", "Odin", "Vandal", None, None, None], "Odin"),
+        (["Operator", "Vandal", "Vandal", "Operator"], "Operator"),  # a tie goes to the first
+        ([None, None], None),
+        ([], None),
+    ],
+)
+def test_main_weapon_is_the_one_he_started_most_rounds_with(v4_match, weapons, expected):
+    v4_match["rounds"] = rounds_with(weapons)
+
+    assert parse_v4_match(v4_match, TRACKED_PUUID).main_weapon == expected
+
+
+def test_main_weapon_ignores_other_players_rounds(v4_match):
+    v4_match["rounds"] = [
+        {
+            "stats": [
+                {"player": {"puuid": "someone-else"}, "economy": {"weapon": {"name": "Odin"}}},
+                {"player": {"puuid": TRACKED_PUUID}, "economy": {"weapon": {"name": "Spectre"}}},
+            ]
+        }
+    ]
+
+    assert parse_v4_match(v4_match, TRACKED_PUUID).main_weapon == "Spectre"
+
+
+def test_main_weapon_is_unknown_without_rounds(v4_match):
+    del v4_match["rounds"]
+
+    record = parse_v4_match(v4_match, TRACKED_PUUID)
+
+    assert record.main_weapon is None
+    assert record.has_details  # the bottom-frag check only needs the scoreboard
+
+
+def test_stored_records_have_no_details():
+    record = parse_stored_match(stored_record(red=7, blue=13))
+
+    assert (record.bottom_fragged, record.main_weapon, record.has_details) == (None, None, False)

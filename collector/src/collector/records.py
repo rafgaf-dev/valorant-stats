@@ -29,6 +29,13 @@ class MatchRecord:
     bodyshots: int
     legshots: int
     source: Source
+    # Only known from full match details (v4); None for lightweight stored records.
+    bottom_fragged: bool | None = None  # lowest combat score on his team
+    main_weapon: str | None = None  # the weapon he started the most rounds with
+
+    @property
+    def has_details(self) -> bool:
+        return self.bottom_fragged is not None
 
 
 class RunStatus(StrEnum):

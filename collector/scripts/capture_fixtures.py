@@ -30,6 +30,7 @@ from urllib.parse import quote, urlencode
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "collector" / "src"))  # reuse the collector's parsing rules
 
+from collector.metrics import RECENT_MATCH_COUNT  # noqa: E402
 from collector.parse import NeedsDetails, parse_stored_match  # noqa: E402
 
 FIXTURES_DIR = REPO_ROOT / "collector" / "tests" / "fixtures" / "henrikdev"
@@ -46,7 +47,7 @@ AUTH_HINTS = {
 }
 
 V4_DOCUMENTS = ("matches-v4.json", "match-details-v4.json")
-V4_UNUSED_SECTIONS = ("rounds", "kills")
+V4_UNUSED_SECTIONS = ("kills",)
 
 TRACKED_RIOT_ID = {"name": "Example", "tag": "EUW"}
 OTHER_RIOT_ID = {"name": "Player", "tag": "0000"}
@@ -288,24 +289,37 @@ def fetch(
             {"mode": "competitive", "size": stored_count},
         ),
     )
-    undecided = [
+    # The same details the collector fetches: records the score can't decide (surrenders) and
+    # the recent window's matches that the recent v4 response doesn't already cover.
+    have_v4 = {m["metadata"]["match_id"] for m in responses["matches-v4.json"].get("data", [])}
+    records = stored.get("data", [])
+    newest = sorted(records, key=lambda record: record["meta"]["started_at"], reverse=True)
+    wanted = [
         record["meta"]["id"]
-        for record in stored.get("data", [])
+        for record in records
         if isinstance(parse_stored_match(record), NeedsDetails)
     ]
+    wanted += [
+        record["meta"]["id"]
+        for record in newest[:RECENT_MATCH_COUNT]
+        if record["meta"]["id"] not in have_v4 and record["meta"]["id"] not in wanted
+    ]
 
-    def match_details() -> dict[str, Any]:
-        details = [
-            api_get(api_key, f"/valorant/v4/match/{AFFINITY}/{quote(match_id, safe='')}")["data"]
-            for match_id in undecided
-        ]
-        return {"status": 200, "data": details}
-
-    step(
-        "match-details-v4.json",
-        f"4. match details for {len(undecided)} record(s) the score can't decide (v4)",
-        match_details,
-    )
+    # Fetched per match, so a re-run only requests the ones not already cached.
+    cached = {
+        m["metadata"]["match_id"]: m
+        for m in responses.get("match-details-v4.json", {}).get("data", [])
+    }
+    missing = [match_id for match_id in wanted if match_id not in cached]
+    print(f"4. match details (v4): {len(wanted)} wanted, {len(missing)} to fetch")
+    for match_id in missing:
+        cached[match_id] = api_get(
+            api_key, f"/valorant/v4/match/{AFFINITY}/{quote(match_id, safe='')}"
+        )["data"]
+    responses["match-details-v4.json"] = {
+        "status": 200,
+        "data": [cached[match_id] for match_id in wanted if match_id in cached],
+    }
     return responses
 
 
@@ -325,16 +339,43 @@ def describe(responses: dict[str, Any], puuid: str) -> None:
 
 
 def trim(responses: dict[str, Any]) -> dict[str, Any]:
-    """Drops v4 match sections the collector doesn't read; they are ~95% of the payload."""
+    """Drops the v4 match data the collector doesn't read; it is ~95% of the payload.
+
+    Kills go entirely. Rounds keep only what parse.py reads: the tracked player's weapon at
+    the start of each round.
+    """
+    puuid = responses["account.json"]["data"]["puuid"]
     trimmed = dict(responses)
     for name in V4_DOCUMENTS:
         if name in responses:
-            matches = [
-                {key: value for key, value in match.items() if key not in V4_UNUSED_SECTIONS}
-                for match in responses[name].get("data", [])
-            ]
+            matches = [_trim_match(match, puuid) for match in responses[name].get("data", [])]
             trimmed[name] = {**responses[name], "data": matches}
     return trimmed
+
+
+def _trim_match(match: dict[str, Any], puuid: str) -> dict[str, Any]:
+    kept = {key: value for key, value in match.items() if key not in V4_UNUSED_SECTIONS}
+    if "rounds" in match:
+        kept["rounds"] = [
+            {
+                "stats": [
+                    {
+                        "player": {"puuid": entry.get("player", {}).get("puuid")},
+                        "economy": {
+                            "weapon": {
+                                "name": ((entry.get("economy") or {}).get("weapon") or {}).get(
+                                    "name"
+                                )
+                            }
+                        },
+                    }
+                    for entry in round_.get("stats", [])
+                    if entry.get("player", {}).get("puuid") == puuid
+                ]
+            }
+            for round_ in match["rounds"]
+        ]
+    return kept
 
 
 def pseudonymize(responses: dict[str, Any], player: dict) -> tuple[dict[str, Any], list[str]]:

@@ -12,6 +12,7 @@ import pytest
 from moto import mock_aws
 
 from collector.config import PlayerConfig
+from collector.henrikdev import NotFoundError
 
 FIXTURES = Path(__file__).parent / "fixtures"
 HENRIKDEV = FIXTURES / "henrikdev"
@@ -51,7 +52,8 @@ class FakeHenrikDev:
         self.recent = _load("matches-v4.json")["data"]
         self.stored = _load("stored-matches.json")["data"]
         details = _load("match-details-v4.json")["data"]
-        self.details = {match["metadata"]["match_id"]: match for match in details}
+        # Full details exist for every match HenrikDev has; here, the captured v4 matches.
+        self.details = {m["metadata"]["match_id"]: m for m in [*self.recent, *details]}
         self.calls: Counter[str] = Counter()
         self.errors: dict[str, Exception] = {}
 
@@ -74,6 +76,8 @@ class FakeHenrikDev:
 
     def match_details(self, match_id: str) -> dict[str, Any]:
         self._call("match_details")
+        if match_id not in self.details:
+            raise NotFoundError(404, "Match not found (code 26)")
         return copy.deepcopy(self.details[match_id])
 
 

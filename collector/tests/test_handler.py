@@ -63,7 +63,7 @@ def test_handler_collects_publishes_and_reports(lambda_env, aws, capsys):
     metrics = next(line for line in lines if "_aws" in line)
     assert (metrics["SuccessfulRuns"], metrics["MatchesImported"], metrics["FailedPlayers"]) == (
         1,
-        25,
+        34,
         0,
     )
     events = [line.get("event") for line in lines]

@@ -14,6 +14,7 @@ from collector.store import DynamoMatchStore, JsonFileMatchStore
 EXPECTED_SUMMARY = Path(__file__).parent / "fixtures" / "summary.expected.json"
 STORED_RECORDS = 20  # in stored-matches.json; none is a remake
 RECENT_V4 = 5  # in matches-v4.json; all also in the stored records
+ENRICHED = 9  # the other recent-window matches, which get full details fetched
 
 
 @pytest.fixture(params=["json-file", "dynamodb"])
@@ -39,16 +40,19 @@ def test_first_run_backfills_history_and_publishes_the_contract_summary(
 
     assert run.status is RunStatus.SUCCESS
     assert run.matches_found == STORED_RECORDS + RECENT_V4
-    assert run.matches_imported == STORED_RECORDS + RECENT_V4  # v4 replaces 5 stored records
+    # Every write counts: 20 stored records, then 5 recent and 9 enriched upgrades to v4.
+    assert run.matches_imported == STORED_RECORDS + RECENT_V4 + ENRICHED
     assert henrikdev.calls == {
         "account": 1,
         "stored_matches": 1,
-        "match_details": 1,  # the 3-10 surrender
+        "match_details": 1 + ENRICHED,  # the 3-10 surrender, then the recent window
         "recent_matches": 1,
     }
     records = store.list_matches("neon-main")
     assert len(records) == STORED_RECORDS
-    assert sum(record.source is Source.V4 for record in records) == RECENT_V4 + 1
+    newest = sorted(records, key=lambda record: record.played_at, reverse=True)
+    assert all(record.has_details for record in newest[:15])
+    assert sum(record.source is Source.V4 for record in records) == RECENT_V4 + 1 + ENRICHED
     expected = json.loads(EXPECTED_SUMMARY.read_text(encoding="utf-8"))
     assert published(publisher) == expected
 
@@ -65,6 +69,33 @@ def test_contract_summary_totals_match_the_raw_fixtures(stored_records):
     assert window["draws"] == 1
     assert window["since"] == min(r["meta"]["started_at"] for r in stored_records)[:19] + "Z"
     assert summary["windows"]["recent"]["matches"] == 15
+
+
+def test_contract_detail_counts_match_the_raw_match_details(
+    stored_records, v4_matches, match_details
+):
+    """Independent check of the recent window's detail counts, straight from the raw JSON."""
+    details = {m["metadata"]["match_id"]: m for m in [*v4_matches, *match_details]}
+    newest = sorted(stored_records, key=lambda r: r["meta"]["started_at"], reverse=True)[:15]
+    bottom_frags = heavy_mains = 0
+    for record in newest:
+        match = details[record["meta"]["id"]]
+        me = next(p for p in match["players"] if p["puuid"] == "puuid-tracked")
+        team = [p["stats"]["score"] for p in match["players"] if p["team_id"] == me["team_id"]]
+        bottom_frags += me["stats"]["score"] == min(team)
+        weapons = [
+            entry["economy"]["weapon"]["name"]
+            for round_ in match.get("rounds", [])
+            for entry in round_["stats"]
+            if entry["player"]["puuid"] == "puuid-tracked" and entry["economy"]["weapon"]["name"]
+        ]
+        main = max(weapons, key=weapons.count) if weapons else None
+        heavy_mains += main in ("Odin", "Operator")
+
+    recent = json.loads(EXPECTED_SUMMARY.read_text(encoding="utf-8"))["windows"]["recent"]
+    assert recent["matchesWithDetails"] == 15
+    assert recent["bottomFrags"] == bottom_frags
+    assert recent["odinOrOperatorMains"] == heavy_mains
 
 
 def test_later_runs_skip_the_backfill_and_import_nothing_twice(
@@ -244,5 +275,5 @@ def test_data_from_before_the_guard_is_adopted(player, henrikdev, store, publish
 
     run = collect_player(player, henrikdev, store, publisher, clock)
 
-    assert run.status is RunStatus.SUCCESS
+    assert run.error_code is None
     assert store.get_account("neon-main") == account_hash(henrikdev.account_data["puuid"])

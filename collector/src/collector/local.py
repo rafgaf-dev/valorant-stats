@@ -54,8 +54,8 @@ def main() -> int:
     )
     for run in result.runs:
         print(
-            f"{run.player_id}: {run.status.value}, {run.matches_imported} imported "
-            f"of {run.matches_found} found" + (f" ({run.error_code})" if run.error_code else ""),
+            f"{run.player_id}: {run.status.value}, {run.matches_found} found, "
+            f"{run.matches_imported} written" + (f" ({run.error_code})" if run.error_code else ""),
             file=sys.stderr,
         )
         if run.error_code is None:

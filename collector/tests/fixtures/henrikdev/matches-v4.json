@@ -679,6 +679,274 @@
           "won": true,
           "premier_roster": null
         }
+      ],
+      "rounds": [
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Phantom"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Phantom"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Phantom"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Phantom"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Phantom"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        }
       ]
     },
     {
@@ -1358,6 +1626,204 @@
           },
           "won": false,
           "premier_roster": null
+        }
+      ],
+      "rounds": [
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Guardian"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -2043,6 +2509,274 @@
           "won": false,
           "premier_roster": null
         }
+      ],
+      "rounds": [
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        }
       ]
     },
     {
@@ -2722,6 +3456,232 @@
           },
           "won": true,
           "premier_roster": null
+        }
+      ],
+      "rounds": [
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Guardian"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Guardian"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Bulldog"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -3406,6 +4366,232 @@
           },
           "won": false,
           "premier_roster": null
+        }
+      ],
+      "rounds": [
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Ghost"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Sheriff"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stats": [
+            {
+              "player": {
+                "puuid": "puuid-tracked"
+              },
+              "economy": {
+                "weapon": {
+                  "name": "Vandal"
+                }
+              }
+            }
+          ]
         }
       ]
     }

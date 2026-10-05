@@ -2,8 +2,9 @@
 
 One DynamoDB table holds everything for a player under `PK = PLAYER#<id>`:
 
-- matches at `SK = MATCH#<matchId>`; writes only replace a missing or `stored`-source item,
-  so re-imports are idempotent and a full v4 record supersedes a backfilled one;
+- matches at `SK = MATCH#<matchId>`; writes only replace a missing item, a `stored`-source
+  item, or one written by an older parser, so re-imports are idempotent and a full v4 record
+  supersedes a backfilled or outdated one;
 - import runs at `SK = RUN#<startedAt>`, expiring after 90 days;
 - the account the player id belongs to at `SK = ACCOUNT`, as a SHA-256 hash of the PUUID,
   so a changed Riot ID can't mix two accounts' matches.
@@ -21,7 +22,7 @@ from botocore.exceptions import ClientError
 
 from collector.records import ImportRun, MatchRecord, Result, Source
 
-PARSER_VERSION = 1
+PARSER_VERSION = 2  # 2: bottomFragged and mainWeapon
 IMPORT_RUN_RETENTION = timedelta(days=90)
 
 
@@ -29,7 +30,7 @@ class MatchStore(Protocol):
     def list_matches(self, player_id: str) -> list[MatchRecord]: ...
 
     def put_match(self, player_id: str, record: MatchRecord) -> bool:
-        """Writes the record unless a v4 record already exists; returns whether it wrote."""
+        """Writes the record unless a current v4 record exists; returns whether it wrote."""
         ...
 
     def put_import_run(self, run: ImportRun) -> None: ...
@@ -53,7 +54,7 @@ def _account_item(player_id: str, account_hash: str) -> dict[str, Any]:
 
 
 def _match_item(player_id: str, record: MatchRecord) -> dict[str, Any]:
-    return {
+    item = {
         "PK": _partition_key(player_id),
         "SK": f"MATCH#{record.match_id}",
         "matchId": record.match_id,
@@ -69,6 +70,11 @@ def _match_item(player_id: str, record: MatchRecord) -> dict[str, Any]:
         "source": record.source.value,
         "parserVersion": PARSER_VERSION,
     }
+    if record.bottom_fragged is not None:
+        item["bottomFragged"] = record.bottom_fragged
+    if record.main_weapon is not None:
+        item["mainWeapon"] = record.main_weapon
+    return item
 
 
 def _match_from_item(item: dict[str, Any]) -> MatchRecord:
@@ -85,6 +91,21 @@ def _match_from_item(item: dict[str, Any]) -> MatchRecord:
         bodyshots=int(item["bodyshots"]),
         legshots=int(item["legshots"]),
         source=Source(item["source"]),
+        bottom_fragged=item.get("bottomFragged"),
+        main_weapon=item.get("mainWeapon"),
+    )
+
+
+def _replaceable(existing: dict[str, Any] | None, record: MatchRecord) -> bool:
+    """Whether `record` may overwrite the existing item.
+
+    Anything replaces a missing or stored item; only a full v4 record replaces one written by
+    an older parser, so a stored record can never downgrade a v4 one.
+    """
+    return (
+        existing is None
+        or existing["source"] == Source.STORED.value
+        or (record.source is Source.V4 and int(existing.get("parserVersion", 0)) < PARSER_VERSION)
     )
 
 
@@ -103,6 +124,22 @@ def _import_run_item(run: ImportRun) -> dict[str, Any]:
     if run.error_code:
         item["errorCode"] = run.error_code
     return item
+
+
+def _write_condition(record: MatchRecord) -> dict[str, Any]:
+    """The DynamoDB form of `_replaceable`."""
+    condition = "attribute_not_exists(SK) OR #source = :stored"
+    names = {"#source": "source"}
+    values: dict[str, Any] = {":stored": Source.STORED.value}
+    if record.source is Source.V4:
+        condition += " OR #parser < :parser"
+        names["#parser"] = "parserVersion"
+        values[":parser"] = PARSER_VERSION
+    return {
+        "ConditionExpression": condition,
+        "ExpressionAttributeNames": names,
+        "ExpressionAttributeValues": values,
+    }
 
 
 class DynamoMatchStore:
@@ -125,9 +162,7 @@ class DynamoMatchStore:
         try:
             self._table.put_item(
                 Item=_match_item(player_id, record),
-                ConditionExpression="attribute_not_exists(SK) OR #source = :stored",
-                ExpressionAttributeNames={"#source": "source"},
-                ExpressionAttributeValues={":stored": Source.STORED.value},
+                **_write_condition(record),
             )
         except ClientError as error:
             if error.response["Error"]["Code"] == "ConditionalCheckFailedException":
@@ -163,8 +198,7 @@ class JsonFileMatchStore:
         items = self._load()
         item = _match_item(player_id, record)
         key = f"{item['PK']}|{item['SK']}"
-        existing = items.get(key)
-        if existing is not None and existing["source"] != Source.STORED.value:
+        if not _replaceable(items.get(key), record):
             return False
         items[key] = item
         self._save(items)

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "player": {
     "id": "empty",
     "displayName": "The Neon Menace",
@@ -22,7 +22,10 @@
       "legshots": 0,
       "kd": null,
       "winRate": null,
-      "headshotRate": null
+      "headshotRate": null,
+      "matchesWithDetails": 0,
+      "bottomFrags": 0,
+      "odinOrOperatorMains": 0
     },
     "sinceTracking": {
       "since": null,
@@ -38,7 +41,10 @@
       "legshots": 0,
       "kd": null,
       "winRate": null,
-      "headshotRate": null
+      "headshotRate": null,
+      "matchesWithDetails": 0,
+      "bottomFrags": 0,
+      "odinOrOperatorMains": 0
     }
   },
   "lastImport": {
