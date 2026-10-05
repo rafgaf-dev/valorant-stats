@@ -1,21 +1,22 @@
+import type { ReactNode } from "react";
 import type { PlayerSummary } from "../api";
-import { actionItems, METRICS, metricComment, performanceRating, trendOf } from "../roast";
-import { formatDelta, formatMetric, formatMonth, formatUpdated, metricDelta } from "../summary";
-import { CalculationNotes } from "./CalculationNotes";
+import { performanceRating, takeaways } from "../roast";
+import { formatMonth, formatUpdated } from "../summary";
+import { ComparisonBars } from "./ComparisonBars";
 import { OutcomesChart } from "./OutcomesChart";
+import { ShameTally } from "./ShameTally";
+import { SpinningNeon } from "./SpinningNeon";
 
 export type SlideContent = {
 	title: string;
 	wordArt?: boolean;
-	body: React.ReactNode;
-	notes: React.ReactNode;
+	body: ReactNode;
 };
 
 /** The slides after the question, built from the summary. */
 export function buildSlides(summary: PlayerSummary): SlideContent[] {
 	const { player, windows } = summary;
 	const { recent, sinceTracking } = windows;
-	const sinceLabel = sinceTracking.since ? `Since ${formatMonth(sinceTracking.since)}` : "Since tracking";
 
 	if (sinceTracking.matches === 0) {
 		return [
@@ -27,85 +28,59 @@ export function buildSlides(summary: PlayerSummary): SlideContent[] {
 						<p>No completed competitive matches have been collected yet. Check back after his next game.</p>
 					</div>
 				),
-				notes: <p>The collector hasn&apos;t found any completed competitive matches for this player yet.</p>,
 			},
 			closingSlide(summary),
 		];
 	}
 
-	const rating = performanceRating(windows);
+	const baselineLabel = sinceTracking.since ? `Since ${formatMonth(sinceTracking.since)}` : "Since tracking";
+	const known = recent.matchesWithDetails ?? 0;
 	return [
 		{
 			title: `Performance review: ${player.displayName}`,
 			body: (
-				<>
-					<p className="slide-subtitle">
-						Competitive, {player.region.toUpperCase()}. The last {recent.matches} matches compared with all{" "}
-						{sinceTracking.matches}
-						{sinceTracking.since ? ` since ${formatMonth(sinceTracking.since)}` : " tracked so far"}.
-					</p>
-					<div className="table-scroll">
-						<table className="office-table">
-							<thead>
-								<tr>
-									<th scope="col">Metric</th>
-									<th scope="col">Last {recent.matches}</th>
-									<th scope="col">{sinceLabel}</th>
-									<th scope="col">Change</th>
-									<th scope="col">Reviewer comment</th>
-								</tr>
-							</thead>
-							<tbody>
-								{METRICS.map(({ key, label }) => {
-									const delta = metricDelta(key, recent, sinceTracking);
-									return (
-										<tr key={key}>
-											<th scope="row">{label}</th>
-											<td>{formatMetric(key, recent[key])}</td>
-											<td>{formatMetric(key, sinceTracking[key])}</td>
-											<td>{formatDelta(key, delta)}</td>
-											<td>{metricComment(key, trendOf(delta))}</td>
-										</tr>
-									);
-								})}
-							</tbody>
-						</table>
+				<div className="review">
+					<SpinningNeon caption={performanceRating(windows).summary} />
+					<div className="review-charts">
+						<ComparisonBars recent={recent} baseline={sinceTracking} baselineLabel={baselineLabel} />
+						{known > 0 && (
+							<div className="tallies">
+								<ShameTally
+									label="bottom-fragged"
+									count={recent.bottomFrags ?? 0}
+									known={known}
+									total={recent.matches}
+									tone="loss"
+								/>
+								<ShameTally
+									label="with an Odin or Operator as his main gun"
+									count={recent.odinOrOperatorMains ?? 0}
+									known={known}
+									total={recent.matches}
+									tone="warning"
+								/>
+							</div>
+						)}
+						<p className="slide-note">
+							{baselineLabel}: {sinceTracking.matches} games.
+						</p>
 					</div>
-					<p className="slide-note">
-						Last {recent.matches}: {recent.kills} kills, {recent.deaths} deaths, {recent.assists} assists;{" "}
-						{recent.headshots} head, {recent.bodyshots} body and {recent.legshots} leg hits.
-					</p>
-				</>
+				</div>
 			),
-			notes: <CalculationNotes />,
 		},
 		{
-			title: `Match outcomes, last ${recent.matches}`,
+			title: `Games thrown vs not thrown, last ${recent.matches}`,
 			body: <OutcomesChart wins={recent.wins} losses={recent.losses} draws={recent.draws} />,
-			notes: (
-				<p>
-					A 3D pie chart was chosen because it is the least readable chart type available, which felt
-					appropriate.
-				</p>
-			),
 		},
 		{
 			title: "Key takeaways",
 			body: (
-				<div className="takeaways">
-					<p className="rating">
-						Overall rating: <strong className={`rating-${rating.tone}`}>{rating.rating}</strong>
-					</p>
-					<p>{rating.summary}</p>
-					<h3>Action items</h3>
-					<ul className="office-bullets">
-						{actionItems(player.displayName, player.agent).map((item) => (
-							<li key={item}>{item}</li>
-						))}
-					</ul>
-				</div>
+				<ul className="takeaways">
+					{takeaways(recent).map((line) => (
+						<li key={line}>{line}</li>
+					))}
+				</ul>
 			),
-			notes: <p>The rating is always negative. That isn&apos;t a bug; it&apos;s the premise.</p>,
 		},
 		closingSlide(summary),
 	];
@@ -133,6 +108,5 @@ function closingSlide(summary: PlayerSummary): SlideContent {
 				</p>
 			</div>
 		),
-		notes: <p>Do not take questions.</p>,
 	};
 }

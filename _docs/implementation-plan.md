@@ -235,6 +235,14 @@ computed from summed totals, never by averaging per-match ratios.
 | K/D | `Σkills / max(Σdeaths, 1)` | Zero deaths count as one. K/D/A totals are shown beside it. |
 | Win rate | `wins / completed matches` | Draws count as matches but not wins. The W–L–D record is shown. |
 | Headshot % | `Σheadshot hits / Σ(head + body + leg hits)` | No hits → `null`. |
+| Bottom frags | Games where his combat score was the lowest on his team | A tie for last counts. Full details only. |
+| Odin or Operator mains | Games where the weapon he started the most rounds with was the Odin or Operator | Ties go to the weapon used first. Full details only. |
+| Thrown / not thrown | Thrown = losses + draws; not thrown = wins | Shown for the recent window. |
+
+Bottom frags and main weapons need full match details (v4), which stored
+history records don't carry. Each window publishes how many of its matches
+have details (`matchesWithDetails`); the collector keeps that at 15 for the
+recent window (section 7).
 
 - **Recent** = the 15 most recent matches. **Since tracking** = all stored
   matches, plus the date of the earliest one.
@@ -242,14 +250,14 @@ computed from summed totals, never by averaging per-match ratios.
   "not enough data".
 - Values are published unrounded. Rounding is a display concern handled by the
   frontend.
-- The definitions live in one module (`collector/src/collector/metrics.py`),
-  are unit-tested, and are explained in a small info note in the UI.
+- The definitions live in `collector/src/collector/metrics.py` and
+  `parse.py`, and are unit-tested against the captured fixtures.
 
 ## 6. Published contract: `/data/players/{playerId}/summary.json`
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "player": { "id": "neon-main", "displayName": "The Neon Menace", "agent": "Neon", "region": "eu" },
   "queue": "competitive",
   "generatedAt": "2026-10-04T12:00:00Z",
@@ -258,14 +266,16 @@ computed from summed totals, never by averaging per-match ratios.
       "matches": 15, "wins": 9, "losses": 5, "draws": 1,
       "kills": 156, "deaths": 110, "assists": 74,
       "headshots": 120, "bodyshots": 380, "legshots": 22,
-      "kd": 1.4181818, "winRate": 0.6, "headshotRate": 0.2298850
+      "kd": 1.4181818, "winRate": 0.6, "headshotRate": 0.2298850,
+      "matchesWithDetails": 15, "bottomFrags": 6, "odinOrOperatorMains": 2
     },
     "sinceTracking": {
       "since": "2026-06-01T18:22:00Z",
       "matches": 312, "wins": 160, "losses": 148, "draws": 4,
       "kills": 1842, "deaths": 1561, "assists": 903,
       "headshots": 1400, "bodyshots": 5600, "legshots": 400,
-      "kd": 1.1800128, "winRate": 0.5128205, "headshotRate": 0.1891892
+      "kd": 1.1800128, "winRate": 0.5128205, "headshotRate": 0.1891892,
+      "matchesWithDetails": 40, "bottomFrags": 13, "odinOrOperatorMains": 3
     }
   },
   "lastImport": { "status": "success", "finishedAt": "2026-10-04T12:00:00Z" }
@@ -280,7 +290,10 @@ computed from summed totals, never by averaging per-match ratios.
   load the same file.
 - The frontend treats `generatedAt` older than 24 hours as **stale** and shows
   a banner, but still renders the numbers.
-- Any change to the schema increments `schemaVersion`.
+- Any change to the schema increments `schemaVersion`. Version 2 added
+  `matchesWithDetails`, `bottomFrags`, and `odinOrOperatorMains`; the frontend
+  accepts versions 1 and 2 (without the counts it leaves the tallies out), so
+  the frontend and the collector can be deployed in either order.
 
 ## 7. Collector behavior
 
@@ -319,6 +332,10 @@ For each run:
       miss one.
    4. Parse, skip matches with `is_completed == false`, and write them
       idempotently with `source = v4`.
+   5. Make sure the 15 most recent matches all have full details: fetch the
+      match details for any that are stored records or were written by an older
+      parser (`parserVersion`). This costs up to 15 requests after the first
+      backfill or a parser upgrade, and nothing on later runs.
    5. Query all of the player's matches, compute both windows, and publish
       `summary.json`. It is published on every successful run, even when
       nothing new was imported, so `generatedAt` shows the data is current and
@@ -386,10 +403,19 @@ and apply Terraform, or the next scheduled run recreates the data.
      "Correct.", then a checkerboard transition reveals the review. With
      `prefers-reduced-motion`, the thumbs-up appears without spinning and the
      slide changes without a transition.
-  3. The deck: the performance review table (last 15 vs since tracking, change,
-     and a reviewer comment per metric), match outcomes as a 3D pie chart with
-     a text legend, key takeaways (an always-negative rating and action items),
-     and "Questions?" with the sources and the full Riot disclaimer.
+  3. The deck:
+     - **Performance review:** Neon, tilted off-kilter, spins into place once
+       the slide is on screen (replayed on every visit, skipped with reduced
+       motion), with a speech-bubble verdict. Beside her, a clustered bar chart
+       of last 15 against the long-term value per metric, and two tallies with
+       one square per game: bottom frags, and games with an Odin or Operator
+       as his main gun.
+     - **Games thrown vs not thrown:** a 3D pie, built from stacked layers so
+       it reads as one solid disc, with a text legend. Draws count as thrown.
+     - **Key takeaways:** three short lines: "Do better.", "Lock in.", and one
+       chosen from his stats ("Put the Odin down.", "Stop bottom fragging.",
+       or "Touch grass.").
+     - **Questions?** with the sources and the full Riot disclaimer.
   4. The black "End of slide show, click to exit." screen returns to slide 2.
 
   Navigation: Previous/Next buttons or the arrow, Page Up/Down, Home, and End
@@ -404,11 +430,9 @@ and apply Terraform, or the next scheduled run recreates the data.
 - **States:** loading (a progress bar), error (a dialog with "Try again"),
   empty (a "Click to add stats" placeholder slide), and stale (a yellow
   "Security warning" message bar above the slide).
-- **Roast copy** lives in `roast.ts` as pure, tested functions: one comment per
-  metric and direction, the overall rating, and the action items.
-- **Speaker notes:** a toggle under the slide shows each slide's notes; the
-  review's notes explain the formulas, the zero-death rule, draws, hits,
-  remakes, and surrenders.
+- **Roast copy** lives in `roast.ts` as pure, tested functions: the
+  always-negative verdict and the takeaways. There are no speaker notes; the
+  formulas are documented in the README instead.
 - **Player photo:** kept out of git. It lives in the gitignored
   `config/photos/<player-id>.webp`, is uploaded to the data bucket at
   `data/players/<player-id>/photo.webp` on deploy, and is served from there

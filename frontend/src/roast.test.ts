@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import contract from "../../collector/tests/fixtures/summary.expected.json";
 import type { PlayerSummary, Window } from "./api";
-import { actionItems, metricComment, performanceRating, trendOf } from "./roast";
+import { performanceRating, takeaways, trendOf } from "./roast";
 
 const summary = contract as PlayerSummary;
 const baseline = { ...summary.windows.sinceTracking, kd: 1, winRate: 0.5, headshotRate: 0.3 };
@@ -17,8 +17,7 @@ describe("performanceRating", () => {
 			sinceTracking: baseline,
 		});
 
-		expect(rating.rating).toBe("Needs improvement");
-		expect(rating.summary).toContain("who carried him");
+		expect(rating).toEqual({ rating: "Needs improvement", summary: "The numbers went up. Somebody carried him." });
 	});
 
 	it("is harshest when the numbers get worse", () => {
@@ -27,7 +26,7 @@ describe("performanceRating", () => {
 			sinceTracking: baseline,
 		});
 
-		expect(rating).toMatchObject({ rating: "Does not meet expectations", tone: "worse" });
+		expect(rating.rating).toBe("Does not meet expectations");
 	});
 
 	it("calls mixed numbers inconsistent", () => {
@@ -39,15 +38,6 @@ describe("performanceRating", () => {
 		expect(rating.rating).toBe("Inconsistent");
 	});
 
-	it("ignores metrics without data", () => {
-		const rating = performanceRating({
-			recent: recent({ kd: 1.2, winRate: 0.6, headshotRate: null }),
-			sinceTracking: baseline,
-		});
-
-		expect(rating.rating).toBe("Needs improvement");
-	});
-
 	it("is pending without recent matches", () => {
 		const rating = performanceRating({
 			recent: recent({ matches: 0, kd: null, winRate: null, headshotRate: null }),
@@ -57,29 +47,33 @@ describe("performanceRating", () => {
 		expect(rating.rating).toBe("Pending");
 	});
 
-	it("is never positive on the contract fixture", () => {
-		// K/D and win rate are up, headshot rate is down: improvement, which is suspicious.
-		expect(performanceRating(summary.windows).rating).toBe("Needs improvement");
-	});
-});
-
-describe("comments", () => {
 	it("maps deltas to trends", () => {
 		expect([trendOf(0.1), trendOf(-0.1), trendOf(0), trendOf(null)]).toEqual(["up", "down", "level", "unknown"]);
 	});
+});
 
-	it("roasts every metric in every direction", () => {
-		for (const key of ["kd", "winRate", "headshotRate"] as const) {
-			for (const trend of ["up", "down", "level", "unknown"] as const) {
-				expect(metricComment(key, trend)).toMatch(/\.$/);
-			}
-		}
-		expect(metricComment("headshotRate", "down")).toContain("ankle");
+describe("takeaways", () => {
+	it("keeps it short", () => {
+		expect(takeaways(recent({ bottomFrags: 0, odinOrOperatorMains: 0 }))).toEqual([
+			"Do better.",
+			"Lock in.",
+			"Touch grass.",
+		]);
 	});
 
-	it("names the player and agent in the action items", () => {
-		expect(actionItems("Alex", "Neon")[0]).toBe(
-			"Schedule a one-to-one with Alex to find out what he thinks Neon's abilities do.",
-		);
+	it("calls out the Odin first", () => {
+		expect(takeaways(recent({ bottomFrags: 4, odinOrOperatorMains: 1 }))[2]).toBe("Put the Odin down.");
+	});
+
+	it("calls out bottom fragging next", () => {
+		expect(takeaways(recent({ bottomFrags: 4, odinOrOperatorMains: 0 }))[2]).toBe("Stop bottom fragging.");
+	});
+
+	it("works with summaries from before the detail counts existed", () => {
+		const legacy = recent({});
+		delete legacy.bottomFrags;
+		delete legacy.odinOrOperatorMains;
+
+		expect(takeaways(legacy)).toHaveLength(3);
 	});
 });

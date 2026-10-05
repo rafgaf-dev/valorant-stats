@@ -12,8 +12,10 @@ reveals the review, and the deck walks through the numbers:
 
 | | |
 | --- | --- |
-| ![A thumbs-up and "Correct." over the first slide](docs/images/thumbs-up.webp) | ![The performance review table: last 15 matches against the long-term numbers, with a reviewer comment for each metric](docs/images/review.webp) |
-| ![Match outcomes as a 3D pie chart with a legend: 7 wins, 7 losses, 1 draw](docs/images/outcomes.webp) | The screenshots use the sample data in `frontend/dev-data/`. |
+| ![A thumbs-up and "Correct." over the first slide](docs/images/thumbs-up.webp) | ![The performance review: a tilted Neon with a speech bubble, bar charts of the last 15 games against the long-term numbers, and tallies of bottom frags and Odin or Operator games](docs/images/review.webp) |
+| ![Games thrown vs not thrown as a 3D pie chart: 7 not thrown, 8 thrown](docs/images/outcomes.webp) | ![Key takeaways: "Do better.", "Lock in.", "Touch grass."](docs/images/takeaways.webp) |
+
+The screenshots use the sample data in `frontend/dev-data/`.
 
 ## How it works
 
@@ -49,11 +51,16 @@ flowchart LR
 | K/D | Kills divided by deaths, with zero deaths counted as one |
 | Win rate | Wins divided by matches; draws count as matches, not wins |
 | Headshot % | Headshot hits divided by all hits (head, body, and leg) |
+| Bottom frags | Games where his combat score was the lowest on his team (a tie for last counts) |
+| Odin or Operator mains | Games where the gun he started the most rounds with was the Odin or Operator |
+| Thrown | Losses and draws; wins are "not thrown" |
 
 Only completed competitive matches count, and every value comes from summed totals
 rather than an average of per-match ratios. Remakes (one round or fewer) are skipped.
 Surrenders are scored for the team that didn't surrender, which the round score alone
-can't tell, so the collector fetches that match's details.
+can't tell, so the collector fetches that match's details. Bottom frags and main weapons
+also need full match details, so the collector makes sure the last 15 matches always have
+them.
 
 ## Data source
 
