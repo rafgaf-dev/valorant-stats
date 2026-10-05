@@ -1,5 +1,17 @@
 # Valorant Stats Implementation Plan
 
+## Status (2026-10-05)
+
+Milestones 0–8 are complete: the collector runs in AWS, the site is served through
+CloudFront and deploys from GitHub Actions, and the README documents the project.
+Remaining owner tasks, none of which need code:
+
+- Get the friend's consent before sharing the URL (section 2, gate zero, item 4).
+- Re-check Riot's fan-content policy and HenrikDev's terms before sharing.
+- Confirm the SNS alert email subscription.
+- Enable the schedule (`schedule_enabled = true`, then plan and apply).
+- Revisit the alarm thresholds after the first weeks of scheduled runs.
+
 ## 1. Product goal
 
 A small, playful dashboard showing a friend's Valorant performance. The first
@@ -585,10 +597,12 @@ Each milestone is one or more small PRs that pass CI.
    would need near-administrator access.
 7. **Operations:** the delete-player script. Revisit the alarm thresholds
    after the first weeks of scheduled runs.
-8. **README:** architecture diagram, screenshot, how to run locally, how to
-   deploy, cost, data source, disclaimer. Get the friend's consent, and
-   re-check Riot's fan-content policy and HenrikDev's terms, before sharing the
-   URL.
+8. **README:** architecture diagram (Mermaid), screenshots, how it works, the
+   metric definitions, data source, privacy, local development, quality checks,
+   deployment, and the disclaimer. Screenshots use the sample data with photo
+   requests blocked, so the public repository never shows the real player. Get
+   the friend's consent, and re-check Riot's fan-content policy and HenrikDev's
+   terms, before sharing the URL.
 
 ## 13. Decision log
 
