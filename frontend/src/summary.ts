@@ -37,6 +37,17 @@ export function formatDate(timestamp: string): string {
 	return new Date(timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
+/** "Sun 20 Sep, 19:39", in the viewer's time zone. */
+export function formatMatchDate(timestamp: string): string {
+	return new Date(timestamp).toLocaleString("en-GB", {
+		weekday: "short",
+		day: "numeric",
+		month: "short",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+}
+
 export function formatUpdated(timestamp: string): string {
 	return new Date(timestamp).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 }

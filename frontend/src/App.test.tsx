@@ -78,7 +78,7 @@ describe("App", () => {
 		expect(document.querySelector(".checkerboard")).not.toBeInTheDocument();
 
 		const slide = currentSlide();
-		expect(slide).toHaveAccessibleName("Slide 2 of 5: Performance review: The Neon Menace");
+		expect(slide).toHaveAccessibleName("Slide 2 of 6: Performance review: The Neon Menace");
 		expect(slide).toHaveTextContent("Last 15: 1.48");
 		expect(slide).toHaveTextContent("Since Aug 2026: 1.41");
 		expect(slide).toHaveTextContent("+0.07");
@@ -110,8 +110,8 @@ describe("App", () => {
 		expect(slide.querySelectorAll(".cell-loss")).toHaveLength(6);
 		expect(slide.querySelectorAll(".cell-warning")).toHaveLength(2);
 
-		fireEvent.keyDown(window, { key: "ArrowRight" });
-		fireEvent.keyDown(window, { key: "ArrowRight" });
+		fireEvent.keyDown(window, { key: "End" });
+		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		expect(currentSlide()).toHaveTextContent("Do better.Lock in.Put the Odin down.");
 	});
 
@@ -125,6 +125,62 @@ describe("App", () => {
 		expect(currentSlide()).not.toHaveTextContent("bottom-fragged");
 	});
 
+	it("shows the current streak and lets you pick any recent game", async () => {
+		stubFetch([200, contract]);
+		render(<App />);
+		await answerNo();
+		fireEvent.keyDown(window, { key: "ArrowRight" });
+
+		const slide = currentSlide();
+		expect(slide).toHaveTextContent("Won the last one");
+		expect(slide).toHaveTextContent("Don't get used to it.");
+		const strip = within(slide).getByRole("list", { name: "Recent games, oldest first" });
+		const games = within(strip).getAllByRole("button");
+		expect(games.map((game) => game.textContent).join("")).toBe("LDWWWWWLLLLLWLW");
+		expect(games.at(-1)).toHaveAttribute("aria-pressed", "true");
+		expect(within(slide).getByRole("table")).toHaveAccessibleName("Game 15 of 15: Win");
+		expect(within(slide).getByRole("table")).toHaveTextContent("Sunset");
+
+		fireEvent.click(games[13]);
+
+		const details = within(slide).getByRole("table");
+		expect(details).toHaveAccessibleName("Game 14 of 15: Loss");
+		expect(details).toHaveTextContent("Lotus");
+		expect(details).toHaveTextContent("8 / 13 / 2");
+		expect(games[13]).toHaveAttribute("aria-pressed", "true");
+		expect(games.at(-1)).toHaveAttribute("aria-pressed", "false");
+	});
+
+	it("calls out a loss streak", async () => {
+		const recentMatches = contract.recentMatches.map((match, index) =>
+			index < 5 ? { ...match, result: index < 4 ? "loss" : "win" } : match,
+		);
+		stubFetch([200, { ...contract, recentMatches }]);
+		render(<App />);
+		await answerNo();
+		fireEvent.keyDown(window, { key: "ArrowRight" });
+
+		expect(currentSlide()).toHaveTextContent("4 losses in a row");
+		expect(currentSlide()).toHaveTextContent("Somebody check on him.");
+		expect(currentSlide().querySelectorAll(".in-streak")).toHaveLength(4);
+
+		fireEvent.keyDown(window, { key: "End" });
+		fireEvent.keyDown(window, { key: "ArrowLeft" });
+		expect(within(currentSlide()).getAllByRole("listitem").at(-1)).toHaveTextContent("End the loss streak.");
+	});
+
+	it("leaves the recent form out for summaries from before it existed", async () => {
+		const legacy: Record<string, unknown> = { ...contract, schemaVersion: 2 };
+		delete legacy.recentMatches;
+		stubFetch([200, legacy]);
+		render(<App />);
+		await answerNo();
+
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 5/);
+		fireEvent.keyDown(window, { key: "ArrowRight" });
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 3 of 5: Games thrown/);
+	});
+
 	it("skips the animation when reduced motion is requested", async () => {
 		stubReducedMotion(true);
 		stubFetch([200, contract]);
@@ -135,7 +191,7 @@ describe("App", () => {
 		await act(() => vi.advanceTimersByTimeAsync(REDUCED_CELEBRATE_MS));
 
 		expect(document.querySelector(".checkerboard")).not.toBeInTheDocument();
-		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 5/);
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 6/);
 	});
 
 	it("walks through the deck with the keyboard and controls", async () => {
@@ -144,13 +200,16 @@ describe("App", () => {
 		await answerNo();
 
 		fireEvent.keyDown(window, { key: "ArrowRight" });
-		expect(currentSlide()).toHaveAccessibleName("Slide 3 of 5: Games thrown vs not thrown, last 15");
+		expect(currentSlide()).toHaveAccessibleName("Slide 3 of 6: Recent form, last 15");
+
+		fireEvent.keyDown(window, { key: "ArrowRight" });
+		expect(currentSlide()).toHaveAccessibleName("Slide 4 of 6: Games thrown vs not thrown, last 15");
 		expect(screen.getByRole("list", { name: "15 games" })).toHaveTextContent("Not thrown: 7 Thrown: 8");
 		expect(currentSlide()).toHaveTextContent("Draws count as thrown.");
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		const takeaways = currentSlide();
-		expect(takeaways).toHaveAccessibleName("Slide 4 of 5: Key takeaways");
+		expect(takeaways).toHaveAccessibleName("Slide 5 of 6: Key takeaways");
 		expect(within(takeaways).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
 			"Do better.",
 			"Lock in.",
@@ -169,7 +228,7 @@ describe("App", () => {
 
 		fireEvent.click(screen.getByRole("button", { name: "End show" }));
 		fireEvent.click(screen.getByRole("button", { name: "End of slide show, click to exit." }));
-		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 5/);
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 6/);
 
 		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		expect(screen.getAllByRole("button", { name: "No" })).toHaveLength(2);

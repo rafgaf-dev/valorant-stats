@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "player": {
     "id": "empty",
     "displayName": "The Neon Menace",
@@ -47,6 +47,7 @@
       "odinOrOperatorMains": 0
     }
   },
+  "recentMatches": [],
   "lastImport": {
     "status": "success",
     "finishedAt": "2026-10-05T12:00:02Z"

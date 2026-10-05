@@ -22,7 +22,7 @@ from botocore.exceptions import ClientError
 
 from collector.records import ImportRun, MatchRecord, Result, Source
 
-PARSER_VERSION = 2  # 2: bottomFragged and mainWeapon
+PARSER_VERSION = 3  # 2: bottomFragged and mainWeapon; 3: mapName
 IMPORT_RUN_RETENTION = timedelta(days=90)
 
 
@@ -74,6 +74,8 @@ def _match_item(player_id: str, record: MatchRecord) -> dict[str, Any]:
         item["bottomFragged"] = record.bottom_fragged
     if record.main_weapon is not None:
         item["mainWeapon"] = record.main_weapon
+    if record.map_name is not None:
+        item["mapName"] = record.map_name
     return item
 
 
@@ -93,6 +95,8 @@ def _match_from_item(item: dict[str, Any]) -> MatchRecord:
         source=Source(item["source"]),
         bottom_fragged=item.get("bottomFragged"),
         main_weapon=item.get("mainWeapon"),
+        map_name=item.get("mapName"),
+        parser_version=int(item.get("parserVersion", 0)),
     )
 
 

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 
@@ -32,6 +32,9 @@ class MatchRecord:
     # Only known from full match details (v4); None for lightweight stored records.
     bottom_fragged: bool | None = None  # lowest combat score on his team
     main_weapon: str | None = None  # the weapon he started the most rounds with
+    map_name: str | None = None
+    # Set when read back from the store: which parser wrote the record. Not part of equality.
+    parser_version: int | None = field(default=None, compare=False)
 
     @property
     def has_details(self) -> bool:

@@ -4,6 +4,7 @@ import { performanceRating, takeaways } from "../roast";
 import { formatMonth, formatUpdated } from "../summary";
 import { ComparisonBars } from "./ComparisonBars";
 import { OutcomesChart } from "./OutcomesChart";
+import { RecentForm } from "./RecentForm";
 import { ShameTally } from "./ShameTally";
 import { SpinningNeon } from "./SpinningNeon";
 
@@ -15,7 +16,7 @@ export type SlideContent = {
 
 /** The slides after the question, built from the summary. */
 export function buildSlides(summary: PlayerSummary): SlideContent[] {
-	const { player, windows } = summary;
+	const { player, windows, recentMatches = [] } = summary;
 	const { recent, sinceTracking } = windows;
 
 	if (sinceTracking.matches === 0) {
@@ -68,6 +69,14 @@ export function buildSlides(summary: PlayerSummary): SlideContent[] {
 				</div>
 			),
 		},
+		...(recentMatches.length > 0
+			? [
+					{
+						title: `Recent form, last ${recentMatches.length}`,
+						body: <RecentForm matches={recentMatches} />,
+					},
+				]
+			: []),
 		{
 			title: `Games thrown vs not thrown, last ${recent.matches}`,
 			body: <OutcomesChart wins={recent.wins} losses={recent.losses} draws={recent.draws} />,
@@ -76,7 +85,7 @@ export function buildSlides(summary: PlayerSummary): SlideContent[] {
 			title: "Key takeaways",
 			body: (
 				<ul className="takeaways">
-					{takeaways(recent).map((line) => (
+					{takeaways(recent, recentMatches).map((line) => (
 						<li key={line}>{line}</li>
 					))}
 				</ul>

@@ -71,7 +71,13 @@ def parse_v4_match(match: dict[str, Any], puuid: str) -> MatchRecord | Skipped:
         source=Source.V4,
         bottom_fragged=_bottom_fragged(match["players"], player, own_team),
         main_weapon=_main_weapon(match.get("rounds"), puuid),
+        map_name=_map_name(metadata),
     )
+
+
+def _map_name(metadata: dict[str, Any]) -> str | None:
+    name = (metadata.get("map") or {}).get("name")
+    return name if isinstance(name, str) and name else None
 
 
 def _bottom_fragged(players: list[dict[str, Any]], player: dict[str, Any], team: str) -> bool:
@@ -131,6 +137,7 @@ def parse_stored_match(record: dict[str, Any]) -> MatchRecord | Skipped | NeedsD
         bodyshots=_field(shots, "body", int),
         legshots=_field(shots, "leg", int),
         source=Source.STORED,
+        map_name=_map_name(meta),
     )
 
 

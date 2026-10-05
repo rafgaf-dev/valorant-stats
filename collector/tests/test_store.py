@@ -86,7 +86,7 @@ def test_dynamodb_items_have_the_documented_keys_and_ttl(table):
     match = items["MATCH#match-1"]
     run = items["RUN#2026-10-05T12:00:00+00:00"]
     assert match["PK"] == run["PK"] == "PLAYER#neon-main"
-    assert (match["source"], match["parserVersion"]) == ("v4", 2)
+    assert (match["source"], match["parserVersion"]) == ("v4", 3)
     assert (match["bottomFragged"], match["mainWeapon"]) == (True, "Odin")
     assert (run["status"], run["durationMs"], run["matchesImported"]) == ("success", 3000, 2)
     assert run["expiresAt"] == int(datetime(2027, 1, 3, 12, tzinfo=UTC).timestamp())
@@ -176,3 +176,13 @@ def test_a_stored_record_never_downgrades_an_older_v4_record(store):
 
     assert store.put_match("neon-main", STORED) is False
     assert store.list_matches("neon-main")[0].source is Source.V4
+
+
+def test_records_read_back_know_their_parser_version_without_affecting_equality(store):
+    store.put_match("neon-main", replace(V4, map_name="Sunset"))
+
+    (record,) = store.list_matches("neon-main")
+
+    assert record.map_name == "Sunset"
+    assert record.parser_version == 3
+    assert record == replace(V4, map_name="Sunset")  # parser_version isn't compared
