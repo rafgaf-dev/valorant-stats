@@ -32,6 +32,10 @@ production app reads from CloudFront. Add `?player=empty` or `?player=stale` to
 the URL to preview those states, or run `make dev LOCAL=1` to see the real data
 from `make collect-local` (below).
 
+The first slide shows the player's photo from `config/photos/<player-id>.webp`
+(gitignored, so photos never enter the repository). Without one it falls back to
+the agent art.
+
 Before pushing, run the same checks as CI:
 
 ```bash

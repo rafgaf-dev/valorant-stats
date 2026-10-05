@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { playerIdFromLocation } from "./player";
+import { photoUrl, playerIdFromLocation } from "./player";
 
 describe("playerIdFromLocation", () => {
 	it("uses the ?player= override in development", () => {
@@ -12,5 +12,12 @@ describe("playerIdFromLocation", () => {
 
 	it("falls back to the default player", () => {
 		expect(playerIdFromLocation("", true)).toBe("neon-main");
+	});
+});
+
+describe("photoUrl", () => {
+	it("points at the photo next to the player's summary", () => {
+		expect(photoUrl("neon-main")).toBe("/data/players/neon-main/photo.webp");
+		expect(photoUrl("../x")).toBe("/data/players/..%2Fx/photo.webp");
 	});
 });

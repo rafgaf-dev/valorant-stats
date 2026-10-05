@@ -350,35 +350,63 @@ DynamoDB items and their objects under `data/players/<id>/`, then invalidates
   `make collect-local` instead (`DEV_DATA_DIR`). On WSL with the repository on
   a Windows drive, the dev server polls for file changes, because WSL doesn't
   deliver change events for `/mnt/c`.
-- **Components:**
-  - `PlayerHeader`: art, name, and metadata (region, queue, last updated),
-    taken from the summary instead of hardcoded.
-  - `StatCard`: recent value, since-tracking value, delta, sample size, and
-    K/D/A or W–L–D detail. The long-term label shows its start month and match
-    count ("since Feb 2022 (141 matches)"), because the stored history has
-    gaps.
-  - `MetricNotes`: replaces `RecentGames`, which is really a footnote. It
-    explains the formulas and the zero-death rule.
-  - `Verdict`: the playful "cooking/trolling" ruling. Its logic lives in a
-    tested pure function.
-- **States:** loading, error (fetch failed or unknown schema version), empty
-  (no matches yet), stale (older than 24h), and normal.
+- **Concept:** the page is a parody of a 2007-era office slide show, a
+  quarterly "performance review" of the friend. The running joke is that he
+  doesn't play well, so every rating is negative whatever the numbers do; the
+  humour is in the corporate wording, and the numbers themselves stay accurate
+  and readable.
+- **Flow:**
+  1. Slide 1 asks "Do you think <name> played well recently?" next to his
+     photo, with two answers: "No" and a green "No".
+  2. Either answer shows a thumbs-up that spins in ("Newsflash") with
+     "Correct.", then a checkerboard transition reveals the review. With
+     `prefers-reduced-motion`, the thumbs-up appears without spinning and the
+     slide changes without a transition.
+  3. The deck: the performance review table (last 15 vs since tracking, change,
+     and a reviewer comment per metric), match outcomes as a 3D pie chart with
+     a text legend, key takeaways (an always-negative rating and action items),
+     and "Questions?" with the sources and the full Riot disclaimer.
+  4. The black "End of slide show, click to exit." screen returns to slide 2.
+
+  Navigation: Previous/Next buttons or the arrow, Page Up/Down, Home, and End
+  keys. Focus moves to each new slide's title, and every slide is a labelled
+  region ("Slide 2 of 5: …").
+- **Design tokens:** the default theme palette of the era (navy `#1F497D`,
+  blue `#4F81BD`, red `#C0504D`, green `#9BBB59`, orange `#F79646`) on white
+  4:3 slides on a black stage. Text is Carlito, a metric-compatible Calibri
+  clone, bundled. Type is sized in container units at the template's default
+  44/20/12 pt proportions, so slides scale like slides; below 720px wide they
+  grow taller instead of shrinking.
+- **States:** loading (a progress bar), error (a dialog with "Try again"),
+  empty (a "Click to add stats" placeholder slide), and stale (a yellow
+  "Security warning" message bar above the slide).
+- **Roast copy** lives in `roast.ts` as pure, tested functions: one comment per
+  metric and direction, the overall rating, and the action items.
+- **Speaker notes:** a toggle under the slide shows each slide's notes; the
+  review's notes explain the formulas, the zero-death rule, draws, hits,
+  remakes, and surrenders.
+- **Player photo:** kept out of git. It lives in the gitignored
+  `config/photos/<player-id>.webp`, is uploaded to the data bucket at
+  `data/players/<player-id>/photo.webp` on deploy, and is served from there
+  (the dev server serves it from `config/photos/`). Without a photo the slide
+  falls back to the agent art, then to a "Click to add picture" placeholder.
 - **Artwork:** download the Neon portrait into `frontend/src/assets/` (cropped
   and converted to WebP: 792 KB → 85 KB) and add
   `frontend/src/assets/ASSETS.md` with its source and the attribution. Don't
   hotlink a community CDN. The art belongs to Riot and is used under Riot's
   fan-content policy ("Legal Jibber Jabber"), which allows free fan projects
   with the disclaimer. It is not open source.
-- **Footer disclaimer** (required wording style): "valorant-stats isn't
+- **Disclaimer:** every slide footer says "Unofficial fan project. Not
+  endorsed by Riot Games."; the closing slide carries the full text: "valorant-stats isn't
   endorsed by Riot Games and doesn't reflect the views or opinions of Riot
   Games or anyone officially involved in producing or managing Riot Games
   properties. Riot Games and all associated properties are trademarks or
   registered trademarks of Riot Games, Inc." Followed by: "Match data from
   the unofficial [HenrikDev API](https://docs.henrikdev.xyz)."
-- **Accessibility:** use real `<table>` or `<dl>` semantics for the numbers,
-  give deltas a text label (don't rely on colour alone), make the info note
-  keyboard-accessible, and support `prefers-reduced-motion` for decorative
-  effects.
+- **Accessibility:** real table semantics for the numbers, deltas and
+  ratings in words rather than colour alone, keyboard navigation with visible
+  focus, focus moved to each new slide, and `prefers-reduced-motion`
+  respected.
 - **Fonts:** bundled from the `@fontsource` packages (SIL OFL) instead of
   Google Fonts, so the page makes no third-party requests and visitors' IP
   addresses aren't sent to Google.
@@ -557,4 +585,6 @@ Each milestone is one or more small PRs that pass CI.
 | API key | Shell env locally, Secrets Manager in AWS | Never in git, the bundle, or Terraform state. |
 | Domain | CloudFront-generated URL | A custom domain isn't worth the cost yet. |
 | Artwork | Local copy under Riot's fan-content policy | Avoids hotlinking. Licensing is stated accurately. |
+| Visual style | 2007 office slide-show parody | Fits the joke: a "performance review" with an always-negative rating. |
+| Player photo | Gitignored, uploaded to the data bucket on deploy | Keeps the friend's face out of the public repository's history. |
 | Database availability | N/A (DynamoDB is multi-AZ by default) | Replaces the earlier single-AZ RDS decision. |
