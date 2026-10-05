@@ -25,6 +25,7 @@ frontend/dist/
 
 # Python / collector
 collector/.fixture-cache/
+collector/.local/
 __pycache__/
 *.py[cod]
 .venv/

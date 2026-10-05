@@ -39,6 +39,20 @@ make check
 Run `make help` for the individual targets (`lint`, `format`, `test`,
 `typecheck`, `build`, `validate-infra`).
 
+On WSL with the repository on a Windows drive (`/mnt/c/...`), keep the Python
+virtual environment on the Linux filesystem; the tests run about 100 times
+faster:
+
+```bash
+export VENV=$HOME/.cache/valorant-stats-venv
+```
+
+To run the collector against the real API without AWS, put a
+[HenrikDev](https://docs.henrikdev.xyz) API key in `HENRIKDEV_API_KEY`, copy
+`config/players.example.json` to `config/players.json` with real Riot IDs, and
+run `make collect-local`. Matches and the summary go to the gitignored
+`collector/.local/` directory.
+
 ## License
 
 [MIT](LICENSE). This is an unofficial fan project and is not endorsed by Riot
