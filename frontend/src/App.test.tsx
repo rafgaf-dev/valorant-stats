@@ -78,7 +78,7 @@ describe("App", () => {
 		expect(document.querySelector(".checkerboard")).not.toBeInTheDocument();
 
 		const slide = currentSlide();
-		expect(slide).toHaveAccessibleName("Slide 2 of 6: Performance review: The Neon Menace");
+		expect(slide).toHaveAccessibleName("Slide 2 of 7: Performance review: The Neon Menace");
 		expect(slide).toHaveTextContent("Last 15: 1.48");
 		expect(slide).toHaveTextContent("Since Aug 2026: 1.41");
 		expect(slide).toHaveTextContent("+0.07");
@@ -111,6 +111,7 @@ describe("App", () => {
 		expect(slide.querySelectorAll(".cell-warning")).toHaveLength(2);
 
 		fireEvent.keyDown(window, { key: "End" });
+		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		expect(currentSlide()).toHaveTextContent("Do better.Lock in.Put the Odin down.");
 	});
@@ -166,6 +167,7 @@ describe("App", () => {
 
 		fireEvent.keyDown(window, { key: "End" });
 		fireEvent.keyDown(window, { key: "ArrowLeft" });
+		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		expect(within(currentSlide()).getAllByRole("listitem").at(-1)).toHaveTextContent("End the loss streak.");
 	});
 
@@ -176,9 +178,9 @@ describe("App", () => {
 		render(<App />);
 		await answerNo();
 
-		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 5/);
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 6/);
 		fireEvent.keyDown(window, { key: "ArrowRight" });
-		expect(currentSlide()).toHaveAccessibleName(/^Slide 3 of 5: Games thrown/);
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 3 of 6: Games thrown/);
 	});
 
 	it("skips the animation when reduced motion is requested", async () => {
@@ -191,7 +193,7 @@ describe("App", () => {
 		await act(() => vi.advanceTimersByTimeAsync(REDUCED_CELEBRATE_MS));
 
 		expect(document.querySelector(".checkerboard")).not.toBeInTheDocument();
-		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 6/);
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 7/);
 	});
 
 	it("walks through the deck with the keyboard and controls", async () => {
@@ -200,21 +202,25 @@ describe("App", () => {
 		await answerNo();
 
 		fireEvent.keyDown(window, { key: "ArrowRight" });
-		expect(currentSlide()).toHaveAccessibleName("Slide 3 of 6: Recent form, last 15");
+		expect(currentSlide()).toHaveAccessibleName("Slide 3 of 7: Recent form, last 15");
 
 		fireEvent.keyDown(window, { key: "ArrowRight" });
-		expect(currentSlide()).toHaveAccessibleName("Slide 4 of 6: Games thrown vs not thrown, last 15");
+		expect(currentSlide()).toHaveAccessibleName("Slide 4 of 7: Games thrown vs not thrown, last 15");
 		expect(screen.getByRole("list", { name: "15 games" })).toHaveTextContent("Not thrown: 7 Thrown: 8");
 		expect(currentSlide()).toHaveTextContent("Draws count as thrown.");
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		const takeaways = currentSlide();
-		expect(takeaways).toHaveAccessibleName("Slide 5 of 6: Key takeaways");
+		expect(takeaways).toHaveAccessibleName("Slide 5 of 7: Key takeaways");
 		expect(within(takeaways).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
 			"Do better.",
 			"Lock in.",
 			"Touch grass.",
 		]);
+
+		fireEvent.click(screen.getByRole("button", { name: "Next" }));
+		expect(currentSlide()).toHaveAccessibleName("Slide 6 of 7: Peer review");
+		expect(currentSlide()).toHaveTextContent("Was this review fair?");
 
 		fireEvent.keyDown(window, { key: "End" });
 		const closing = currentSlide();
@@ -228,7 +234,7 @@ describe("App", () => {
 
 		fireEvent.click(screen.getByRole("button", { name: "End show" }));
 		fireEvent.click(screen.getByRole("button", { name: "End of slide show, click to exit." }));
-		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 6/);
+		expect(currentSlide()).toHaveAccessibleName(/^Slide 2 of 7/);
 
 		fireEvent.keyDown(window, { key: "ArrowLeft" });
 		expect(screen.getAllByRole("button", { name: "No" })).toHaveLength(2);

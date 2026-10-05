@@ -1,8 +1,8 @@
 # Infrastructure
 
 Terraform for the whole site: the collector (DynamoDB table, data bucket, API key secret,
-Lambda, schedule), alarms and a monthly budget, and the public site (CloudFront in front of
-private buckets, plus a GitHub Actions deploy role).
+Lambda, schedule), the votes function, alarms and a monthly budget, and the public site
+(CloudFront in front of private buckets, plus a GitHub Actions deploy role).
 
 All commands run from the repository root with your AWS credentials available, for
 example `export AWS_PROFILE=personal`. Nothing here contains secrets or account IDs:
@@ -99,7 +99,10 @@ the data.
 
 CloudFront serves the built frontend from the site bucket and `/data/*` (summaries and
 photos) from the data bucket. Both buckets are private and readable only by this
-distribution. Every response carries HSTS and a strict Content Security Policy that
+distribution. `/api/*` goes, uncached, to the votes function's URL, which requires
+IAM auth: only this distribution can call it, through Origin Access Control. Because
+CloudFront can only sign a POST whose body hash it is given, the page sends an
+`x-amz-content-sha256` header with each vote. Every response carries HSTS and a strict Content Security Policy that
 allows only the site's own scripts, styles, fonts, images, and data. Caching follows each
 object's `Cache-Control`: `index.html` is revalidated, hashed assets are immutable, and
 summaries are cached for five minutes.
@@ -107,7 +110,7 @@ summaries are cached for five minutes.
 ## Costs
 
 Expected around $1–2 a month: Secrets Manager ($0.40), three custom metrics
-(~$0.90), two alarms ($0.20), and cents for Lambda, DynamoDB, S3, and CloudFront at
+(~$0.90), three alarms ($0.30), and cents for Lambda, DynamoDB, S3, and CloudFront at
 friend-group traffic. The budget emails at 80% of actual and 100% of forecast spend
 (default $5).
 

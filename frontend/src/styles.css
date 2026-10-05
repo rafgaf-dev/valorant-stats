@@ -764,6 +764,88 @@ button {
 	background: var(--accent-2);
 }
 
+/* --- Peer review: one vote per viewer per day, then an Office bar chart ---------------- */
+
+.peer-review {
+	display: grid;
+	gap: 3cqi;
+	align-content: center;
+	justify-items: center;
+	height: 100%;
+	text-align: center;
+}
+
+.slide-body .peer-question {
+	margin: 0;
+	color: var(--navy);
+	font-size: clamp(26px, 5.4cqi, 58px);
+	font-weight: 700;
+	line-height: 1.05;
+}
+
+.vote-results {
+	width: min(100%, 64cqi);
+}
+
+.vote-results:focus {
+	outline: none; /* focused after a vote so keyboard users stay on the slide */
+}
+
+.vote-chart {
+	display: grid;
+	gap: 1.4cqi;
+	margin: 0;
+	font-size: clamp(14px, 2.4cqi, 26px);
+	text-align: left;
+}
+
+.vote-chart figcaption {
+	color: var(--muted);
+	font-size: 0.85em;
+}
+
+.vote-row {
+	display: grid;
+	grid-template-columns: 7.5em minmax(0, 1fr) 5.5em;
+	gap: 1.2cqi;
+	align-items: center;
+}
+
+.vote-label {
+	font-weight: 700;
+}
+
+.vote-bar {
+	height: 4.2cqi;
+	min-height: 22px;
+	border-left: 1px solid #a6a6a6;
+}
+
+.vote-fill {
+	display: block;
+	height: 100%;
+	box-shadow: 0.3cqi 0.3cqi 0.4cqi rgb(0 0 0 / 0.25);
+}
+
+.vote-fair .vote-fill {
+	background: linear-gradient(180deg, #8eb4e3 0%, var(--accent-1) 45%, #3a6aa5 100%);
+}
+
+.vote-tooGenerous .vote-fill {
+	background: linear-gradient(180deg, #c3d69b 0%, var(--accent-3) 45%, #76923c 100%);
+}
+
+.vote-count {
+	font-variant-numeric: tabular-nums;
+}
+
+.slide-body .vote-notice {
+	min-height: 1.25em;
+	margin: 0;
+	color: var(--muted);
+	font-size: clamp(14px, 2.2cqi, 24px);
+}
+
 /* --- Takeaways and closing ------------------------------------------------------------- */
 
 .takeaways {
@@ -982,6 +1064,10 @@ button {
 	}
 
 	.bar-row {
+		grid-template-columns: 6.5em minmax(0, 1fr) 4.8em;
+	}
+
+	.vote-row {
 		grid-template-columns: 6.5em minmax(0, 1fr) 4.8em;
 	}
 

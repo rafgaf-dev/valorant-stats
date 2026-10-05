@@ -30,5 +30,5 @@ testpaths = ["tests"]
 addopts = ["--import-mode=importlib", "--strict-markers"]
 
 [tool.coverage.run]
-source = ["collector"]
+source = ["collector", "votes"]
 branch = true

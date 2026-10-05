@@ -4,6 +4,7 @@ import { performanceRating, takeaways } from "../roast";
 import { formatMonth, formatUpdated } from "../summary";
 import { ComparisonBars } from "./ComparisonBars";
 import { OutcomesChart } from "./OutcomesChart";
+import { PeerReview } from "./PeerReview";
 import { RecentForm } from "./RecentForm";
 import { ShameTally } from "./ShameTally";
 import { SpinningNeon } from "./SpinningNeon";
@@ -90,6 +91,10 @@ export function buildSlides(summary: PlayerSummary): SlideContent[] {
 					))}
 				</ul>
 			),
+		},
+		{
+			title: "Peer review",
+			body: <PeerReview playerId={player.id} />,
 		},
 		closingSlide(summary),
 	];

@@ -100,3 +100,76 @@ export async function getPlayerSummary(playerId: string, signal?: AbortSignal): 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+
+// Peer review votes, served by the votes function under /api (infrastructure/votes.tf).
+
+export type VoteChoice = "fair" | "tooGenerous";
+
+export type VoteTally = { fair: number; tooGenerous: number; yourVote: VoteChoice | null };
+
+export type VoteResult = { tally: VoteTally; alreadyVoted: boolean };
+
+export class VoteError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "VoteError";
+	}
+}
+
+export function votesUrl(playerId: string): string {
+	return `/api/votes/${encodeURIComponent(playerId)}`;
+}
+
+export async function getVotes(playerId: string, signal?: AbortSignal): Promise<VoteTally> {
+	const response = await request(votesUrl(playerId), { signal });
+	if (!response.ok) throw new VoteError(`The votes couldn't be loaded (HTTP ${response.status}).`);
+	return parseTally(await readJson(response));
+}
+
+/** Casts a vote. One per viewer per day: a second one returns the first, unchanged. */
+export async function castVote(playerId: string, choice: VoteChoice): Promise<VoteResult> {
+	const body = JSON.stringify({ choice });
+	const response = await request(votesUrl(playerId), {
+		method: "POST",
+		// CloudFront signs requests to the function URL, and can only sign a POST whose body
+		// hash the browser supplies.
+		headers: { "Content-Type": "application/json", "x-amz-content-sha256": await sha256Hex(body) },
+		body,
+	});
+	if (response.ok || response.status === 409) {
+		return { tally: parseTally(await readJson(response)), alreadyVoted: response.status === 409 };
+	}
+	throw new VoteError(`The vote couldn't be sent (HTTP ${response.status}).`);
+}
+
+async function request(url: string, init: RequestInit): Promise<Response> {
+	try {
+		return await fetch(url, init);
+	} catch (error) {
+		if (error instanceof DOMException && error.name === "AbortError") throw error;
+		throw new VoteError("The votes couldn't be reached.");
+	}
+}
+
+async function readJson(response: Response): Promise<unknown> {
+	try {
+		return await response.json();
+	} catch {
+		throw new VoteError("The votes response wasn't understood.");
+	}
+}
+
+function parseTally(body: unknown): VoteTally {
+	const valid =
+		isRecord(body) &&
+		Number.isInteger(body.fair) &&
+		Number.isInteger(body.tooGenerous) &&
+		(body.yourVote === null || body.yourVote === "fair" || body.yourVote === "tooGenerous");
+	if (!valid) throw new VoteError("The votes response wasn't understood.");
+	return { fair: body.fair as number, tooGenerous: body.tooGenerous as number, yourVote: body.yourVote as VoteChoice | null };
+}
+
+async function sha256Hex(text: string): Promise<string> {
+	const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+	return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
