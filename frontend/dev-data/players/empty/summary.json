@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "player": {
+    "id": "empty",
+    "displayName": "The Neon Menace",
+    "agent": "Neon",
+    "region": "eu"
+  },
+  "queue": "competitive",
+  "generatedAt": "2026-10-05T12:00:02Z",
+  "windows": {
+    "recent": {
+      "matches": 0,
+      "wins": 0,
+      "losses": 0,
+      "draws": 0,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "headshots": 0,
+      "bodyshots": 0,
+      "legshots": 0,
+      "kd": null,
+      "winRate": null,
+      "headshotRate": null
+    },
+    "sinceTracking": {
+      "since": null,
+      "matches": 0,
+      "wins": 0,
+      "losses": 0,
+      "draws": 0,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "headshots": 0,
+      "bodyshots": 0,
+      "legshots": 0,
+      "kd": null,
+      "winRate": null,
+      "headshotRate": null
+    }
+  },
+  "lastImport": {
+    "status": "success",
+    "finishedAt": "2026-10-05T12:00:02Z"
+  }
+}

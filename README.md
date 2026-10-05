@@ -27,8 +27,10 @@ make dev
 ```
 
 Open http://127.0.0.1:5173. Vite serves the React app and, in development only,
-the sample summary in `frontend/dev-data/` under `/data`, the same path the
-production app reads from CloudFront.
+the sample summaries in `frontend/dev-data/` under `/data`, the same path the
+production app reads from CloudFront. Add `?player=empty` or `?player=stale` to
+the URL to preview those states, or run `make dev LOCAL=1` to see the real data
+from `make collect-local` (below).
 
 Before pushing, run the same checks as CI:
 

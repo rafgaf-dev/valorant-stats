@@ -343,21 +343,28 @@ DynamoDB items and their objects under `data/players/<id>/`, then invalidates
   as a relative URL, so there is no API base URL to configure.
   `VITE_PLAYER_ID` selects the profile at build time.
 - **Local development:** a small dev-only Vite middleware in `vite.config.ts`
-  serves `frontend/dev-data/` under `/data`. It contains sample summaries for
-  the normal, empty (`null` metrics), and stale states. This replaces
-  `lambda/api/local_server.py`, and `make dev` becomes just `vite`.
+  serves `frontend/dev-data/` under `/data`. It holds sample summaries for the
+  normal state (`neon-main`, identical to the contract fixture, which a test
+  enforces), `empty`, and `stale`; in development, `?player=<id>` switches
+  between them. `make dev LOCAL=1` serves the real summaries from
+  `make collect-local` instead (`DEV_DATA_DIR`). On WSL with the repository on
+  a Windows drive, the dev server polls for file changes, because WSL doesn't
+  deliver change events for `/mnt/c`.
 - **Components:**
   - `PlayerHeader`: art, name, and metadata (region, queue, last updated),
     taken from the summary instead of hardcoded.
   - `StatCard`: recent value, since-tracking value, delta, sample size, and
-    K/D/A or W–L–D detail.
+    K/D/A or W–L–D detail. The long-term label shows its start month and match
+    count ("since Feb 2022 (141 matches)"), because the stored history has
+    gaps.
   - `MetricNotes`: replaces `RecentGames`, which is really a footnote. It
     explains the formulas and the zero-death rule.
   - `Verdict`: the playful "cooking/trolling" ruling. Its logic lives in a
     tested pure function.
 - **States:** loading, error (fetch failed or unknown schema version), empty
   (no matches yet), stale (older than 24h), and normal.
-- **Artwork:** download the Neon portrait into `frontend/src/assets/` and add
+- **Artwork:** download the Neon portrait into `frontend/src/assets/` (cropped
+  and converted to WebP: 792 KB → 85 KB) and add
   `frontend/src/assets/ASSETS.md` with its source and the attribution. Don't
   hotlink a community CDN. The art belongs to Riot and is used under Riot's
   fan-content policy ("Legal Jibber Jabber"), which allows free fan projects
@@ -372,6 +379,9 @@ DynamoDB items and their objects under `data/players/<id>/`, then invalidates
   give deltas a text label (don't rely on colour alone), make the info note
   keyboard-accessible, and support `prefers-reduced-motion` for decorative
   effects.
+- **Fonts:** bundled from the `@fontsource` packages (SIL OFL) instead of
+  Google Fonts, so the page makes no third-party requests and visitors' IP
+  addresses aren't sent to Google.
 - **Tooling:** move `vite`, `typescript`, and `@vitejs/plugin-react` to
   `devDependencies`. Add ESLint (typescript-eslint, react-hooks) and Vitest
   with Testing Library.
