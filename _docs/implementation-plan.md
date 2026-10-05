@@ -184,6 +184,7 @@ global.
 | --- | --- | --- | --- |
 | Match | `PLAYER#<playerId>` | `MATCH#<matchId>` | `matchId`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `source` (`v4`/`stored`), `parserVersion` |
 | Import run | `PLAYER#<playerId>` | `RUN#<startedAt ISO-8601 UTC>` | `status` (`success`/`partial`/`failed`), `matchesFound`, `matchesImported`, `errorCode`, `durationMs`, `expiresAt` (TTL, 90 days) |
+| Account | `PLAYER#<playerId>` | `ACCOUNT` | `accountHash` (SHA-256 of the PUUID) |
 
 - Matches are keyed by match ID alone. Every run reads all of a player's
   matches (a few hundred items) and sorts them in memory, so a timestamp in the
@@ -195,8 +196,12 @@ global.
 - `parserVersion` records which parser wrote an item. Raw match JSON is **not**
   kept: it contains the other nine players' Riot IDs, and HenrikDev keeps the
   matches, so re-parsing can fetch them again.
-- PUUIDs are not secret and don't need encryption. They are resolved from the
-  Riot ID on every run and never stored or published.
+- PUUIDs are resolved from the Riot ID on every run and never published. Only a
+  SHA-256 hash is stored, in the account item: if the configured Riot ID starts
+  resolving to a different account, the run fails with `account_changed`
+  instead of mixing two accounts' matches under one player id. Running
+  `make delete-player` clears the old data (and the account item) first. Data
+  stored before this check existed is adopted on the next run.
 
 ### Player configuration
 

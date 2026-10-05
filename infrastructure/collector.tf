@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "collector" {
 
   statement {
     sid       = "StoreMatches"
-    actions   = ["dynamodb:Query", "dynamodb:PutItem"]
+    actions   = ["dynamodb:Query", "dynamodb:GetItem", "dynamodb:PutItem"]
     resources = [aws_dynamodb_table.collector.arn]
   }
 
