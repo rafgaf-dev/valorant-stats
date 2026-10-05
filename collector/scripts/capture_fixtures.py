@@ -9,9 +9,10 @@ to collector/tests/fixtures/henrikdev/, and prints the fields the collector's pa
 on. Riot IDs, PUUIDs, party IDs, and match IDs are replaced before anything is written,
 because the fixtures are committed to a public repository.
 
-Raw responses are cached in collector/.fixture-cache/ (gitignored, local only) so that
---offline can re-run the pseudonymization without spending API requests. Delete the cache
-when the fixtures are final: it contains other players' real Riot IDs.
+Raw responses are cached in collector/.fixture-cache/ (gitignored, local only). Online runs
+fetch only what the cache is missing (--refresh fetches everything again), and --offline
+makes no API requests at all. Delete the cache when the fixtures are final: it contains
+other players' real Riot IDs.
 """
 
 import argparse
@@ -21,12 +22,16 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, urlencode
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "collector" / "src"))  # reuse the collector's parsing rules
+
+from collector.parse import NeedsDetails, parse_stored_match  # noqa: E402
+
 FIXTURES_DIR = REPO_ROOT / "collector" / "tests" / "fixtures" / "henrikdev"
 CACHE_DIR = REPO_ROOT / "collector" / ".fixture-cache"
 API_HOST = "https://api.henrikdev.xyz"
@@ -40,6 +45,7 @@ AUTH_HINTS = {
     403: "The API key is invalid. Check it in the HenrikDev dashboard.",
 }
 
+V4_DOCUMENTS = ("matches-v4.json", "match-details-v4.json")
 V4_UNUSED_SECTIONS = ("rounds", "kills")
 
 TRACKED_RIOT_ID = {"name": "Example", "tag": "EUW"}
@@ -240,30 +246,67 @@ def cross_check(v4_matches: list[dict], stored: dict, puuid: str) -> None:
         print("   no match appears in both responses")
 
 
-def fetch(api_key: str, player: dict, match_count: int, stored_count: int) -> dict[str, Any]:
-    print("1. account (v2)")
-    account = api_get(
-        api_key,
-        f"/valorant/v2/account/{quote(player['gameName'], safe='')}/"
-        f"{quote(player['tagLine'], safe='')}",
+def fetch(
+    api_key: str, player: dict, match_count: int, stored_count: int, cached: dict[str, Any]
+) -> dict[str, Any]:
+    """Fetches the documents missing from `cached`; cached ones cost no requests."""
+    responses = dict(cached)
+
+    def step(name: str, label: str, request: Callable[[], Any]) -> Any:
+        if name in responses:
+            print(f"{label}: cached")
+        else:
+            print(f"{label}: fetching")
+            responses[name] = request()
+        return responses[name]
+
+    account = step(
+        "account.json",
+        "1. account (v2)",
+        lambda: api_get(
+            api_key,
+            f"/valorant/v2/account/{quote(player['gameName'], safe='')}/"
+            f"{quote(player['tagLine'], safe='')}",
+        ),
     )
     puuid = account["data"]["puuid"]
-    print(f"   ok, region={account['data'].get('region')!r}")
-
-    print(f"2. recent competitive matches (v4, size={match_count})")
-    matches = api_get(
-        api_key,
-        f"/valorant/v4/by-puuid/matches/{AFFINITY}/{PLATFORM}/{puuid}",
-        {"mode": "competitive", "size": match_count},
+    step(
+        "matches-v4.json",
+        f"2. recent competitive matches (v4, size={match_count})",
+        lambda: api_get(
+            api_key,
+            f"/valorant/v4/by-puuid/matches/{AFFINITY}/{PLATFORM}/{puuid}",
+            {"mode": "competitive", "size": match_count},
+        ),
     )
-
-    print(f"3. stored competitive matches (v1, size={stored_count})")
-    stored = api_get(
-        api_key,
-        f"/valorant/v1/by-puuid/stored-matches/{AFFINITY}/{puuid}",
-        {"mode": "competitive", "size": stored_count},
+    stored = step(
+        "stored-matches.json",
+        f"3. stored competitive matches (v1, size={stored_count})",
+        lambda: api_get(
+            api_key,
+            f"/valorant/v1/by-puuid/stored-matches/{AFFINITY}/{puuid}",
+            {"mode": "competitive", "size": stored_count},
+        ),
     )
-    return {"account.json": account, "matches-v4.json": matches, "stored-matches.json": stored}
+    undecided = [
+        record["meta"]["id"]
+        for record in stored.get("data", [])
+        if isinstance(parse_stored_match(record), NeedsDetails)
+    ]
+
+    def match_details() -> dict[str, Any]:
+        details = [
+            api_get(api_key, f"/valorant/v4/match/{AFFINITY}/{quote(match_id, safe='')}")["data"]
+            for match_id in undecided
+        ]
+        return {"status": 200, "data": details}
+
+    step(
+        "match-details-v4.json",
+        f"4. match details for {len(undecided)} record(s) the score can't decide (v4)",
+        match_details,
+    )
+    return responses
 
 
 def describe(responses: dict[str, Any], puuid: str) -> None:
@@ -276,16 +319,22 @@ def describe(responses: dict[str, Any], puuid: str) -> None:
     cross_check(
         responses["matches-v4.json"].get("data", []), responses["stored-matches.json"], puuid
     )
+    print("Match details for stored records the score can't decide:")
+    for match in responses.get("match-details-v4.json", {}).get("data", []):
+        describe_v4_match(match, puuid)
 
 
 def trim(responses: dict[str, Any]) -> dict[str, Any]:
     """Drops v4 match sections the collector doesn't read; they are ~95% of the payload."""
-    matches = responses["matches-v4.json"]
-    trimmed_matches = [
-        {key: value for key, value in match.items() if key not in V4_UNUSED_SECTIONS}
-        for match in matches.get("data", [])
-    ]
-    return {**responses, "matches-v4.json": {**matches, "data": trimmed_matches}}
+    trimmed = dict(responses)
+    for name in V4_DOCUMENTS:
+        if name in responses:
+            matches = [
+                {key: value for key, value in match.items() if key not in V4_UNUSED_SECTIONS}
+                for match in responses[name].get("data", [])
+            ]
+            trimmed[name] = {**responses[name], "data": matches}
+    return trimmed
 
 
 def pseudonymize(responses: dict[str, Any], player: dict) -> tuple[dict[str, Any], list[str]]:
@@ -320,8 +369,12 @@ def main() -> int:
     parser.add_argument("--player", help="player id from config/players.json (default: first)")
     parser.add_argument("--matches", type=int, default=5, help="recent v4 matches to save")
     parser.add_argument("--stored", type=int, default=20, help="stored match records to save")
-    parser.add_argument(
-        "--offline", action="store_true", help="reuse the cached raw responses; no API requests"
+    requests = parser.add_mutually_exclusive_group()
+    requests.add_argument(
+        "--offline", action="store_true", help="use only the cached raw responses; no requests"
+    )
+    requests.add_argument(
+        "--refresh", action="store_true", help="fetch everything again, ignoring the cache"
     )
     parser.add_argument("--out", type=Path, default=FIXTURES_DIR)
     args = parser.parse_args()
@@ -341,8 +394,11 @@ def main() -> int:
         if not api_key:
             print("Set HENRIKDEV_API_KEY in the environment.", file=sys.stderr)
             return 2
+        cached = {}
+        if cache_file.exists() and not args.refresh:
+            cached = json.loads(cache_file.read_text(encoding="utf-8"))
         try:
-            responses = fetch(api_key, player, args.matches, args.stored)
+            responses = fetch(api_key, player, args.matches, args.stored, cached)
         except ApiError as error:
             print(f"   FAILED: {error}", file=sys.stderr)
             if error.status in AUTH_HINTS:

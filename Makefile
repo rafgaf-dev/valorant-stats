@@ -23,7 +23,7 @@ help:
 		'make build           Create a production frontend build' \
 		'make validate-infra  Run terraform validate without a backend' \
 		'make check           Run everything CI runs' \
-		'make capture-fixtures  Save pseudonymized HenrikDev responses (needs HENRIKDEV_API_KEY; PLAYER=<id>, OFFLINE=1)'
+		'make capture-fixtures  Save pseudonymized HenrikDev responses (needs HENRIKDEV_API_KEY; PLAYER=<id>, OFFLINE=1, REFRESH=1)'
 
 install: $(VENV_STAMP) $(NODE_STAMP)
 
@@ -64,7 +64,7 @@ validate-infra:
 check: lint typecheck test build validate-infra
 
 capture-fixtures:
-	$(PYTHON) collector/scripts/capture_fixtures.py $(if $(PLAYER),--player $(PLAYER)) $(if $(OFFLINE),--offline)
+	$(PYTHON) collector/scripts/capture_fixtures.py $(if $(PLAYER),--player $(PLAYER)) $(if $(OFFLINE),--offline) $(if $(REFRESH),--refresh)
 
 clean:
 	rm -rf frontend/dist frontend/node_modules $(VENV) collector/.pytest_cache collector/.ruff_cache collector/.coverage collector/.fixture-cache

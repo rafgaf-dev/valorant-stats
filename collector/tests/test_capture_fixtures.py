@@ -142,3 +142,13 @@ def test_trim_drops_unused_v4_sections_only():
     assert sorted(match) == ["metadata", "players"]
     assert trimmed["stored-matches.json"] == responses["stored-matches.json"]
     assert "kills" in responses["matches-v4.json"]["data"][0]
+
+
+def test_trim_also_trims_match_details():
+    responses = make_responses()
+    detail = {"metadata": {}, "players": [], "rounds": [], "kills": []}
+    responses["match-details-v4.json"] = {"status": 200, "data": [detail]}
+
+    trimmed = trim(responses)
+
+    assert trimmed["match-details-v4.json"]["data"] == [{"metadata": {}, "players": []}]
