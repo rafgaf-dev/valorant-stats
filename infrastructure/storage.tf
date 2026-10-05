@@ -85,7 +85,43 @@ resource "aws_s3_bucket_lifecycle_configuration" "data" {
   }
 }
 
+# CloudFront may read published files and list the bucket (missing files then return 404
+# rather than 403). Nothing else is readable from outside the account.
 data "aws_iam_policy_document" "data_bucket" {
+  statement {
+    sid       = "CloudFrontRead"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.data.arn}/data/*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.site.arn]
+    }
+  }
+
+  statement {
+    sid       = "CloudFrontList"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.data.arn]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.site.arn]
+    }
+  }
+
   statement {
     sid       = "DenyInsecureTransport"
     effect    = "Deny"

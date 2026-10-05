@@ -566,9 +566,15 @@ Each milestone is one or more small PRs that pass CI.
    (disabled), alarms, and the monthly budget (moved here from milestone 7 so
    it exists before anything can cost money). Apply, set the secret, invoke
    manually, then enable the schedule. Steps: `infrastructure/README.md`.
-6. **Delivery:** CloudFront, the frontend publish (`aws s3 sync --delete`
-   on the site bucket plus an `index.html` invalidation), and the GitHub OIDC
-   deploy workflow.
+6. **Delivery:** CloudFront with security headers (HSTS and a strict CSP,
+   verified against the real build), the site bucket, the frontend publish
+   (`scripts/deploy-frontend.sh`: hashed assets first, `index.html` second, old
+   assets removed last, then an invalidation), photo uploads, and the GitHub
+   OIDC deploy workflow. CI deploys only the frontend, through a role limited to
+   the site bucket and invalidations, and only from the `production`
+   environment, which accepts `main` alone. Terraform stays a reviewed local
+   apply: it needs the gitignored players file, and a CI role able to apply it
+   would need near-administrator access.
 7. **Operations:** the delete-player script, and any alarm tuning after the
    first weeks of scheduled runs.
 8. **README:** architecture diagram, screenshot, how to run locally, how to

@@ -1,4 +1,4 @@
-.PHONY: help install dev lint format typecheck test build validate-infra check capture-fixtures collect-local infra-bootstrap infra-init infra-plan infra-apply set-api-key invoke clean
+.PHONY: help install dev lint format typecheck test build validate-infra check capture-fixtures collect-local infra-bootstrap infra-init infra-plan infra-apply set-api-key invoke deploy-frontend upload-photos clean
 
 PYTHON ?= python3
 NPM ?= corepack npm
@@ -12,6 +12,7 @@ VENV ?= collector/.venv
 VENV_BIN := $(abspath $(VENV))/bin
 VENV_STAMP := $(VENV)/.installed
 NODE_STAMP := frontend/node_modules/.package-lock.json
+TF_OUTPUT = $(TERRAFORM) -chdir=infrastructure output -raw
 
 export COREPACK_ENABLE_DOWNLOAD_PROMPT := 0
 
@@ -27,7 +28,17 @@ help:
 		'make validate-infra    Run terraform validate without a backend' \
 		'make check             Run everything CI runs' \
 		'make capture-fixtures  Save pseudonymized HenrikDev responses (needs HENRIKDEV_API_KEY; PLAYER=<id>, OFFLINE=1, REFRESH=1)' \
-		'make collect-local     Run the collector against the real API into collector/.local (needs HENRIKDEV_API_KEY; PLAYER=<id>)' \n		'' \n		'AWS (uses your AWS_PROFILE; see infrastructure/README.md):' \n		'make infra-bootstrap   Create the Terraform state bucket once and write infrastructure/backend.hcl' \n		'make infra-init        Initialise Terraform against the state bucket' \n		'make infra-plan        Show what would change in AWS and save the plan' \n		'make infra-apply       Apply the saved plan' \n		'make set-api-key       Store HENRIKDEV_API_KEY in Secrets Manager' \n		'make invoke            Run the collector Lambda once and show its result'
+		'make collect-local     Run the collector against the real API into collector/.local (needs HENRIKDEV_API_KEY; PLAYER=<id>)' \
+		'' \
+		'AWS (uses your AWS_PROFILE; see infrastructure/README.md):' \
+		'make infra-bootstrap   Create the Terraform state bucket once and write infrastructure/backend.hcl' \
+		'make infra-init        Initialise Terraform against the state bucket' \
+		'make infra-plan        Show what would change in AWS and save the plan' \
+		'make infra-apply       Apply the saved plan' \
+		'make set-api-key       Store HENRIKDEV_API_KEY in Secrets Manager' \
+		'make invoke            Run the collector Lambda once and show its result' \
+		'make deploy-frontend   Build and publish the frontend (CI does this on merge to main)' \
+		'make upload-photos     Publish config/photos/<player-id>.webp next to each summary'
 
 install: $(VENV_STAMP) $(NODE_STAMP)
 
@@ -61,9 +72,10 @@ test: install
 build: $(NODE_STAMP)
 	$(NPM) --prefix frontend run build
 
+# A separate data directory, so validation never touches the real backend or needs AWS access.
 validate-infra:
-	$(TERRAFORM) -chdir=infrastructure init -backend=false -input=false
-	$(TERRAFORM) -chdir=infrastructure validate
+	TF_DATA_DIR=.terraform-validate $(TERRAFORM) -chdir=infrastructure init -backend=false -input=false
+	TF_DATA_DIR=.terraform-validate $(TERRAFORM) -chdir=infrastructure validate
 
 check: lint typecheck test build validate-infra
 
@@ -91,16 +103,33 @@ infra-apply:
 set-api-key:
 	@test -n "$$HENRIKDEV_API_KEY" || { echo "Set HENRIKDEV_API_KEY first." >&2; exit 1; }
 	@printf '%s' "$$HENRIKDEV_API_KEY" | aws secretsmanager put-secret-value \
-		--secret-id "$$($(TERRAFORM) -chdir=infrastructure output -raw api_key_secret_arn)" \
+		--secret-id "$$($(TF_OUTPUT) api_key_secret_arn)" \
 		--secret-string file:///dev/stdin --query VersionId --output text
 
 # Prints the function's last log lines, then its response.
 invoke:
 	@response=$$(mktemp); \
 	aws lambda invoke --cli-read-timeout 310 --log-type Tail --query LogResult --output text \
-		--function-name "$$($(TERRAFORM) -chdir=infrastructure output -raw collector_function_name)" \
+		--function-name "$$($(TF_OUTPUT) collector_function_name)" \
 		"$$response" | base64 -d; \
 	echo; cat "$$response"; echo; rm -f "$$response"
+
+deploy-frontend: build
+	SITE_BUCKET="$$($(TF_OUTPUT) site_bucket)" DISTRIBUTION_ID="$$($(TF_OUTPUT) distribution_id)" \
+		scripts/deploy-frontend.sh frontend/dist
+
+# Photos stay out of git; they're uploaded straight from config/photos/ to the data bucket.
+upload-photos:
+	@bucket="$$($(TF_OUTPUT) data_bucket)"; distribution="$$($(TF_OUTPUT) distribution_id)"; found=0; \
+	for photo in config/photos/*.webp; do \
+		[ -e "$$photo" ] || continue; found=1; id="$$(basename "$$photo" .webp)"; \
+		echo "Uploading $$id"; \
+		aws s3 cp "$$photo" "s3://$$bucket/data/players/$$id/photo.webp" --only-show-errors \
+			--content-type image/webp --cache-control "public, max-age=3600"; \
+		aws cloudfront create-invalidation --distribution-id "$$distribution" \
+			--paths "/data/players/$$id/photo.webp" --query Invalidation.Id --output text; \
+	done; \
+	[ "$$found" = 1 ] || echo "No photos in config/photos/ (expected <player-id>.webp)."
 
 clean:
 	rm -rf frontend/dist frontend/node_modules $(VENV) collector/.pytest_cache collector/.ruff_cache collector/.coverage collector/.fixture-cache collector/.local

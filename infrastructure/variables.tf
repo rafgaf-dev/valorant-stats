@@ -37,3 +37,9 @@ variable "schedule_enabled" {
   type        = bool
   default     = false
 }
+
+variable "github_repository" {
+  description = "owner/name of the GitHub repository whose production environment may deploy."
+  type        = string
+  default     = "rafgaf-dev/valorant-stats"
+}
