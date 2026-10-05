@@ -1,0 +1,951 @@
+{
+  "status": 200,
+  "results": {
+    "total": 138,
+    "returned": 20,
+    "before": -20,
+    "after": 138
+  },
+  "data": [
+    {
+      "meta": {
+        "id": "match-0001",
+        "map": {
+          "id": "92584fbe-486a-b1b2-9faa-39b0f486b498",
+          "name": "Sunset"
+        },
+        "version": "release-13.05-shipping-11-5350494",
+        "mode": "Competitive",
+        "started_at": "2026-09-20T18:39:05.47Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "Madrid"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 208,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 20,
+        "score": 4075,
+        "kills": 14,
+        "deaths": 9,
+        "assists": 9,
+        "shots": {
+          "head": 9,
+          "body": 32,
+          "leg": 1
+        },
+        "damage": {
+          "made": 2660,
+          "received": 1834
+        }
+      },
+      "teams": {
+        "red": 6,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0002",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "version": "release-13.05-shipping-11-5350494",
+        "mode": "Competitive",
+        "started_at": "2026-09-20T18:15:17.811Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "Madrid"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 208,
+        "character": {
+          "id": "e370fa57-4757-3604-3648-499e1f642d3f",
+          "name": "Gekko"
+        },
+        "tier": 20,
+        "score": 2549,
+        "kills": 8,
+        "deaths": 13,
+        "assists": 2,
+        "shots": {
+          "head": 8,
+          "body": 17,
+          "leg": 0
+        },
+        "damage": {
+          "made": 1859,
+          "received": 2139
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 1
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0003",
+        "map": {
+          "id": "756da597-416b-c0f2-f47b-afbdf28670bc",
+          "name": "Summit"
+        },
+        "version": "release-13.05-shipping-11-5350494",
+        "mode": "Competitive",
+        "started_at": "2026-09-05T21:14:41.674Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 207,
+        "character": {
+          "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+          "name": "Clove"
+        },
+        "tier": 20,
+        "score": 2956,
+        "kills": 12,
+        "deaths": 15,
+        "assists": 3,
+        "shots": {
+          "head": 10,
+          "body": 14,
+          "leg": 2
+        },
+        "damage": {
+          "made": 2192,
+          "received": 2791
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 6
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0004",
+        "map": {
+          "id": "224b0a95-48b9-f703-1bd8-67aca101a61f",
+          "name": "Abyss"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-31T22:56:56.807Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 207,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 20,
+        "score": 5681,
+        "kills": 20,
+        "deaths": 15,
+        "assists": 2,
+        "shots": {
+          "head": 20,
+          "body": 21,
+          "leg": 0
+        },
+        "damage": {
+          "made": 3540,
+          "received": 2673
+        }
+      },
+      "teams": {
+        "red": 3,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0005",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-31T22:28:37.83Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 207,
+        "character": {
+          "id": "e370fa57-4757-3604-3648-499e1f642d3f",
+          "name": "Gekko"
+        },
+        "tier": 21,
+        "score": 3881,
+        "kills": 13,
+        "deaths": 13,
+        "assists": 2,
+        "shots": {
+          "head": 11,
+          "body": 21,
+          "leg": 0
+        },
+        "damage": {
+          "made": 2503,
+          "received": 2562
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 3
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0006",
+        "map": {
+          "id": "92584fbe-486a-b1b2-9faa-39b0f486b498",
+          "name": "Sunset"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-31T20:09:11.208Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 207,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 21,
+        "score": 6588,
+        "kills": 25,
+        "deaths": 13,
+        "assists": 4,
+        "shots": {
+          "head": 18,
+          "body": 33,
+          "leg": 1
+        },
+        "damage": {
+          "made": 4156,
+          "received": 2646
+        }
+      },
+      "teams": {
+        "red": 7,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0007",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-30T20:07:29.089Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 206,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 21,
+        "score": 1972,
+        "kills": 7,
+        "deaths": 14,
+        "assists": 1,
+        "shots": {
+          "head": 7,
+          "body": 11,
+          "leg": 0
+        },
+        "damage": {
+          "made": 1188,
+          "received": 2338
+        }
+      },
+      "teams": {
+        "red": 2,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0008",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-29T21:14:49.527Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 206,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 21,
+        "score": 8736,
+        "kills": 32,
+        "deaths": 14,
+        "assists": 6,
+        "shots": {
+          "head": 25,
+          "body": 54,
+          "leg": 4
+        },
+        "damage": {
+          "made": 5924,
+          "received": 3079
+        }
+      },
+      "teams": {
+        "red": 11,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0009",
+        "map": {
+          "id": "7eaecc1b-4337-bbf6-6ab9-04b8f06b3319",
+          "name": "Ascent"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-24T21:32:43.77Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 205,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 21,
+        "score": 5407,
+        "kills": 19,
+        "deaths": 15,
+        "assists": 9,
+        "shots": {
+          "head": 16,
+          "body": 28,
+          "leg": 1
+        },
+        "damage": {
+          "made": 3656,
+          "received": 2699
+        }
+      },
+      "teams": {
+        "red": 8,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0010",
+        "map": {
+          "id": "d960549e-485c-e861-8d71-aa9d1aed12a2",
+          "name": "Split"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-23T15:43:38.666Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 205,
+        "character": {
+          "id": "eb93336a-449b-9c1b-0a54-a891f7921d69",
+          "name": "Phoenix"
+        },
+        "tier": 20,
+        "score": 5735,
+        "kills": 18,
+        "deaths": 16,
+        "assists": 7,
+        "shots": {
+          "head": 16,
+          "body": 32,
+          "leg": 3
+        },
+        "damage": {
+          "made": 3791,
+          "received": 3508
+        }
+      },
+      "teams": {
+        "red": 10,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0011",
+        "map": {
+          "id": "756da597-416b-c0f2-f47b-afbdf28670bc",
+          "name": "Summit"
+        },
+        "version": "release-13.04-shipping-20-5340415",
+        "mode": "Competitive",
+        "started_at": "2026-08-23T15:18:12.934Z",
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 205,
+        "character": {
+          "id": "dade69b4-4f5a-8528-247b-219e5a1facd6",
+          "name": "Fade"
+        },
+        "tier": 20,
+        "score": 4988,
+        "kills": 19,
+        "deaths": 5,
+        "assists": 2,
+        "shots": {
+          "head": 16,
+          "body": 15,
+          "leg": 0
+        },
+        "damage": {
+          "made": 3216,
+          "received": 1036
+        }
+      },
+      "teams": {
+        "red": 3,
+        "blue": 10
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0012",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "version": "release-13.02-shipping-17-5277781",
+        "mode": "Competitive",
+        "started_at": "2026-08-17T20:57:55.716Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 204,
+        "character": {
+          "id": "e370fa57-4757-3604-3648-499e1f642d3f",
+          "name": "Gekko"
+        },
+        "tier": 20,
+        "score": 6835,
+        "kills": 26,
+        "deaths": 12,
+        "assists": 7,
+        "shots": {
+          "head": 17,
+          "body": 53,
+          "leg": 4
+        },
+        "damage": {
+          "made": 4792,
+          "received": 2263
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 8
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0013",
+        "map": {
+          "id": "2fb9a4fd-47b8-4e7d-a969-74b4046ebd53",
+          "name": "Breeze"
+        },
+        "version": "release-13.02-shipping-17-5277781",
+        "mode": "Competitive",
+        "started_at": "2026-08-17T19:45:36.856Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 204,
+        "character": {
+          "id": "6f2a04ca-43e0-be17-7f36-b3908627744d",
+          "name": "Skye"
+        },
+        "tier": 19,
+        "score": 5607,
+        "kills": 21,
+        "deaths": 9,
+        "assists": 7,
+        "shots": {
+          "head": 19,
+          "body": 28,
+          "leg": 2
+        },
+        "damage": {
+          "made": 3787,
+          "received": 2126
+        }
+      },
+      "teams": {
+        "red": 8,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0014",
+        "map": {
+          "id": "d960549e-485c-e861-8d71-aa9d1aed12a2",
+          "name": "Split"
+        },
+        "version": "release-13.02-shipping-15-5253245",
+        "mode": "Competitive",
+        "started_at": "2026-08-10T19:54:20.721Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 203,
+        "character": {
+          "id": "601dbbe7-43ce-be57-2a40-4abd24953621",
+          "name": "KAY/O"
+        },
+        "tier": 19,
+        "score": 9884,
+        "kills": 37,
+        "deaths": 16,
+        "assists": 7,
+        "shots": {
+          "head": 25,
+          "body": 52,
+          "leg": 1
+        },
+        "damage": {
+          "made": 5719,
+          "received": 3374
+        }
+      },
+      "teams": {
+        "red": 14,
+        "blue": 14
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0015",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "version": "release-13.02-shipping-15-5253245",
+        "mode": "Competitive",
+        "started_at": "2026-08-10T19:00:18.316Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 203,
+        "character": {
+          "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+          "name": "Raze"
+        },
+        "tier": 19,
+        "score": 6435,
+        "kills": 21,
+        "deaths": 18,
+        "assists": 6,
+        "shots": {
+          "head": 13,
+          "body": 62,
+          "leg": 1
+        },
+        "damage": {
+          "made": 4251,
+          "received": 3278
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 10
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0016",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "version": "release-13.02-shipping-15-5253245",
+        "mode": "Competitive",
+        "started_at": "2026-08-10T18:16:32.892Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 203,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 19,
+        "score": 3765,
+        "kills": 13,
+        "deaths": 16,
+        "assists": 5,
+        "shots": {
+          "head": 11,
+          "body": 24,
+          "leg": 3
+        },
+        "damage": {
+          "made": 2727,
+          "received": 2870
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 10
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0017",
+        "map": {
+          "id": "2fb9a4fd-47b8-4e7d-a969-74b4046ebd53",
+          "name": "Breeze"
+        },
+        "version": "release-13.02-shipping-15-5253245",
+        "mode": "Competitive",
+        "started_at": "2026-08-09T00:00:49.112Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Red",
+        "level": 202,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 19,
+        "score": 3739,
+        "kills": 13,
+        "deaths": 18,
+        "assists": 3,
+        "shots": {
+          "head": 10,
+          "body": 17,
+          "leg": 1
+        },
+        "damage": {
+          "made": 2356,
+          "received": 3139
+        }
+      },
+      "teams": {
+        "red": 7,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0018",
+        "map": {
+          "id": "7eaecc1b-4337-bbf6-6ab9-04b8f06b3319",
+          "name": "Ascent"
+        },
+        "version": "release-13.02-shipping-15-5253245",
+        "mode": "Competitive",
+        "started_at": "2026-08-08T23:13:04.05Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 202,
+        "character": {
+          "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+          "name": "Sova"
+        },
+        "tier": 19,
+        "score": 6473,
+        "kills": 25,
+        "deaths": 16,
+        "assists": 7,
+        "shots": {
+          "head": 17,
+          "body": 22,
+          "leg": 3
+        },
+        "damage": {
+          "made": 4110,
+          "received": 2709
+        }
+      },
+      "teams": {
+        "red": 13,
+        "blue": 11
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0019",
+        "map": {
+          "id": "756da597-416b-c0f2-f47b-afbdf28670bc",
+          "name": "Summit"
+        },
+        "version": "release-13.02-shipping-15-5253245",
+        "mode": "Competitive",
+        "started_at": "2026-08-08T22:33:46.405Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "Frankfurt"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 202,
+        "character": {
+          "id": "b444168c-4e35-8076-db47-ef9bf368f384",
+          "name": "Tejo"
+        },
+        "tier": 19,
+        "score": 6705,
+        "kills": 25,
+        "deaths": 11,
+        "assists": 3,
+        "shots": {
+          "head": 22,
+          "body": 34,
+          "leg": 1
+        },
+        "damage": {
+          "made": 4699,
+          "received": 2279
+        }
+      },
+      "teams": {
+        "red": 7,
+        "blue": 13
+      }
+    },
+    {
+      "meta": {
+        "id": "match-0020",
+        "map": {
+          "id": "d960549e-485c-e861-8d71-aa9d1aed12a2",
+          "name": "Split"
+        },
+        "version": "release-13.02-shipping-7-5092570",
+        "mode": "Competitive",
+        "started_at": "2026-08-02T00:32:50.941Z",
+        "season": {
+          "id": "4f0864e2-40af-28a4-de2c-0e9e64e75f23",
+          "short": "e11a4"
+        },
+        "region": "eu",
+        "cluster": "London"
+      },
+      "stats": {
+        "puuid": "puuid-tracked",
+        "name": "Example",
+        "tag": "EUW",
+        "team": "Blue",
+        "level": 201,
+        "character": {
+          "id": "dade69b4-4f5a-8528-247b-219e5a1facd6",
+          "name": "Fade"
+        },
+        "tier": 19,
+        "score": 4423,
+        "kills": 16,
+        "deaths": 14,
+        "assists": 4,
+        "shots": {
+          "head": 12,
+          "body": 34,
+          "leg": 1
+        },
+        "damage": {
+          "made": 3119,
+          "received": 2710
+        }
+      },
+      "teams": {
+        "red": 8,
+        "blue": 13
+      }
+    }
+  ]
+}
