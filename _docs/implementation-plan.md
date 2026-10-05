@@ -159,7 +159,7 @@ Why this design:
 | Collector Lambda | Python 3.13, arm64, 256 MB, 5-minute timeout, reserved concurrency 1 (runs never overlap), no VPC. |
 | EventBridge Scheduler | `rate(6 hours)`, configurable. Retry policy: 0 retries (the next scheduled run is the retry). |
 | Secrets Manager | One secret, the HenrikDev API key. Terraform creates the secret *container* only. The value is set with the AWS CLI, so it never enters Terraform state or git. |
-| CloudWatch | Log group with 14-day retention. Custom metrics: `SuccessfulRuns`, `MatchesImported`, `ApiErrors`. |
+| CloudWatch | Log group with 14-day retention. Custom metrics: `SuccessfulRuns`, `MatchesImported`, `FailedPlayers`. |
 | SNS | One email subscription for alarms. |
 | AWS Budgets | Monthly budget (for example $5), with alerts at 80% actual and 100% forecast. |
 
@@ -170,18 +170,19 @@ global.
 
 | Item | PK | SK | Attributes |
 | --- | --- | --- | --- |
-| Match | `PLAYER#<playerId>` | `MATCH#<playedAt ISO-8601 UTC>#<matchId>` | `matchId`, `queue`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `source` (`v4`/`stored`), `parserVersion` |
+| Match | `PLAYER#<playerId>` | `MATCH#<matchId>` | `matchId`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `source` (`v4`/`stored`), `parserVersion` |
 | Import run | `PLAYER#<playerId>` | `RUN#<startedAt ISO-8601 UTC>` | `status` (`success`/`partial`/`failed`), `matchesFound`, `matchesImported`, `errorCode`, `durationMs`, `expiresAt` (TTL, 90 days) |
 
-- The sort key starts with the timestamp, so "latest 15 matches" is one
-  `Query` with `ScanIndexForward=false`.
-- The API fills in `playedAt` and `matchId`, so the key is the same on every
-  import. Writes use `PutItem` with the condition
+- Matches are keyed by match ID alone. Every run reads all of a player's
+  matches (a few hundred items) and sorts them in memory, so a timestamp in the
+  key would add nothing. Keying by ID also means a full v4 record replaces its
+  stored record even if the two sources disagree on the timestamp.
+- Writes use `PutItem` with the condition
   `attribute_not_exists(SK) OR source = stored`. Re-imports are idempotent,
   and a full v4 record replaces a lighter stored record for the same match.
-- `parserVersion` makes it possible to re-parse stored matches if the parsing
-  logic changes. For that, also store the raw match JSON in the data bucket
-  under `raw/<matchId>.json` (not served by CloudFront).
+- `parserVersion` records which parser wrote an item. Raw match JSON is **not**
+  kept: it contains the other nine players' Riot IDs, and HenrikDev keeps the
+  matches, so re-parsing can fetch them again.
 - PUUIDs are not secret and don't need encryption. They are resolved from the
   Riot ID on every run and never stored or published.
 
@@ -271,13 +272,18 @@ tested without AWS or the network.
 
 ```text
 collector/src/collector/
+  config.py    PLAYERS parsing and validation
   henrikdev.py HTTP client: auth header, timeouts, rate limits, error mapping
-  records.py   MatchRecord, Result, Source (shared data types)
+  records.py   MatchRecord, ImportRun and enums (shared data types)
   parse.py     v4 match / stored record JSON → MatchRecord (pure)
   metrics.py   list[MatchRecord] → windows (pure)
-  store.py     DynamoDB reads and writes
-  publish.py   writes summary.json and raw match JSON to S3
-  handler.py   orchestration, structured logging, metrics
+  summary.py   windows → the published summary contract (pure)
+  store.py     DynamoDB store, plus a JSON-file store for local runs
+  publish.py   writes summary.json to S3, or to a local directory
+  collect.py   per-player orchestration and error isolation
+  telemetry.py structured JSON logs and Embedded Metric Format
+  handler.py   Lambda entry point: wires AWS clients into collect.py
+  local.py     `make collect-local` entry point
 ```
 
 For each run:
@@ -297,8 +303,9 @@ For each run:
    4. Parse, skip matches with `is_completed == false`, and write them
       idempotently with `source = v4`.
    5. Query all of the player's matches, compute both windows, and publish
-      `summary.json`. If nothing new was imported and a summary exists, skip
-      the publish.
+      `summary.json`. It is published on every successful run, even when
+      nothing new was imported, so `generatedAt` shows the data is current and
+      the frontend's 24-hour stale banner only appears when collection stops.
    6. Write an import-run item.
 3. Emit one structured JSON log line per player and per run, and the CloudWatch
    metrics through Embedded Metric Format (no extra API calls).
@@ -311,7 +318,7 @@ For each run:
 | Response | Behavior |
 | --- | --- |
 | `200` | Continue. |
-| `404` (error code 22, 23, or 24) | Account not found or has no region yet. Mark this player failed (`account_not_found`) and continue with the next player. |
+| `404` | Account not found or has no region yet (error codes 22–24). Mark this player failed (`not_found`) and continue with the next player. A `404` for one match's details skips only that match (run status `partial`). |
 | `401` / `403` | Key missing or invalid. Stop the whole run, status `failed`, error code `api_auth`. Don't retry. |
 | `429` | Wait for `Retry-After` / `X-RateLimit-Reset` once if it is ≤ 60s. Otherwise stop the run cleanly. Previously published summaries stay unchanged. |
 | `400` | A bug in the request. Fail this player with the API's error code in the log. |
@@ -423,8 +430,8 @@ Changes from the current tree:
   with `use_lockfile = true`, so no DynamoDB lock table is needed.
 - **IAM is defined next to its resource,** with the narrowest scope possible:
   - Collector: `secretsmanager:GetSecretValue` on one secret ARN, DynamoDB
-    read/write on one table, and `s3:PutObject` on `data/players/*` and
-    `raw/*` of the data bucket.
+    read/write on one table, and `s3:PutObject` on `data/players/*` of the
+    data bucket.
   - Scheduler: `lambda:InvokeFunction` on the collector only.
   - Bucket policies allow `s3:GetObject` only from this CloudFront
     distribution (OAC with an `AWS:SourceArn` condition).
@@ -508,8 +515,10 @@ Each milestone is one or more small PRs that pass CI.
    tests.
 3. **Collector I/O:** `henrikdev.py`, `store.py`, `publish.py`, and `handler.py`
    with moto tests. A `make collect-local` target runs the collector against
-   real data with `HENRIKDEV_API_KEY` from the shell environment and writes the
-   summary to `frontend/dev-data/`.
+   real data with `HENRIKDEV_API_KEY` from the shell environment. It keeps
+   matches in `collector/.local/store.json` and writes the summary to
+   `collector/.local/data/` (both gitignored, so real stats aren't committed).
+   Milestone 4 lets the dev server read from there.
 4. **Frontend:** move to the new contract and dev data, update the components,
    add the states, local art and ASSETS.md, and tests.
 5. **Infrastructure:** bootstrap, storage, secrets, collector, and scheduler
