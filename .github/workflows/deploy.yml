@@ -1,0 +1,58 @@
+name: Deploy
+
+# Publishes the frontend after it changes on main. Infrastructure and the collector are
+# applied locally with a reviewed `terraform plan` (see infrastructure/README.md).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - "scripts/deploy-frontend.sh"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    # The AWS role trusts only this environment, which only main can deploy to.
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
+    permissions:
+      contents: read
+      id-token: write # to exchange the GitHub OIDC token for AWS credentials
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: corepack npm ci
+      - run: corepack npm test
+      - run: corepack npm run build
+      - name: Check the bundle contains no API keys
+        run: "! grep -rqE 'HDEV-|RGAPI-' dist"
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-west-1
+      - name: Upload and invalidate
+        working-directory: .
+        env:
+          SITE_BUCKET: ${{ secrets.SITE_BUCKET }}
+          DISTRIBUTION_ID: ${{ secrets.DISTRIBUTION_ID }}
+        run: scripts/deploy-frontend.sh frontend/dist

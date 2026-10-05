@@ -46,6 +46,8 @@ infrastructure/.build/
 *.tfstate
 *.tfstate.*
 *.tfplan
+tfplan
+.terraform-validate/
 *.tfvars
 *.tfvars.json
 crash.log

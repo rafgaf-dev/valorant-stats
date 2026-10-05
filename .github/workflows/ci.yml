@@ -53,6 +53,9 @@ jobs:
       - run: corepack npm run build
       - name: Check the bundle contains no API keys
         run: "! grep -rqE 'HDEV-|RGAPI-' dist"
+      - name: Check the deploy script
+        working-directory: .
+        run: shellcheck scripts/*.sh
 
   terraform:
     name: Terraform

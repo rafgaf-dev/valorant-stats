@@ -16,3 +16,23 @@ output "data_bucket" {
 output "table_name" {
   value = aws_dynamodb_table.collector.name
 }
+
+output "site_url" {
+  description = "The public site."
+  value       = "https://${aws_cloudfront_distribution.site.domain_name}"
+}
+
+output "site_bucket" {
+  description = "Deploy target for the built frontend (a GitHub environment secret)."
+  value       = aws_s3_bucket.site.id
+}
+
+output "distribution_id" {
+  description = "For cache invalidations (a GitHub environment secret)."
+  value       = aws_cloudfront_distribution.site.id
+}
+
+output "deploy_role_arn" {
+  description = "Assumed by the deploy workflow through OIDC (a GitHub environment secret)."
+  value       = aws_iam_role.deploy.arn
+}
