@@ -51,8 +51,8 @@ jobs:
       - run: corepack npm run typecheck
       - run: corepack npm test
       - run: corepack npm run build
-      - name: Check the bundle contains no Riot API key
-        run: "! grep -rq 'RGAPI-' dist"
+      - name: Check the bundle contains no API keys
+        run: "! grep -rqE 'HDEV-|RGAPI-' dist"
 
   terraform:
     name: Terraform

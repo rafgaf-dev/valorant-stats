@@ -15,9 +15,9 @@ with **Since tracking** (all stored competitive matches since the first
 successful import). Every metric shows its sample size, and the page shows
 when the data was last refreshed.
 
-The browser never calls the Riot API. A scheduled collector fetches data from
-Riot, stores it, and publishes a precomputed JSON summary that the frontend
-reads as a static file.
+The browser never calls a stats API. A scheduled collector fetches match data
+from the HenrikDev API (section 2), stores it, and publishes a precomputed JSON
+summary that the frontend reads as a static file.
 
 ### Non-goals
 
@@ -26,51 +26,95 @@ reads as a static file.
 - No custom domain for now. The generated CloudFront URL is enough.
 - No multi-environment setup (dev/stage/prod). There is one environment.
 
-## 2. Gate zero: confirm Riot API access
+## 2. Data source: HenrikDev API
 
-Everything else depends on this, so do it before writing any more backend code.
+### Why not the official Riot API
 
-1. Check the Riot Developer Portal for the key types that can call
-   `val-match-v1` (match data). Valorant match endpoints have historically
-   required an approved **production** key. Valorant products have also been
-   required to use **Riot Sign On (RSO)**, so each tracked player opts in
-   themselves. Development keys expire every 24 hours, so a scheduled collector
-   can't run on one.
-2. Register the app honestly as a small, noncommercial fan dashboard for a
-   friend group, and apply for the key type that the portal says is required.
-3. Once you have a working key, fetch one real account, match list, and match
-   by hand. Save the sanitized responses as test fixtures
-   (`collector/tests/fixtures/`). All parsing code is written against these
-   files, not against assumptions.
-4. Ask the friend for consent. Their Riot ID, their stats, and the jokes about
-   them will be on a public URL. If RSO is required, they have to opt in anyway.
+Tested on 2026-10-04: a Riot development key can call `account-v1` but gets
+`403 Forbidden` on `val-match-v1`. Riot offers no development-tier access to
+Valorant match data. The only route is a production key for a registered
+product, which Riot grants to public apps for a wide audience (with Riot Sign
+On). A private dashboard for a friend group doesn't fit that.
 
-**If access is denied or requires RSO**, stop and choose one of these before
-continuing:
+### What HenrikDev is
 
-- Add an RSO opt-in flow as an extra milestone. This needs a small callback
-  endpoint (one Lambda function URL) and token storage.
-- Use a third-party Valorant data API as the data source. Read its terms first.
-  Only the `riot.py` client module would change.
+[HenrikDev](https://docs.henrikdev.xyz) is a community-run, **unofficial**
+Valorant API. It serves match data by Riot ID or PUUID, with no Riot Sign On.
+Trade-offs, accepted for this project:
 
-### Riot endpoint facts to verify against the fixtures
+- It isn't endorsed by Riot. It gets data from Riot's own services, and it
+  could break, change, or shut down. Its compatibility with Riot's terms is
+  unclear. The README and the page footer say where the data comes from.
+- Keys come from the [HenrikDev dashboard](https://api.henrikdev.xyz/dashboard/)
+  (joining its Discord is required). A **Basic** key allows 30 requests per
+  minute. Every background request it makes to Riot for an uncached match also
+  counts against that limit.
+- Only `henrikdev.py` (the HTTP client) and `parse.py` know about this source.
+  Switching to the official API later means replacing those two modules.
 
-| Purpose | Host | Path |
+### Endpoints used
+
+All requests send the key in the `Authorization` header. Affinity is `eu`,
+platform `pc`. Specs come from the published OpenAPI document
+(`https://api.henrikdev.xyz/openapi.json`, v4.6.0 at the time of writing).
+
+| Purpose | Path | Notes |
 | --- | --- | --- |
-| Riot ID → PUUID | `europe.api.riotgames.com` (account-v1 uses regional routing) | `/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}` |
-| Match list | `eu.api.riotgames.com` (Valorant uses shard routing) | `/val/match/v1/matchlists/by-puuid/{puuid}` |
-| Match detail | `eu.api.riotgames.com` | `/val/match/v1/matches/{matchId}` |
+| Riot ID → PUUID | `GET /valorant/v2/account/{name}/{tag}` | `data.puuid`, `data.region`. |
+| Recent matches (full) | `GET /valorant/v4/by-puuid/matches/eu/pc/{puuid}?mode=competitive&size=10` | Authoritative source for new matches. |
+| Match history (light) | `GET /valorant/v1/by-puuid/stored-matches/eu/{puuid}?mode=competitive` | One-time backfill of older matches. |
+| Match details (full) | `GET /valorant/v4/match/eu/{match_id}` | Only for backfilled records whose result the score can't decide (surrenders). |
 
-- Competitive matches have `matchInfo.queueId == "competitive"`.
-- Remakes and abandoned games have `matchInfo.isCompleted == false`. Exclude them.
-- Wins come from `teams[].won`. If no team won, the match was a draw. Confirm
-  how draws appear in the fixture.
-- **Headshots are not in `players[].stats`.** They are per round, under
-  `roundResults[].playerStats[]` (the entry matching the player's PUUID) →
-  `damage[]` → `headshots`, `bodyshots`, `legshots`. These are *hits*, not
-  shots fired.
-- The match list returns recent history only, not the player's full career.
-  That is why the long-term metric is labelled "Since tracking", not "Career".
+### Field facts (from the OpenAPI schemas; verify against the fixtures)
+
+- **v4 match:**
+  - Competitive matches have `metadata.queue.id == "competitive"`.
+  - Remakes and abandoned games have `metadata.is_completed == false`. Exclude them.
+  - Start time is `metadata.started_at` (ISO-8601), and the ID is `metadata.match_id`.
+  - Per-player totals are in `players[].stats`: `kills`, `deaths`, `assists`,
+    `headshots`, `bodyshots`, `legshots`. These are *hits*, not shots fired.
+    No per-round aggregation is needed.
+  - The result comes from `teams[]`, the entry whose `team_id` matches the
+    player's `team_id`: `won`, and `rounds.won`/`rounds.lost`. Equal rounds
+    means a draw.
+- **Stored match record:**
+  - `meta.id`, `meta.started_at`, and `meta.mode` (`"Competitive"`).
+  - `stats.team` with `stats.kills`/`deaths`/`assists`, and
+    `stats.shots.head`/`body`/`leg`.
+  - `teams.red`/`teams.blue` are round wins, and there is **no completed flag
+    and no winner field**. The result is derived from the score using
+    Valorant's rules:
+
+    | Score | Meaning | Result |
+    | --- | --- | --- |
+    | 1 round or fewer in total | Remake (only possible in round 1) | Skip the record. |
+    | One team on 13 or more, scores differ | Regulation or overtime win | Higher score wins. |
+    | Equal, both on 12 or more | Overtime draw | Draw. |
+    | Anything else (no team on 13) | Surrender (possible from round 5); the surrendering team loses regardless of score | Fetch match details (v4) and use `teams[].won`. |
+
+    The captured records include one surrender (3–10) and one overtime draw
+    (14–14).
+- **Stored history has gaps.** HenrikDev only keeps matches that some API user
+  has requested, and its docs warn there can be holes. That is acceptable for
+  the long-term window, which is labelled "Since tracking" and shows its start
+  date and sample size.
+
+### Gate zero checklist
+
+1. ✅ Confirm the official API is unavailable: Riot key → 403 on match data.
+2. ✅ Get a HenrikDev Basic key, and keep it only in the shell environment
+   (`HENRIKDEV_API_KEY`) and, later, in Secrets Manager.
+3. ✅ Run `make capture-fixtures`. It saves the account, recent v4 matches,
+   and stored history to `collector/tests/fixtures/henrikdev/`, after replacing
+   Riot IDs, PUUIDs, party IDs, and match IDs, and it cross-checks the two
+   sources. All parsing code is written against these files. Captured
+   2026-10-05 from the project owner's own account: 5 v4 matches and 20 of 138 stored records. All 5 matches agree
+   across both sources. `rounds` and `kills` are dropped from the v4 fixtures
+   because the collector doesn't read them. Re-runs with `OFFLINE=1` use the
+   local raw cache and cost no API requests.
+4. Ask the friend for consent **before the site is deployed publicly** (it is a
+   surprise until then). Their Riot ID, their stats, and the jokes about them
+   will be on a public URL. Until then, development uses the owner's account.
 
 ## 3. Architecture
 
@@ -83,8 +127,8 @@ Browser ──────────► │  /*        → S3 site bucket (pri
                                                         │ PutObject summary.json
 EventBridge Scheduler (every 6h) ──► Collector Lambda ──┤
                                          │  │           └──► DynamoDB (matches, import runs)
-                                         │  └──► Riot API (europe / eu hosts)
-                                         └──► Secrets Manager (Riot API key)
+                                         │  └──► HenrikDev API (api.henrikdev.xyz)
+                                         └──► Secrets Manager (HenrikDev API key)
 
 CloudWatch: collector errors, "no successful run in 12h" alarm → SNS email
 AWS Budgets: monthly budget alert → email
@@ -114,26 +158,27 @@ Why this design:
 | DynamoDB | One table, on-demand billing, PITR on, TTL attribute for import-run records. |
 | Collector Lambda | Python 3.13, arm64, 256 MB, 5-minute timeout, reserved concurrency 1 (runs never overlap), no VPC. |
 | EventBridge Scheduler | `rate(6 hours)`, configurable. Retry policy: 0 retries (the next scheduled run is the retry). |
-| Secrets Manager | One secret, the Riot API key. Terraform creates the secret *container* only. The value is set with the AWS CLI, so it never enters Terraform state or git. |
-| CloudWatch | Log group with 14-day retention. Custom metrics: `SuccessfulRuns`, `MatchesImported`, `RiotErrors`. |
+| Secrets Manager | One secret, the HenrikDev API key. Terraform creates the secret *container* only. The value is set with the AWS CLI, so it never enters Terraform state or git. |
+| CloudWatch | Log group with 14-day retention. Custom metrics: `SuccessfulRuns`, `MatchesImported`, `ApiErrors`. |
 | SNS | One email subscription for alarms. |
 | AWS Budgets | Monthly budget (for example $5), with alerts at 80% actual and 100% forecast. |
 
-Region: `eu-west-1`, close to the EU Riot hosts. Budgets and CloudFront are
+Region: `eu-west-1`, close to the EU players. Budgets and CloudFront are
 global.
 
 ## 4. Data model (DynamoDB, single table)
 
 | Item | PK | SK | Attributes |
 | --- | --- | --- | --- |
-| Match | `PLAYER#<playerId>` | `MATCH#<playedAt ISO-8601 UTC>#<matchId>` | `matchId`, `queue`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `parserVersion` |
+| Match | `PLAYER#<playerId>` | `MATCH#<playedAt ISO-8601 UTC>#<matchId>` | `matchId`, `queue`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `source` (`v4`/`stored`), `parserVersion` |
 | Import run | `PLAYER#<playerId>` | `RUN#<startedAt ISO-8601 UTC>` | `status` (`success`/`partial`/`failed`), `matchesFound`, `matchesImported`, `errorCode`, `durationMs`, `expiresAt` (TTL, 90 days) |
 
 - The sort key starts with the timestamp, so "latest 15 matches" is one
   `Query` with `ScanIndexForward=false`.
-- Riot fills in `playedAt` and `matchId`, so the key is the same on every
-  import. Writes use `PutItem` with `attribute_not_exists(SK)`, which makes
-  re-imports idempotent.
+- The API fills in `playedAt` and `matchId`, so the key is the same on every
+  import. Writes use `PutItem` with the condition
+  `attribute_not_exists(SK) OR source = stored`. Re-imports are idempotent,
+  and a full v4 record replaces a lighter stored record for the same match.
 - `parserVersion` makes it possible to re-parse stored matches if the parsing
   logic changes. For that, also store the raw match JSON in the data bucket
   under `raw/<matchId>.json` (not served by CloudFront).
@@ -222,12 +267,12 @@ computed from summed totals, never by averaging per-match ratios.
 ## 7. Collector behavior
 
 Code layout: pure logic is kept separate from I/O so that most of it can be
-tested without AWS or Riot.
+tested without AWS or the network.
 
 ```text
 collector/src/collector/
-  riot.py      HTTP client: auth header, timeouts, rate limits, error mapping
-  parse.py     match JSON → MatchRecord (pure)
+  henrikdev.py HTTP client: auth header, timeouts, rate limits, error mapping
+  parse.py     v4 match / stored record JSON → MatchRecord (pure)
   metrics.py   list[MatchRecord] → windows (pure)
   store.py     DynamoDB reads and writes
   publish.py   writes summary.json and raw match JSON to S3
@@ -236,17 +281,20 @@ collector/src/collector/
 
 For each run:
 
-1. Read the Riot key from Secrets Manager (cached for the life of the Lambda
+1. Read the HenrikDev key from Secrets Manager (cached for the life of the Lambda
    container) and load `PLAYERS`.
 2. For each player, handled **independently** so that one failure doesn't
    affect the others:
-   1. Resolve the Riot ID to a PUUID.
-   2. Fetch the match list and keep competitive entries whose IDs aren't stored
-      yet.
-   3. Fetch the details for at most `MAX_DETAILS_PER_RUN` (default 30) new
-      matches, oldest first. The backfill finishes over several runs instead of
-      exceeding rate limits.
-   4. Parse, skip incomplete matches, and write them idempotently.
+   1. Resolve the Riot ID to a PUUID (account v2).
+   2. **First run only** (no matches stored yet): backfill from stored matches
+      (v1) and write them with `source = stored`. Records whose result the
+      score can't decide (surrenders, see section 2) get one match-details
+      request each.
+   3. Fetch the 10 most recent competitive matches (v4). Six-hour runs mean
+      a player would have to play more than 10 ranked games between runs to
+      miss one.
+   4. Parse, skip matches with `is_completed == false`, and write them
+      idempotently with `source = v4`.
    5. Query all of the player's matches, compute both windows, and publish
       `summary.json`. If nothing new was imported and a summary exists, skip
       the publish.
@@ -257,15 +305,19 @@ For each run:
    did, and `failed` if none did. The handler raises only on `failed`, so the
    Lambda error metric means something.
 
-### Riot error handling
+### API error handling
 
 | Response | Behavior |
 | --- | --- |
 | `200` | Continue. |
-| `404` on account lookup | Mark this player failed (`riot_account_not_found`) and continue with the next player. |
-| `401` / `403` | Key is invalid, expired, or lacks access. Stop the whole run, status `failed`, error code `riot_auth`. Don't retry. |
-| `429` | Wait for `Retry-After` once if it is ≤ 10s. Otherwise stop the run cleanly. Previously published summaries stay unchanged. |
-| `5xx` / timeout | Up to 2 retries with exponential backoff and jitter, then fail this player. |
+| `404` (error code 22, 23, or 24) | Account not found or has no region yet. Mark this player failed (`account_not_found`) and continue with the next player. |
+| `401` / `403` | Key missing or invalid. Stop the whole run, status `failed`, error code `api_auth`. Don't retry. |
+| `429` | Wait for `Retry-After` / `X-RateLimit-Reset` once if it is ≤ 60s. Otherwise stop the run cleanly. Previously published summaries stay unchanged. |
+| `400` | A bug in the request. Fail this player with the API's error code in the log. |
+| `5xx` / timeout | Up to 2 retries with exponential backoff and jitter, then fail this player. HenrikDev returns `500` (code 9) when Riot itself is unavailable. |
+
+Requests are spaced at least 2.1s apart, which stays under the Basic key's 30
+requests per minute even when HenrikDev has to fetch uncached matches from Riot.
 
 The previous `summary.json` is only overwritten after a successful computation,
 so the site always shows the last good data.
@@ -306,7 +358,8 @@ DynamoDB items and their objects under `data/players/<id>/`, then invalidates
   endorsed by Riot Games and doesn't reflect the views or opinions of Riot
   Games or anyone officially involved in producing or managing Riot Games
   properties. Riot Games and all associated properties are trademarks or
-  registered trademarks of Riot Games, Inc."
+  registered trademarks of Riot Games, Inc." Followed by: "Match data from
+  the unofficial [HenrikDev API](https://docs.henrikdev.xyz)."
 - **Accessibility:** use real `<table>` or `<dl>` semantics for the numbers,
   give deltas a text label (don't rely on colour alone), make the info note
   keyboard-accessible, and support `prefers-reduced-motion` for decorative
@@ -326,7 +379,9 @@ collector/
   pyproject.toml          ruff, pytest, moto (dev only); no runtime deps
   src/collector/...
   tests/
-    fixtures/             sanitized real Riot responses + expected summary
+    fixtures/henrikdev/   pseudonymized real API responses + expected summary
+  scripts/
+    capture_fixtures.py   saves the fixtures (make capture-fixtures)
 config/
   players.example.json    committed; players.json is gitignored
 frontend/
@@ -372,7 +427,7 @@ Changes from the current tree:
   - Scheduler: `lambda:InvokeFunction` on the collector only.
   - Bucket policies allow `s3:GetObject` only from this CloudFront
     distribution (OAC with an `AWS:SourceArn` condition).
-- **The Riot key never touches state.** After the first apply, set it with
+- **The HenrikDev key never touches state.** After the first apply, set it with
   `aws secretsmanager put-secret-value --secret-id <output> --secret-string file://-`.
 - **CI deploys without access keys.** GitHub OIDC assumes a role restricted to
   `repo:<owner>/valorant-stats:ref:refs/heads/main`. No long-lived AWS keys are
@@ -409,14 +464,15 @@ The budget alarm catches anything unexpected.
 
 - **`metrics.py`:** zero deaths, zero matches (`null`s), zero hits, fewer than
   15 matches, draws, and sums vs per-match ratios.
-- **`parse.py`:** the real fixtures, an incomplete match (skipped), a draw,
-  per-round headshot aggregation, and the player not found in the match
+- **`parse.py`:** the real fixtures for both v4 matches and stored records,
+  an incomplete match (skipped), a draw, and the player not found in the match
   (error, not a silent zero).
-- **`riot.py`:** 401/403/404/429 (with and without `Retry-After`), 5xx with
+- **`henrikdev.py`:** 401/403/404/429 (with and without `Retry-After`), 5xx with
   retries, and timeouts. Uses a stubbed opener, with no network access.
 - **`handler.py`:** with moto for DynamoDB, S3, and Secrets Manager. Checks
   idempotent re-runs (no duplicates), partial failure (one player fails, the
-  other publishes), the per-run detail cap, and that the summary isn't
+  other publishes), backfill only on the first run, a v4 record replacing a
+  stored one, and that the summary isn't
   overwritten on failure.
 - **Contract:** the collector output for the fixtures equals
   `summary.expected.json`, and the frontend renders that same file.
@@ -428,7 +484,7 @@ The budget alarm catches anything unexpected.
 - `terraform plan` is reviewed before each apply. The deploy workflow prints it.
 - The first collector run is invoked manually (`make invoke`) before the
   schedule is enabled. Check the logs and the published summary.
-- `grep` the built `dist/` for the Riot key prefix (`RGAPI-`) in CI. The build
+- `grep` the built `dist/` for API key prefixes (`HDEV-`, `RGAPI-`) in CI. The build
   must not contain it.
 - Revoke the key or point `PLAYERS` at a bad Riot ID. The `failed` run should
   raise the alarm email and the site should keep showing the last summary.
@@ -439,8 +495,9 @@ The budget alarm catches anything unexpected.
 
 Each milestone is one or more small PRs that pass CI.
 
-0. **Riot access:** key approved, consent obtained, real fixtures captured
-   (section 2).
+0. **Data access:** official API ruled out, HenrikDev key obtained, real
+   fixtures captured (section 2). Add a match-details fixture for the
+   surrender case when `parse.py` is written (about 2 API requests).
 1. **Repo hygiene:**
    - LICENSE, the new layout, `pyproject.toml`, and ESLint/Vitest.
    - `ci.yml`.
@@ -448,9 +505,9 @@ Each milestone is one or more small PRs that pass CI.
      patterns (`build/`, `*.bin`, `env/`), and add `config/players.json`.
 2. **Collector core:** `parse.py` and `metrics.py` against the fixtures, with
    tests.
-3. **Collector I/O:** `riot.py`, `store.py`, `publish.py`, and `handler.py`
+3. **Collector I/O:** `henrikdev.py`, `store.py`, `publish.py`, and `handler.py`
    with moto tests. A `make collect-local` target runs the collector against
-   real Riot data with `RIOT_API_KEY` from the shell environment and writes the
+   real data with `HENRIKDEV_API_KEY` from the shell environment and writes the
    summary to `frontend/dev-data/`.
 4. **Frontend:** move to the new contract and dev data, update the components,
    add the states, local art and ASSETS.md, and tests.
@@ -462,7 +519,9 @@ Each milestone is one or more small PRs that pass CI.
 7. **Operations:** alarms, budget, and the delete-player script. Enable the
    schedule.
 8. **README:** architecture diagram, screenshot, how to run locally, how to
-   deploy, cost, disclaimer. Re-check the Riot policies before sharing the URL.
+   deploy, cost, data source, disclaimer. Get the friend's consent, and
+   re-check Riot's fan-content policy and HenrikDev's terms, before sharing the
+   URL.
 
 ## 13. Decision log
 
@@ -472,9 +531,10 @@ Each milestone is one or more small PRs that pass CI.
 | Player list | `config/players.json` (gitignored) | Editable list without committing real Riot IDs. |
 | Recent window | Last 15 completed matches | Still meaningful after a break, unlike a time window. |
 | Main stat | K/D (`max(deaths,1)`), K/D/A shown | Chosen by the owner. Named `kd`, never "KDA". |
-| Long-term window | "Since tracking", not "Career" | Riot's match list doesn't return full history. |
+| Data source | HenrikDev API (unofficial) | The official API has no Valorant match access for a private app (403 on a development key; production keys are for public products). |
+| Long-term window | "Since tracking", not "Career" | Stored history has gaps and doesn't go back to the start of the account. |
 | Storage | DynamoDB + static summary JSON | ~$1/month. No VPC, NAT, RDS, or read API needed for this data volume. |
-| Riot key | Shell env locally, Secrets Manager in AWS | Never in git, the bundle, or Terraform state. |
+| API key | Shell env locally, Secrets Manager in AWS | Never in git, the bundle, or Terraform state. |
 | Domain | CloudFront-generated URL | A custom domain isn't worth the cost yet. |
 | Artwork | Local copy under Riot's fan-content policy | Avoids hotlinking. Licensing is stated accurately. |
 | Database availability | N/A (DynamoDB is multi-AZ by default) | Replaces the earlier single-AZ RDS decision. |
