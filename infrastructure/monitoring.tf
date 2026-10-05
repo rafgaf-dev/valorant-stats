@@ -47,6 +47,23 @@ resource "aws_cloudwatch_metric_alarm" "collector_stale" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
+# Fires when the votes function fails (rejected votes are normal responses, not errors).
+resource "aws_cloudwatch_metric_alarm" "votes_errors" {
+  alarm_name          = "${local.name}-votes-errors"
+  alarm_description   = "The votes function raised an error."
+  namespace           = "AWS/Lambda"
+  metric_name         = "Errors"
+  dimensions          = { FunctionName = aws_lambda_function.votes.function_name }
+  statistic           = "Sum"
+  period              = 3600
+  evaluation_periods  = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
 resource "aws_budgets_budget" "monthly" {
   name         = "${local.name}-monthly"
   budget_type  = "COST"

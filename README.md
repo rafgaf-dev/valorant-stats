@@ -14,7 +14,7 @@ reveals the review, and the deck walks through the numbers:
 | --- | --- |
 | ![A thumbs-up and "Correct." over the first slide](docs/images/thumbs-up.webp) | ![The performance review: a tilted Neon with a speech bubble, bar charts of the last 15 games against the long-term numbers, and tallies of bottom frags and Odin or Operator games](docs/images/review.webp) |
 | ![Recent form: "Won the last one. Don't get used to it.", a strip of win, loss and draw buttons for the last 15 games, and a table for the selected game: map, agent, K/D/A, main gun and whether he bottom-fragged](docs/images/recent-form.webp) | ![Games thrown vs not thrown as a 3D pie chart: 7 not thrown, 8 thrown](docs/images/outcomes.webp) |
-| ![Key takeaways: "Do better.", "Lock in.", "Touch grass."](docs/images/takeaways.webp) | |
+| ![Key takeaways: "Do better.", "Lock in.", "Touch grass."](docs/images/takeaways.webp) | ![Peer review: "Was this review fair?" with the buttons "Fair" and a green "Too generous"](docs/images/peer-review.webp) |
 
 The screenshots use the sample data in `frontend/dev-data/`.
 
@@ -31,6 +31,8 @@ flowchart LR
   browser[Browser] --> cloudfront[CloudFront]
   cloudfront -->|/*| site[(S3 site bucket)]
   cloudfront -->|/data/*| data
+  cloudfront -->|/api/*| votes[Votes Lambda]
+  votes -->|peer review votes| dynamodb
   actions[GitHub Actions] -->|OIDC, no stored keys| site
 ```
 
@@ -39,8 +41,11 @@ flowchart LR
   API requests. Matches go into DynamoDB, and the collector publishes a precomputed
   `summary.json` (last 15 matches against everything since tracking began).
 - **Frontend:** a React and Vite single-page app, served as static files. It reads the
-  summary from the same origin, so there is no API server, no CORS, and no
+  summary as a static file from the same origin, so there is no CORS and no
   third-party request: fonts and artwork are bundled.
+- **Votes:** the "Was this review fair?" slide posts to a small Lambda behind
+  CloudFront at `/api/votes/<player>`. Its function URL only accepts requests signed
+  by CloudFront, and it allows one vote per viewer per day.
 - **Hosting:** two private S3 buckets behind CloudFront, with HSTS and a strict
   Content Security Policy. There is no VPC, NAT gateway, or database server; it costs
   about $1–2 a month.
@@ -85,6 +90,8 @@ The repository is public, so nothing personal is committed:
   that still contains one).
 - The published summary lists the last 15 games without match IDs, so it can't be
   used to look up anyone else in the lobby.
+- Votes don't store IP addresses. A voter is an HMAC of the address, the player, and
+  the date under a key held only by the votes function, and it expires after two days.
 - Account IDs, bucket names, and the API key stay in gitignored files, Secrets
   Manager, and GitHub environment secrets.
 - `make delete-player PLAYER=<id>` removes everything stored about a player,
@@ -94,7 +101,7 @@ The repository is public, so nothing personal is committed:
 
 | Path | Contents |
 | --- | --- |
-| `collector/` | The collector Lambda (`src/collector/`), its tests and fixtures, and dev scripts |
+| `collector/` | The collector Lambda (`src/collector/`), the votes Lambda (`src/votes/`), their tests and fixtures, and dev scripts |
 | `frontend/` | The React app; `dev-data/` holds sample summaries for local development |
 | `infrastructure/` | Terraform, with a one-time `bootstrap/` for the state bucket |
 | `config/` | `players.example.json`; the real `players.json` and `photos/` are gitignored |

@@ -1,6 +1,6 @@
 # The public site: CloudFront in front of two private buckets, read through Origin Access
 # Control. The default behaviour serves the built frontend; /data/* serves summaries and
-# player photos from the data bucket.
+# player photos from the data bucket; /api/* goes to the votes function (votes.tf).
 
 resource "aws_s3_bucket" "site" {
   bucket = "${local.name}-site-${data.aws_caller_identity.current.account_id}"
@@ -88,10 +88,46 @@ resource "aws_cloudfront_origin_access_control" "s3" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_origin_access_control" "lambda" {
+  name                              = "${local.name}-lambda"
+  description                       = "Signed requests from CloudFront to the votes function URL."
+  origin_access_control_origin_type = "lambda"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 # Honours each object's Cache-Control (index.html: no-cache, hashed assets: immutable,
 # summaries: 5 minutes), with gzip and Brotli.
 data "aws_cloudfront_cache_policy" "optimized" {
   name = "Managed-CachingOptimized"
+}
+
+data "aws_cloudfront_cache_policy" "disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+# The votes function sees only what it needs: the viewer's address (for one vote per
+# viewer per day), the body's content type, and the body hash that Origin Access Control
+# needs to sign a POST to a function URL.
+resource "aws_cloudfront_origin_request_policy" "votes" {
+  name    = "${local.name}-votes"
+  comment = "Viewer address and body headers for the votes function."
+
+  cookies_config {
+    cookie_behavior = "none"
+  }
+
+  headers_config {
+    header_behavior = "whitelist"
+
+    headers {
+      items = ["CloudFront-Viewer-Address", "Content-Type", "x-amz-content-sha256"]
+    }
+  }
+
+  query_strings_config {
+    query_string_behavior = "none"
+  }
 }
 
 resource "aws_cloudfront_response_headers_policy" "security" {
@@ -165,6 +201,19 @@ resource "aws_cloudfront_distribution" "site" {
     origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
   }
 
+  origin {
+    origin_id                = "votes"
+    domain_name              = trimsuffix(trimprefix(aws_lambda_function_url.votes.function_url, "https://"), "/")
+    origin_access_control_id = aws_cloudfront_origin_access_control.lambda.id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
   default_cache_behavior {
     target_origin_id           = "site"
     viewer_protocol_policy     = "redirect-to-https"
@@ -183,6 +232,18 @@ resource "aws_cloudfront_distribution" "site" {
     cached_methods             = ["GET", "HEAD"]
     compress                   = true
     cache_policy_id            = data.aws_cloudfront_cache_policy.optimized.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
+  }
+
+  ordered_cache_behavior {
+    path_pattern               = "/api/*"
+    target_origin_id           = "votes"
+    viewer_protocol_policy     = "https-only" # a redirected POST would lose its body
+    allowed_methods            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    cache_policy_id            = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id   = aws_cloudfront_origin_request_policy.votes.id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
   }
 
