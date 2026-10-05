@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import contract from "../../collector/tests/fixtures/summary.expected.json";
-import type { PlayerSummary, Window } from "./api";
-import { performanceRating, takeaways, trendOf } from "./roast";
+import type { PlayerSummary, RecentMatch, Window } from "./api";
+import { currentStreak, performanceRating, streakVerdict, takeaways, trendOf } from "./roast";
 
 const summary = contract as PlayerSummary;
 const baseline = { ...summary.windows.sinceTracking, kd: 1, winRate: 0.5, headshotRate: 0.3 };
+
+function games(results: string): RecentMatch[] {
+	const letters: Record<string, RecentMatch["result"]> = { W: "win", L: "loss", D: "draw" };
+	return [...results].map((letter) => ({ ...summary.recentMatches![0], result: letters[letter] }));
+}
 
 function recent(overrides: Partial<Window>): Window {
 	return { ...summary.windows.recent, ...overrides };
@@ -69,11 +74,40 @@ describe("takeaways", () => {
 		expect(takeaways(recent({ bottomFrags: 4, odinOrOperatorMains: 0 }))[2]).toBe("Stop bottom fragging.");
 	});
 
+	it("adds a line for a loss streak of three or more", () => {
+		const window = recent({ bottomFrags: 0, odinOrOperatorMains: 0 });
+
+		expect(takeaways(window, games("LLLW"))).toContain("End the loss streak.");
+		expect(takeaways(window, games("LLWL"))).toHaveLength(3);
+		expect(takeaways(window, games("WLLL"))).toHaveLength(3);
+	});
+
 	it("works with summaries from before the detail counts existed", () => {
 		const legacy = recent({});
 		delete legacy.bottomFrags;
 		delete legacy.odinOrOperatorMains;
 
 		expect(takeaways(legacy)).toHaveLength(3);
+	});
+});
+
+describe("currentStreak", () => {
+	it("counts identical results back from the newest game", () => {
+		expect(currentStreak(games("LLLWL"))).toEqual({ result: "loss", length: 3 });
+		expect(currentStreak(games("WWWW"))).toEqual({ result: "win", length: 4 });
+		expect(currentStreak(games("DW"))).toEqual({ result: "draw", length: 1 });
+		expect(currentStreak([])).toBeNull();
+	});
+
+	it("never gives him credit", () => {
+		expect(streakVerdict({ result: "loss", length: 5 })).toEqual({
+			headline: "5 losses in a row",
+			remark: "Somebody check on him.",
+		});
+		expect(streakVerdict({ result: "win", length: 3 }).remark).toBe("Carried, presumably.");
+		expect(streakVerdict({ result: "win", length: 1 })).toEqual({
+			headline: "Won the last one",
+			remark: "Don't get used to it.",
+		});
 	});
 });

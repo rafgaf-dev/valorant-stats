@@ -339,3 +339,16 @@ def test_stored_records_have_no_details():
     record = parse_stored_match(stored_record(red=7, blue=13))
 
     assert (record.bottom_fragged, record.main_weapon, record.has_details) == (None, None, False)
+
+
+def test_map_comes_from_both_shapes(v4_match):
+    assert parse_v4_match(v4_match, TRACKED_PUUID).map_name == v4_match["metadata"]["map"]["name"]
+    record = stored_record(red=7, blue=13)
+    record["meta"]["map"] = {"id": "m", "name": "Ascent"}
+    assert parse_stored_match(record).map_name == "Ascent"
+
+
+def test_missing_map_is_unknown_not_an_error(v4_match):
+    del v4_match["metadata"]["map"]
+
+    assert parse_v4_match(v4_match, TRACKED_PUUID).map_name is None

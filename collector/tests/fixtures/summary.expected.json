@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "player": {
     "id": "neon-main",
     "displayName": "The Neon Menace",
@@ -47,6 +47,173 @@
       "odinOrOperatorMains": 0
     }
   },
+  "recentMatches": [
+    {
+      "playedAt": "2026-09-20T18:39:05Z",
+      "result": "win",
+      "map": "Sunset",
+      "agent": "Sova",
+      "kills": 14,
+      "deaths": 9,
+      "assists": 9,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-09-20T18:15:17Z",
+      "result": "loss",
+      "map": "Lotus",
+      "agent": "Gekko",
+      "kills": 8,
+      "deaths": 13,
+      "assists": 2,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-09-05T21:14:41Z",
+      "result": "win",
+      "map": "Summit",
+      "agent": "Clove",
+      "kills": 12,
+      "deaths": 15,
+      "assists": 3,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-31T22:56:56Z",
+      "result": "loss",
+      "map": "Abyss",
+      "agent": "Sova",
+      "kills": 20,
+      "deaths": 15,
+      "assists": 2,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-31T22:28:37Z",
+      "result": "loss",
+      "map": "Lotus",
+      "agent": "Gekko",
+      "kills": 13,
+      "deaths": 13,
+      "assists": 2,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-31T20:09:11Z",
+      "result": "loss",
+      "map": "Sunset",
+      "agent": "Sova",
+      "kills": 25,
+      "deaths": 13,
+      "assists": 4,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-30T20:07:29Z",
+      "result": "loss",
+      "map": "Haven",
+      "agent": "Sova",
+      "kills": 7,
+      "deaths": 14,
+      "assists": 1,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-29T21:14:49Z",
+      "result": "loss",
+      "map": "Haven",
+      "agent": "Sova",
+      "kills": 32,
+      "deaths": 14,
+      "assists": 6,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-24T21:32:43Z",
+      "result": "win",
+      "map": "Ascent",
+      "agent": "Sova",
+      "kills": 19,
+      "deaths": 15,
+      "assists": 9,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-23T15:43:38Z",
+      "result": "win",
+      "map": "Split",
+      "agent": "Phoenix",
+      "kills": 18,
+      "deaths": 16,
+      "assists": 7,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-23T15:18:12Z",
+      "result": "win",
+      "map": "Summit",
+      "agent": "Fade",
+      "kills": 19,
+      "deaths": 5,
+      "assists": 2,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-17T20:57:55Z",
+      "result": "win",
+      "map": "Lotus",
+      "agent": "Gekko",
+      "kills": 26,
+      "deaths": 12,
+      "assists": 7,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-17T19:45:36Z",
+      "result": "win",
+      "map": "Breeze",
+      "agent": "Skye",
+      "kills": 21,
+      "deaths": 9,
+      "assists": 7,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-10T19:54:20Z",
+      "result": "draw",
+      "map": "Split",
+      "agent": "KAY/O",
+      "kills": 37,
+      "deaths": 16,
+      "assists": 7,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    },
+    {
+      "playedAt": "2026-08-10T19:00:18Z",
+      "result": "loss",
+      "map": "Haven",
+      "agent": "Raze",
+      "kills": 21,
+      "deaths": 18,
+      "assists": 6,
+      "bottomFragged": false,
+      "mainWeapon": "Vandal"
+    }
+  ],
   "lastImport": {
     "status": "success",
     "finishedAt": "2026-10-05T12:00:02Z"

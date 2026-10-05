@@ -21,6 +21,8 @@ profile is a friend who mostly plays Neon. The page shows:
 - **K/D**, with the full K/D/A totals beside it.
 - **Win rate**, with the W–L–D record.
 - **Headshot %**.
+- **Recent form:** the last 15 games as a win/loss/draw strip, with the current
+  streak and each game's map, agent, K/D/A, main gun, and bottom-frag status.
 
 Each metric compares **Recent** (the last 15 completed competitive matches)
 with **Since tracking** (all stored competitive matches since the first
@@ -34,7 +36,8 @@ summary that the frontend reads as a static file.
 ### Non-goals
 
 - No arbitrary player lookup, search, or user accounts.
-- No match history browser. The page shows only the summary.
+- No full match history browser. The page shows the summary and the last 15
+  games, without match IDs or other players.
 - No custom domain for now. The generated CloudFront URL is enough.
 - No multi-environment setup (dev/stage/prod). There is one environment.
 
@@ -182,7 +185,7 @@ global.
 
 | Item | PK | SK | Attributes |
 | --- | --- | --- | --- |
-| Match | `PLAYER#<playerId>` | `MATCH#<matchId>` | `matchId`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `source` (`v4`/`stored`), `parserVersion` |
+| Match | `PLAYER#<playerId>` | `MATCH#<matchId>` | `matchId`, `playedAt`, `result` (`win`/`loss`/`draw`), `kills`, `deaths`, `assists`, `headshots`, `bodyshots`, `legshots`, `agent`, `mapName`, `bottomFragged`, `mainWeapon` (the last three when known), `source` (`v4`/`stored`), `parserVersion` |
 | Import run | `PLAYER#<playerId>` | `RUN#<startedAt ISO-8601 UTC>` | `status` (`success`/`partial`/`failed`), `matchesFound`, `matchesImported`, `errorCode`, `durationMs`, `expiresAt` (TTL, 90 days) |
 | Account | `PLAYER#<playerId>` | `ACCOUNT` | `accountHash` (SHA-256 of the PUUID) |
 
@@ -191,8 +194,10 @@ global.
   key would add nothing. Keying by ID also means a full v4 record replaces its
   stored record even if the two sources disagree on the timestamp.
 - Writes use `PutItem` with the condition
-  `attribute_not_exists(SK) OR source = stored`. Re-imports are idempotent,
-  and a full v4 record replaces a lighter stored record for the same match.
+  `attribute_not_exists(SK) OR source = stored`, plus `OR parserVersion < current`
+  for v4 records. Re-imports are idempotent, a full v4 record replaces a
+  lighter stored record for the same match, and a newer parser can rewrite
+  what an older one stored. A stored record never replaces a v4 one.
 - `parserVersion` records which parser wrote an item. Raw match JSON is **not**
   kept: it contains the other nine players' Riot IDs, and HenrikDev keeps the
   matches, so re-parsing can fetch them again.
@@ -257,7 +262,7 @@ recent window (section 7).
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "player": { "id": "neon-main", "displayName": "The Neon Menace", "agent": "Neon", "region": "eu" },
   "queue": "competitive",
   "generatedAt": "2026-10-04T12:00:00Z",
@@ -278,6 +283,12 @@ recent window (section 7).
       "matchesWithDetails": 40, "bottomFrags": 13, "odinOrOperatorMains": 3
     }
   },
+  "recentMatches": [
+    {
+      "playedAt": "2026-10-03T21:14:00Z", "result": "loss", "map": "Lotus", "agent": "Neon",
+      "kills": 9, "deaths": 17, "assists": 3, "bottomFragged": true, "mainWeapon": "Odin"
+    }
+  ],
   "lastImport": { "status": "success", "finishedAt": "2026-10-04T12:00:00Z" }
 }
 ```
@@ -290,10 +301,14 @@ recent window (section 7).
   load the same file.
 - The frontend treats `generatedAt` older than 24 hours as **stale** and shows
   a banner, but still renders the numbers.
+- `recentMatches` lists the last 15 matches, newest first. `map`,
+  `bottomFragged`, and `mainWeapon` are `null` when unknown. Match IDs are left
+  out on purpose: they lead straight to every other player in the lobby.
 - Any change to the schema increments `schemaVersion`. Version 2 added
-  `matchesWithDetails`, `bottomFrags`, and `odinOrOperatorMains`; the frontend
-  accepts versions 1 and 2 (without the counts it leaves the tallies out), so
-  the frontend and the collector can be deployed in either order.
+  `matchesWithDetails`, `bottomFrags`, and `odinOrOperatorMains`; version 3
+  added `recentMatches`. The frontend accepts versions 1 to 3 (it leaves out the
+  tallies without the counts, and the recent form slide without the matches),
+  so the frontend and the collector can be deployed in either order.
 
 ## 7. Collector behavior
 
@@ -331,7 +346,9 @@ For each run:
       a player would have to play more than 10 ranked games between runs to
       miss one.
    4. Parse, skip matches with `is_completed == false`, and write them
-      idempotently with `source = v4`.
+      idempotently with `source = v4`. A match already stored with full
+      details is skipped, unless an older parser wrote it; then it is
+      re-parsed from the same response, at no extra request.
    5. Make sure the 15 most recent matches all have full details: fetch the
       match details for any that are stored records or were written by an older
       parser (`parserVersion`). This costs up to 15 requests after the first
@@ -410,17 +427,23 @@ and apply Terraform, or the next scheduled run recreates the data.
        of last 15 against the long-term value per metric, and two tallies with
        one square per game: bottom frags, and games with an Odin or Operator
        as his main gun.
+     - **Recent form:** a big shape with the current streak ("4 losses in a
+       row") and a remark that never gives him credit, a strip of W/L/D
+       buttons from oldest to latest with the current streak underlined, and
+       a table with the selected game's date, map, agent, K/D/A, main gun, and
+       whether he bottom-fragged. Summaries without `recentMatches` skip it.
      - **Games thrown vs not thrown:** a 3D pie, built from stacked layers so
        it reads as one solid disc, with a text legend. Draws count as thrown.
-     - **Key takeaways:** three short lines: "Do better.", "Lock in.", and one
+     - **Key takeaways:** short lines: "Do better.", "Lock in.", and one
        chosen from his stats ("Put the Odin down.", "Stop bottom fragging.",
-       or "Touch grass.").
+       or "Touch grass."), plus "End the loss streak." after three or more
+       losses in a row.
      - **Questions?** with the sources and the full Riot disclaimer.
   4. The black "End of slide show, click to exit." screen returns to slide 2.
 
   Navigation: Previous/Next buttons or the arrow, Page Up/Down, Home, and End
   keys. Focus moves to each new slide's title, and every slide is a labelled
-  region ("Slide 2 of 5: …").
+  region ("Slide 2 of 6: …").
 - **Design tokens:** the default theme palette of the era (navy `#1F497D`,
   blue `#4F81BD`, red `#C0504D`, green `#9BBB59`, orange `#F79646`) on white
   4:3 slides on a black stage. Text is Carlito, a metric-compatible Calibri

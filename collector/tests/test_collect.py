@@ -277,3 +277,58 @@ def test_data_from_before_the_guard_is_adopted(player, henrikdev, store, publish
 
     assert run.error_code is None
     assert store.get_account("neon-main") == account_hash(henrikdev.account_data["puuid"])
+
+
+def test_records_from_an_older_parser_in_the_recent_window_are_refreshed(
+    player, henrikdev, store, publisher, clock
+):
+    collect_player(player, henrikdev, store, publisher, clock)
+    # Pretend the recent matches were written by parser version 2, before maps were stored.
+    newest = sorted(store.list_matches("neon-main"), key=lambda r: r.played_at, reverse=True)
+    for record in newest[:15]:
+        legacy = replace(record, map_name=None)
+        if isinstance(store, DynamoMatchStore):
+            item = store._table.get_item(
+                Key={"PK": "PLAYER#neon-main", "SK": f"MATCH#{record.match_id}"}
+            )["Item"]
+            item.pop("mapName", None)
+            item["parserVersion"] = 2
+            store._table.put_item(Item=item)
+        else:
+            items = store._load()
+            key = f"PLAYER#neon-main|MATCH#{legacy.match_id}"
+            items[key].pop("mapName", None)
+            items[key]["parserVersion"] = 2
+            store._save(items)
+    henrikdev.calls.clear()
+
+    collect_player(player, henrikdev, store, publisher, clock)
+
+    assert henrikdev.calls["match_details"] == 15 - RECENT_V4  # the recent v4 response covers 5
+    refreshed = sorted(store.list_matches("neon-main"), key=lambda r: r.played_at, reverse=True)
+    assert all(record.map_name for record in refreshed[:15])
+
+
+def test_summary_lists_the_recent_matches_newest_first_without_ids(
+    player, henrikdev, store, publisher, clock
+):
+    collect_player(player, henrikdev, store, publisher, clock)
+
+    matches = published(publisher)["recentMatches"]
+
+    assert len(matches) == 15
+    assert [m["playedAt"] for m in matches] == sorted(
+        (m["playedAt"] for m in matches), reverse=True
+    )
+    assert set(matches[0]) == {
+        "playedAt",
+        "result",
+        "map",
+        "agent",
+        "kills",
+        "deaths",
+        "assists",
+        "bottomFragged",
+        "mainWeapon",
+    }
+    assert not any("match" in json.dumps(m) for m in matches)  # no "match-0001" style IDs

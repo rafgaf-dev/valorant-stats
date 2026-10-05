@@ -1,7 +1,8 @@
 // The published summary contract (plan section 6). The collector writes it; the contract
 // fixture in collector/tests/fixtures/summary.expected.json is tested on both sides.
-// Version 2 added the detail counts; version 1 summaries still render, without them.
-export const SUPPORTED_SCHEMA_VERSIONS = [1, 2] as const;
+// Version 2 added the detail counts and version 3 the recent matches; older summaries still
+// render, without them.
+export const SUPPORTED_SCHEMA_VERSIONS = [1, 2, 3] as const;
 
 export type Window = {
 	matches: number;
@@ -23,6 +24,21 @@ export type Window = {
 	odinOrOperatorMains?: number;
 };
 
+export type MatchResult = "win" | "loss" | "draw";
+
+/** One of the recent matches, newest first. Detail fields are null when they aren't known. */
+export type RecentMatch = {
+	playedAt: string;
+	result: MatchResult;
+	map: string | null;
+	agent: string;
+	kills: number;
+	deaths: number;
+	assists: number;
+	bottomFragged: boolean | null;
+	mainWeapon: string | null;
+};
+
 export type SinceTrackingWindow = Window & { since: string | null };
 
 export type PlayerSummary = {
@@ -31,6 +47,7 @@ export type PlayerSummary = {
 	queue: string;
 	generatedAt: string;
 	windows: { recent: Window; sinceTracking: SinceTrackingWindow };
+	recentMatches?: RecentMatch[]; // schema 3
 	lastImport: { status: "success" | "partial" | "failed"; finishedAt: string };
 };
 

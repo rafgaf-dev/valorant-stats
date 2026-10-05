@@ -13,7 +13,8 @@ reveals the review, and the deck walks through the numbers:
 | | |
 | --- | --- |
 | ![A thumbs-up and "Correct." over the first slide](docs/images/thumbs-up.webp) | ![The performance review: a tilted Neon with a speech bubble, bar charts of the last 15 games against the long-term numbers, and tallies of bottom frags and Odin or Operator games](docs/images/review.webp) |
-| ![Games thrown vs not thrown as a 3D pie chart: 7 not thrown, 8 thrown](docs/images/outcomes.webp) | ![Key takeaways: "Do better.", "Lock in.", "Touch grass."](docs/images/takeaways.webp) |
+| ![Recent form: "Won the last one. Don't get used to it.", a strip of win, loss and draw buttons for the last 15 games, and a table for the selected game: map, agent, K/D/A, main gun and whether he bottom-fragged](docs/images/recent-form.webp) | ![Games thrown vs not thrown as a 3D pie chart: 7 not thrown, 8 thrown](docs/images/outcomes.webp) |
+| ![Key takeaways: "Do better.", "Lock in.", "Touch grass."](docs/images/takeaways.webp) | |
 
 The screenshots use the sample data in `frontend/dev-data/`.
 
@@ -82,6 +83,8 @@ The repository is public, so nothing personal is committed:
 - The collector's test fixtures are real API responses with every Riot ID, PUUID,
   party ID, and match ID replaced (`make capture-fixtures` refuses to write anything
   that still contains one).
+- The published summary lists the last 15 games without match IDs, so it can't be
+  used to look up anyone else in the lobby.
 - Account IDs, bucket names, and the API key stay in gitignored files, Secrets
   Manager, and GitHub environment secrets.
 - `make delete-player PLAYER=<id>` removes everything stored about a player,

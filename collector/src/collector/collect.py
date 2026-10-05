@@ -19,7 +19,7 @@ from collector.metrics import RECENT_MATCH_COUNT
 from collector.parse import NeedsDetails, ParseError, Skipped, parse_stored_match, parse_v4_match
 from collector.publish import Publisher
 from collector.records import ImportRun, MatchRecord, RunStatus
-from collector.store import MatchStore
+from collector.store import PARSER_VERSION, MatchStore
 from collector.summary import build_summary
 
 RECENT_MATCHES = 10  # per run; a 6-hour schedule would need >10 ranked games in between to miss one
@@ -177,7 +177,7 @@ def _import_matches(progress: _Import, client: MatchSource, store: MatchStore) -
     for match in client.recent_matches(puuid, RECENT_MATCHES):
         progress.found += 1
         known = existing.get(match.get("metadata", {}).get("match_id"))
-        if known is None or not known.has_details:
+        if known is None or not known.has_details or _outdated(known):
             _write(_parse(progress, parse_v4_match, match, puuid), progress, store)
 
     _complete_recent_details(progress, client, store)
@@ -186,16 +186,21 @@ def _import_matches(progress: _Import, client: MatchSource, store: MatchStore) -
 def _complete_recent_details(progress: _Import, client: MatchSource, store: MatchStore) -> None:
     """Fetches full details for any match in the recent window that lacks them.
 
-    Bottom frags and main weapons only come from full match data. Recent matches normally
-    arrive with it; this fills the gaps after the first backfill or a parser upgrade, then
-    costs nothing on later runs.
+    Bottom frags and main weapons only come from full match data, and the recent-form slide
+    needs every field the current parser writes. Recent matches normally arrive complete;
+    this fills the gaps after the first backfill or a parser upgrade, then costs nothing on
+    later runs.
     """
     records = sorted(
         store.list_matches(progress.player.id), key=lambda record: record.played_at, reverse=True
     )
     for record in records[:RECENT_MATCH_COUNT]:
-        if not record.has_details:
+        if not record.has_details or _outdated(record):
             _write(_fetch_details(record.match_id, progress, client), progress, store)
+
+
+def _outdated(record: MatchRecord) -> bool:
+    return record.parser_version is not None and record.parser_version < PARSER_VERSION
 
 
 def _import_stored(
