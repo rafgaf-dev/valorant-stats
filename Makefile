@@ -18,7 +18,7 @@ export COREPACK_ENABLE_DOWNLOAD_PROMPT := 0
 help:
 	@printf '%s\n' \
 		'make install           Install collector and frontend dependencies' \
-		'make dev               Run the frontend with sample data from frontend/dev-data' \
+		'make dev               Run the frontend with sample data (LOCAL=1: real data from make collect-local)' \
 		'make lint              Lint and format-check all code' \
 		'make format            Apply formatters (ruff, terraform fmt)' \
 		'make typecheck         Type-check the frontend' \
@@ -40,7 +40,7 @@ $(NODE_STAMP): frontend/package-lock.json
 	$(NPM) --prefix frontend ci
 
 dev: $(NODE_STAMP)
-	$(NPM) --prefix frontend run dev -- --host $(FRONTEND_HOST) --port $(FRONTEND_PORT)
+	$(if $(LOCAL),DEV_DATA_DIR=$(abspath collector/.local/data)) $(NPM) --prefix frontend run dev -- --host $(FRONTEND_HOST) --port $(FRONTEND_PORT)
 
 lint: install
 	cd collector && $(VENV_BIN)/ruff check . && $(VENV_BIN)/ruff format --check .

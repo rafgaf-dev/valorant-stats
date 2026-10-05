@@ -1,20 +1,47 @@
-import type { KdaMetric, Metric } from "../api";
+import type { ReactNode } from "react";
+import type { Window } from "../api";
+import { formatDelta, formatMetric, metricDelta, type MetricKey } from "../summary";
 
-function formatValue(value: number, kind: "kda" | "percentage") {
-	return kind === "percentage" ? `${(value * 100).toFixed(1)}%` : value.toFixed(2);
-}
+type Props = {
+	label: string;
+	metric: MetricKey;
+	recent: Window;
+	baseline: Window;
+	baselineLabel: string;
+	detail: ReactNode;
+};
 
-export function StatCard({ label, metric, kind }: { label: string; metric: Metric | KdaMetric; kind: "kda" | "percentage" }) {
-	const delta = metric.recent - metric.lifetime;
-	const kda = kind === "kda" ? metric as KdaMetric : null;
-	const commentary = delta > 0 ? "cooking" : delta < 0 ? "trolling" : "unchanged, somehow";
+export function StatCard({ label, metric, recent, baseline, baselineLabel, detail }: Props) {
+	const delta = metricDelta(metric, recent, baseline);
+	const trend = delta === null ? null : delta > 0 ? "up" : delta < 0 ? "down" : "level";
+	const commentary = { up: "cooking", down: "trolling", level: "unchanged, somehow" };
+
 	return (
-		<article className="stat-card">
-			<div className="stat-label"><span>{label}</span><span className={delta >= 0 ? "delta positive" : "delta"}>{commentary}</span></div>
-			<div className="stat-main">{formatValue(metric.recent, kind)}</div>
-			<div className="stat-baseline"><span>LAST 15 <b>{formatValue(metric.recent, kind)}</b></span><span>CAREER <b>{formatValue(metric.lifetime, kind)}</b></span></div>
-			{kda && <div className="stat-detail">Recent K/D/A {kda.recentKills} / {kda.recentDeaths} / {kda.recentAssists}</div>}
-			{!kda && <div className="stat-detail">{metric.recentSampleSize} recent matches // {metric.lifetimeSampleSize} total</div>}
+		<article className="stat-card" aria-labelledby={`stat-${metric}`}>
+			<div className="stat-label">
+				<h3 id={`stat-${metric}`}>{label}</h3>
+				{trend && delta !== null && (
+					<span className={`delta ${trend}`}>
+						{commentary[trend]} <span className="delta-value">{formatDelta(metric, delta)}</span>
+					</span>
+				)}
+			</div>
+			{recent[metric] === null ? (
+				<p className="stat-main empty">Not enough data</p>
+			) : (
+				<p className="stat-main">{formatMetric(metric, recent[metric])}</p>
+			)}
+			<dl className="stat-baseline">
+				<div>
+					<dt>Last {recent.matches}</dt>
+					<dd>{formatMetric(metric, recent[metric])}</dd>
+				</div>
+				<div>
+					<dt>{baselineLabel}</dt>
+					<dd>{formatMetric(metric, baseline[metric])}</dd>
+				</div>
+			</dl>
+			<p className="stat-detail">{detail}</p>
 		</article>
 	);
 }

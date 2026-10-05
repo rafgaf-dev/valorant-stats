@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "player": {
-    "id": "neon-main",
+    "id": "stale",
     "displayName": "The Neon Menace",
     "agent": "Neon",
     "region": "eu"
   },
   "queue": "competitive",
-  "generatedAt": "2026-10-05T12:00:02Z",
+  "generatedAt": "2026-09-01T12:00:00Z",
   "windows": {
     "recent": {
       "matches": 15,
@@ -43,6 +43,6 @@
   },
   "lastImport": {
     "status": "success",
-    "finishedAt": "2026-10-05T12:00:02Z"
+    "finishedAt": "2026-09-01T12:00:00Z"
   }
 }

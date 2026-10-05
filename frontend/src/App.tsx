@@ -1,70 +1,135 @@
 import { useEffect, useState } from "react";
-import { getPlayerSummary, type PlayerSummary } from "./api";
+import { getPlayerSummary, SummaryError, type PlayerSummary } from "./api";
+import { MetricNotes } from "./components/MetricNotes";
 import { PlayerHeader } from "./components/PlayerHeader";
-import { RecentGames } from "./components/RecentGames";
 import { StatCard } from "./components/StatCard";
-import "./styles.css";
+import { Verdict } from "./components/Verdict";
+import { playerIdFromLocation } from "./player";
+import { formatMonth, formatUpdated, isStale } from "./summary";
 
-const PLAYER_ID = import.meta.env.VITE_PLAYER_ID ?? "neon-main";
+type State =
+	| { status: "loading" }
+	| { status: "error"; error: SummaryError }
+	| { status: "loaded"; summary: PlayerSummary };
 
-function getVerdict(metrics: PlayerSummary["metrics"]) {
-
-	const deltas = [
-		metrics.kda.recent - metrics.kda.lifetime,
-		metrics.winRate.recent - metrics.winRate.lifetime,
-		metrics.headshotPercentage.recent - metrics.headshotPercentage.lifetime,
-	];
-	const good = deltas.filter((delta) => delta > 0).length;
-	const bad = deltas.filter((delta) => delta < 0).length;
-
-	if (good >= 2) {
-		return { mood: "cooking", title: "HE'S COOKING", text: "Someone check the scoreboard. This is suspiciously competent." };
-	}
-	if (bad >= 2) {
-		return { mood: "trolling", title: "HE'S TROLLING", text: "The plan remains unclear, but the deaths are very real." };
-	}
-	return { mood: "chaos", title: "HE'S COOKING SOMETHING", text: "The numbers refuse to form a coherent explanation." };
-}
+const ERROR_TITLES: Record<SummaryError["kind"], string> = {
+	not_found: "No dossier yet.",
+	unavailable: "Signal lost.",
+	unsupported: "This page is out of date.",
+};
 
 export default function App() {
-	const [summary, setSummary] = useState<PlayerSummary | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState<State>({ status: "loading" });
+	const playerId = playerIdFromLocation(window.location.search, import.meta.env.DEV);
 
 	useEffect(() => {
-		getPlayerSummary(PLAYER_ID).then(setSummary).catch((requestError: Error) => setError(requestError.message));
-	}, []);
+		const controller = new AbortController();
+		getPlayerSummary(playerId, controller.signal)
+			.then((summary) => setState({ status: "loaded", summary }))
+			.catch((error: unknown) => {
+				if (controller.signal.aborted) return;
+				const failure =
+					error instanceof SummaryError ? error : new SummaryError("unavailable", "The stats couldn't be loaded.");
+				setState({ status: "error", error: failure });
+			});
+		return () => controller.abort();
+	}, [playerId]);
 
 	return (
 		<main className="app-shell">
 			<div className="grain" aria-hidden="true" />
-			<section className="dashboard" aria-live="polite">
-				<div className="eyebrow">VALORANT // UNAUTHORIZED FRIEND ANALYSIS</div>
-				{error ? (
-					<div className="state-panel"><strong>Signal lost.</strong><span>{error}</span></div>
-				) : summary ? (
-					<>
-						<PlayerHeader summary={summary} />
-						{summary.metrics ? (
-							<>
-								<div className={`verdict ${getVerdict(summary.metrics).mood}`}>
-									<div><span className="verdict-stamp">OFFICIAL FRIEND GROUP RULING</span><strong>{getVerdict(summary.metrics).title}</strong></div>
-									<p>{getVerdict(summary.metrics).text}</p>
-								</div>
-								<div className="section-heading"><span>Receipts</span><span>LAST 15 VS CAREER DAMAGE</span></div>
-								<div className="stats-grid">
-									<StatCard label="K / D / A" metric={summary.metrics.kda} kind="kda" />
-									<StatCard label="Win rate" metric={summary.metrics.winRate} kind="percentage" />
-									<StatCard label="Headshot %" metric={summary.metrics.headshotPercentage} kind="percentage" />
-								</div>
-								<RecentGames />
-							</>
-						) : <div className="state-panel"><strong>Awaiting first import.</strong><span>The collector has not published a competitive match snapshot yet.</span></div>}
-					</>
-				) : (
-					<div className="state-panel loading"><strong>Pulling the dossier...</strong><span>Connecting to the cached match archive.</span></div>
+			<div className="dashboard" aria-live="polite" aria-busy={state.status === "loading"}>
+				<p className="eyebrow">VALORANT // UNAUTHORIZED FRIEND ANALYSIS</p>
+				{state.status === "loading" && (
+					<div className="state-panel loading">
+						<strong>Pulling the dossier...</strong>
+						<span>Connecting to the cached match archive.</span>
+					</div>
 				)}
-				<footer>Unofficial fan project. VALORANT and all related imagery are property of Riot Games.</footer>
-			</section>
+				{state.status === "error" && (
+					<div className="state-panel" role="alert">
+						<strong>{ERROR_TITLES[state.error.kind]}</strong>
+						<span>{state.error.message}</span>
+					</div>
+				)}
+				{state.status === "loaded" && <Dashboard summary={state.summary} />}
+				<footer>
+					<p>
+						valorant-stats isn&apos;t endorsed by Riot Games and doesn&apos;t reflect the views or opinions of Riot
+						Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all
+						associated properties are trademarks or registered trademarks of Riot Games, Inc.
+					</p>
+					<p>
+						Match data from the unofficial{" "}
+						<a href="https://docs.henrikdev.xyz" rel="noreferrer">
+							HenrikDev API
+						</a>
+						.
+					</p>
+				</footer>
+			</div>
 		</main>
+	);
+}
+
+function Dashboard({ summary }: { summary: PlayerSummary }) {
+	const { recent, sinceTracking } = summary.windows;
+
+	if (sinceTracking.matches === 0) {
+		return (
+			<>
+				<PlayerHeader summary={summary} />
+				<div className="state-panel">
+					<strong>Awaiting first match.</strong>
+					<span>No completed competitive matches have been collected yet.</span>
+				</div>
+			</>
+		);
+	}
+
+	const sinceLabel = sinceTracking.since ? `Since ${formatMonth(sinceTracking.since)}` : "Since tracking";
+	return (
+		<>
+			{isStale(summary.generatedAt) && (
+				<p className="stale-banner" role="status">
+					These stats were last updated {formatUpdated(summary.generatedAt)} and may be out of date.
+				</p>
+			)}
+			<PlayerHeader summary={summary} />
+			<Verdict windows={summary.windows} />
+			<h2 className="section-heading">
+				<span>Receipts</span>
+				<span>
+					Last {recent.matches} vs {sinceLabel.toLowerCase()} ({sinceTracking.matches} matches)
+				</span>
+			</h2>
+			<div className="stats-grid">
+				<StatCard
+					label="K/D"
+					metric="kd"
+					recent={recent}
+					baseline={sinceTracking}
+					baselineLabel={sinceLabel}
+					detail={`K/D/A ${recent.kills} / ${recent.deaths} / ${recent.assists}`}
+				/>
+				<StatCard
+					label="Win rate"
+					metric="winRate"
+					recent={recent}
+					baseline={sinceTracking}
+					baselineLabel={sinceLabel}
+					detail={`W–L–D ${recent.wins}–${recent.losses}–${recent.draws}`}
+				/>
+				<StatCard
+					label="Headshot %"
+					metric="headshotRate"
+					recent={recent}
+					baseline={sinceTracking}
+					baselineLabel={sinceLabel}
+					detail={`Hits: ${recent.headshots} head · ${recent.bodyshots} body · ${recent.legshots} leg`}
+				/>
+			</div>
+			<MetricNotes />
+		</>
 	);
 }
