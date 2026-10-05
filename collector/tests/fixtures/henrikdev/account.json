@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "data": {
+    "puuid": "puuid-tracked",
+    "region": "eu",
+    "account_level": 209,
+    "name": "Example",
+    "tag": "EUW",
+    "card": "ad81a15f-4725-b75f-0c8c-519aa97ed3b6",
+    "title": "19b138cf-4137-692c-c6ec-be9da98109be",
+    "platforms": [
+      "PC",
+      "CONSOLE"
+    ],
+    "updated_at": "2026-10-05T11:14:36.642Z"
+  }
+}

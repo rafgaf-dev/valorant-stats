@@ -1,0 +1,3413 @@
+{
+  "status": 200,
+  "data": [
+    {
+      "metadata": {
+        "match_id": "match-0001",
+        "map": {
+          "id": "92584fbe-486a-b1b2-9faa-39b0f486b498",
+          "name": "Sunset"
+        },
+        "game_version": "release-13.05-shipping-11-5350494",
+        "game_length_in_ms": 1745598,
+        "started_at": "2026-09-20T18:39:05.47Z",
+        "is_completed": true,
+        "queue": {
+          "id": "competitive",
+          "name": "Competitive",
+          "mode_type": "Standard"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "platform": "pc",
+        "premier": null,
+        "party_rr_penaltys": [
+          {
+            "party_id": "party-0001",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0002",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0003",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0004",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0005",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0006",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0007",
+            "penalty": 0.0
+          }
+        ],
+        "region": "eu",
+        "cluster": "Madrid"
+      },
+      "players": [
+        {
+          "puuid": "puuid-0001",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0002",
+          "agent": {
+            "id": "cc8b64c8-4b25-4ff9-6e7f-37b4da43d235",
+            "name": "Deadlock"
+          },
+          "stats": {
+            "score": 3760,
+            "kills": 13,
+            "deaths": 11,
+            "assists": 8,
+            "headshots": 13,
+            "bodyshots": 24,
+            "legshots": 2,
+            "damage": {
+              "dealt": 2366,
+              "received": 2061
+            }
+          },
+          "ability_casts": {
+            "grenade": 11,
+            "ability1": 29,
+            "ability2": 10,
+            "ultimate": 3
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "c15151ec-4dad-9df1-6436-778b78fdcfd9",
+            "title": "e79d9585-4ea7-f8f1-3d4e-31a1e2c71577",
+            "preferred_level_border": null
+          },
+          "account_level": 671,
+          "session_playtime_in_ms": 540000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 46000,
+              "average": 2421.0527
+            },
+            "loadout_value": {
+              "overall": 70400,
+              "average": 3705.2632
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0002",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0003",
+          "agent": {
+            "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+            "name": "Jett"
+          },
+          "stats": {
+            "score": 2015,
+            "kills": 6,
+            "deaths": 19,
+            "assists": 1,
+            "headshots": 8,
+            "bodyshots": 16,
+            "legshots": 2,
+            "damage": {
+              "dealt": 1480,
+              "received": 3315
+            }
+          },
+          "ability_casts": {
+            "grenade": 4,
+            "ability1": 2,
+            "ability2": 18,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "5a6961da-4936-f39a-539a-b8b8f151b73a",
+            "title": "8198f12e-4899-0f25-8319-cbad87d9097b",
+            "preferred_level_border": "49413ac2-4ed5-6953-5791-db838ccb58f3"
+          },
+          "account_level": 97,
+          "session_playtime_in_ms": 480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 50000,
+              "average": 2631.5789
+            },
+            "loadout_value": {
+              "overall": 55200,
+              "average": 2905.2632
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0003",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0003",
+          "agent": {
+            "id": "efba5359-4016-a1e5-7626-b1ae76895940",
+            "name": "Vyse"
+          },
+          "stats": {
+            "score": 5518,
+            "kills": 19,
+            "deaths": 16,
+            "assists": 4,
+            "headshots": 20,
+            "bodyshots": 22,
+            "legshots": 2,
+            "damage": {
+              "dealt": 3466,
+              "received": 2807
+            }
+          },
+          "ability_casts": {
+            "grenade": 15,
+            "ability1": 20,
+            "ability2": 8,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "b7880750-49f6-9623-fc0d-779f0e88fedb",
+            "title": "1b4e3bf6-4850-3d9b-a02e-8182caf29b76",
+            "preferred_level_border": null
+          },
+          "account_level": 159,
+          "session_playtime_in_ms": 180000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 50000,
+              "average": 2631.5789
+            },
+            "loadout_value": {
+              "overall": 52250,
+              "average": 2750.0
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0004",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0004",
+          "agent": {
+            "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+            "name": "Clove"
+          },
+          "stats": {
+            "score": 4295,
+            "kills": 14,
+            "deaths": 18,
+            "assists": 1,
+            "headshots": 13,
+            "bodyshots": 16,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2680,
+              "received": 3562
+            }
+          },
+          "ability_casts": {
+            "grenade": 1,
+            "ability1": 5,
+            "ability2": 49,
+            "ultimate": 3
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "a47307e5-4f61-f36f-53b4-fdb1f8be9f75",
+            "title": "b215b87d-47ed-958d-b710-ee93a2ba9db8",
+            "preferred_level_border": "6f610ab6-4a21-63fd-ac19-4a9204bc2721"
+          },
+          "account_level": 314,
+          "session_playtime_in_ms": 4740000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 43150,
+              "average": 2271.0527
+            },
+            "loadout_value": {
+              "overall": 60800,
+              "average": 3200.0
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0005",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0005",
+          "agent": {
+            "id": "a3bfb853-43b2-7238-a4f1-ad90e9e46bcc",
+            "name": "Reyna"
+          },
+          "stats": {
+            "score": 2641,
+            "kills": 9,
+            "deaths": 17,
+            "assists": 3,
+            "headshots": 10,
+            "bodyshots": 22,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1919,
+              "received": 3150
+            }
+          },
+          "ability_casts": {
+            "grenade": 15,
+            "ability1": 1,
+            "ability2": 3,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "41244f42-43f5-f795-9be8-d2b9edba458a",
+            "title": "42e2f97d-4e69-274c-589c-0fbdeb397df9",
+            "preferred_level_border": "ebc736cd-4b6a-137b-e2b0-1486e31312c9"
+          },
+          "account_level": 376,
+          "session_playtime_in_ms": 3600000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 48750,
+              "average": 2565.7896
+            },
+            "loadout_value": {
+              "overall": 62400,
+              "average": 3284.2104
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0006",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0001",
+          "agent": {
+            "id": "a3bfb853-43b2-7238-a4f1-ad90e9e46bcc",
+            "name": "Reyna"
+          },
+          "stats": {
+            "score": 3564,
+            "kills": 14,
+            "deaths": 12,
+            "assists": 2,
+            "headshots": 7,
+            "bodyshots": 36,
+            "legshots": 0,
+            "damage": {
+              "dealt": 2510,
+              "received": 2157
+            }
+          },
+          "ability_casts": {
+            "grenade": 15,
+            "ability1": 7,
+            "ability2": 5,
+            "ultimate": 3
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "07d52a52-4569-054b-11d6-f2ac39a519ee",
+            "title": "4661c80b-462d-0d9d-d76e-be9aa7962643",
+            "preferred_level_border": "086dd1ab-4889-793a-4b33-0a99e311fa25"
+          },
+          "account_level": 444,
+          "session_playtime_in_ms": 12360000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 42700,
+              "average": 2247.3684
+            },
+            "loadout_value": {
+              "overall": 77150,
+              "average": 4060.5264
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0007",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0001",
+          "agent": {
+            "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+            "name": "Clove"
+          },
+          "stats": {
+            "score": 6394,
+            "kills": 25,
+            "deaths": 12,
+            "assists": 5,
+            "headshots": 20,
+            "bodyshots": 35,
+            "legshots": 2,
+            "damage": {
+              "dealt": 4360,
+              "received": 2535
+            }
+          },
+          "ability_casts": {
+            "grenade": 6,
+            "ability1": 1,
+            "ability2": 34,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "67d7faa4-4b40-e16a-1c54-0f9b41919849",
+            "title": "16a50610-4fcc-8f6c-7edb-f2b00cf6af6b",
+            "preferred_level_border": "bd1082ab-462c-3fb8-e049-28a9750acf0f"
+          },
+          "account_level": 501,
+          "session_playtime_in_ms": 3480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 42800,
+              "average": 2252.6316
+            },
+            "loadout_value": {
+              "overall": 74600,
+              "average": 3926.3157
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0008",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0006",
+          "agent": {
+            "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+            "name": "Jett"
+          },
+          "stats": {
+            "score": 5386,
+            "kills": 19,
+            "deaths": 11,
+            "assists": 4,
+            "headshots": 15,
+            "bodyshots": 29,
+            "legshots": 0,
+            "damage": {
+              "dealt": 3594,
+              "received": 2313
+            }
+          },
+          "ability_casts": {
+            "grenade": 11,
+            "ability1": 3,
+            "ability2": 23,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "1ad8901b-49c7-cb36-0948-fdb5ebe0a565",
+            "title": "3bd26312-4c0a-d247-c479-06a4a518f841",
+            "preferred_level_border": "af1852a5-4e66-02a6-2ae3-ab8c885efb80"
+          },
+          "account_level": 387,
+          "session_playtime_in_ms": 0,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 46850,
+              "average": 2465.7896
+            },
+            "loadout_value": {
+              "overall": 77150,
+              "average": 4060.5264
+            }
+          }
+        },
+        {
+          "puuid": "puuid-tracked",
+          "name": "Example",
+          "tag": "EUW",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0007",
+          "agent": {
+            "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+            "name": "Sova"
+          },
+          "stats": {
+            "score": 4075,
+            "kills": 14,
+            "deaths": 9,
+            "assists": 9,
+            "headshots": 9,
+            "bodyshots": 32,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2660,
+              "received": 1834
+            }
+          },
+          "ability_casts": {
+            "grenade": 5,
+            "ability1": 14,
+            "ability2": 21,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "ad81a15f-4725-b75f-0c8c-519aa97ed3b6",
+            "title": "19b138cf-4137-692c-c6ec-be9da98109be",
+            "preferred_level_border": "6f610ab6-4a21-63fd-ac19-4a9204bc2721"
+          },
+          "account_level": 208,
+          "session_playtime_in_ms": 2340000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 41000,
+              "average": 2157.8948
+            },
+            "loadout_value": {
+              "overall": 73950,
+              "average": 3892.1052
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0009",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0003",
+          "agent": {
+            "id": "b444168c-4e35-8076-db47-ef9bf368f384",
+            "name": "Tejo"
+          },
+          "stats": {
+            "score": 2163,
+            "kills": 7,
+            "deaths": 16,
+            "assists": 2,
+            "headshots": 6,
+            "bodyshots": 20,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1465,
+              "received": 2766
+            }
+          },
+          "ability_casts": {
+            "grenade": 12,
+            "ability1": 11,
+            "ability2": 26,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "16ac5364-471a-fd97-5a44-8ab9c48c7c84",
+            "title": "6b4e1d0c-410e-878b-f151-9b8a8abc83a3",
+            "preferred_level_border": "3d90bc3a-4626-71d6-a17c-93ae14d05fb0"
+          },
+          "account_level": 313,
+          "session_playtime_in_ms": 480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 44600,
+              "average": 2347.3684
+            },
+            "loadout_value": {
+              "overall": 61500,
+              "average": 3236.842
+            }
+          }
+        }
+      ],
+      "observers": [],
+      "coaches": [],
+      "teams": [
+        {
+          "team_id": "Red",
+          "rounds": {
+            "won": 6,
+            "lost": 13
+          },
+          "won": false,
+          "premier_roster": null
+        },
+        {
+          "team_id": "Blue",
+          "rounds": {
+            "won": 13,
+            "lost": 6
+          },
+          "won": true,
+          "premier_roster": null
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "match_id": "match-0002",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "game_version": "release-13.05-shipping-11-5350494",
+        "game_length_in_ms": 1229942,
+        "started_at": "2026-09-20T18:15:17.811Z",
+        "is_completed": true,
+        "queue": {
+          "id": "competitive",
+          "name": "Competitive",
+          "mode_type": "Standard"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "platform": "pc",
+        "premier": null,
+        "party_rr_penaltys": [
+          {
+            "party_id": "party-0008",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0009",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0010",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0011",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0012",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0013",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0007",
+            "penalty": 0.0
+          }
+        ],
+        "region": "eu",
+        "cluster": "Madrid"
+      },
+      "players": [
+        {
+          "puuid": "puuid-0010",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0010",
+          "agent": {
+            "id": "7c8a4701-4de6-9355-b254-e09bc2a34b72",
+            "name": "Miks"
+          },
+          "stats": {
+            "score": 1459,
+            "kills": 5,
+            "deaths": 13,
+            "assists": 3,
+            "headshots": 5,
+            "bodyshots": 9,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1141,
+              "received": 2248
+            }
+          },
+          "ability_casts": {
+            "grenade": 10,
+            "ability1": 5,
+            "ability2": 22,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "c4c56dea-4e64-2e94-e360-63ac2a726e0f",
+            "title": "2178d2e2-402a-4d13-47d2-f8bf096067a3",
+            "preferred_level_border": "6694d7f7-4ab9-8545-5921-35a9ea8cec24"
+          },
+          "account_level": 861,
+          "session_playtime_in_ms": 12120000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 46450,
+              "average": 3317.8572
+            },
+            "loadout_value": {
+              "overall": 41950,
+              "average": 2996.4285
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0011",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0012",
+          "agent": {
+            "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+            "name": "Raze"
+          },
+          "stats": {
+            "score": 4345,
+            "kills": 16,
+            "deaths": 7,
+            "assists": 1,
+            "headshots": 6,
+            "bodyshots": 46,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2774,
+              "received": 1715
+            }
+          },
+          "ability_casts": {
+            "grenade": 6,
+            "ability1": 12,
+            "ability2": 11,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 23,
+            "name": "Ascendant 3"
+          },
+          "customization": {
+            "card": "4ae57e72-4b7e-a3ab-1ece-1ebfa0504971",
+            "title": "8198f12e-4899-0f25-8319-cbad87d9097b",
+            "preferred_level_border": null
+          },
+          "account_level": 167,
+          "session_playtime_in_ms": 11520000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 37750,
+              "average": 2696.4285
+            },
+            "loadout_value": {
+              "overall": 52950,
+              "average": 3782.1428
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0012",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0009",
+          "agent": {
+            "id": "8e253930-4c05-31dd-1b6c-968525494517",
+            "name": "Omen"
+          },
+          "stats": {
+            "score": 6181,
+            "kills": 24,
+            "deaths": 6,
+            "assists": 3,
+            "headshots": 20,
+            "bodyshots": 33,
+            "legshots": 2,
+            "damage": {
+              "dealt": 4118,
+              "received": 1284
+            }
+          },
+          "ability_casts": {
+            "grenade": 13,
+            "ability1": 10,
+            "ability2": 22,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "bdc0c02c-441c-8ebc-ec5e-27bff0888ae0",
+            "title": "42019b6e-4dde-6eca-36f3-388c02e65d94",
+            "preferred_level_border": "49413ac2-4ed5-6953-5791-db838ccb58f3"
+          },
+          "account_level": 91,
+          "session_playtime_in_ms": 540000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 31550,
+              "average": 2253.5715
+            },
+            "loadout_value": {
+              "overall": 55100,
+              "average": 3935.7144
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0013",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0009",
+          "agent": {
+            "id": "a3bfb853-43b2-7238-a4f1-ad90e9e46bcc",
+            "name": "Reyna"
+          },
+          "stats": {
+            "score": 1439,
+            "kills": 6,
+            "deaths": 6,
+            "assists": 4,
+            "headshots": 3,
+            "bodyshots": 12,
+            "legshots": 3,
+            "damage": {
+              "dealt": 1020,
+              "received": 1424
+            }
+          },
+          "ability_casts": {
+            "grenade": 22,
+            "ability1": 3,
+            "ability2": 1,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 17,
+            "name": "Platinum 3"
+          },
+          "customization": {
+            "card": "b5314b3f-4532-9e41-bc1f-13954a4c6829",
+            "title": "c4de2e82-4288-92bb-ed42-e4aa12a657ef",
+            "preferred_level_border": null
+          },
+          "account_level": 168,
+          "session_playtime_in_ms": 31080000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 31100,
+              "average": 2221.4285
+            },
+            "loadout_value": {
+              "overall": 53650,
+              "average": 3832.1428
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0014",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0008",
+          "agent": {
+            "id": "22697a3d-45bf-8dd7-4fec-84a9e28c69d7",
+            "name": "Chamber"
+          },
+          "stats": {
+            "score": 1785,
+            "kills": 6,
+            "deaths": 14,
+            "assists": 0,
+            "headshots": 4,
+            "bodyshots": 6,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1231,
+              "received": 2464
+            }
+          },
+          "ability_casts": {
+            "grenade": 12,
+            "ability1": 6,
+            "ability2": 8,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "051e29eb-4a58-d0f6-d384-dea1fe95f0a5",
+            "title": "129190d4-42fa-4e79-75e3-ffb5679d1dc2",
+            "preferred_level_border": "5d0d6c6c-4f0a-dc65-e506-b786cc27dbe1"
+          },
+          "account_level": 282,
+          "session_playtime_in_ms": 4920000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 33300,
+              "average": 2378.5715
+            },
+            "loadout_value": {
+              "overall": 38400,
+              "average": 2742.8572
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0015",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0010",
+          "agent": {
+            "id": "bb2a4828-46eb-8cd1-e765-15848195d751",
+            "name": "Neon"
+          },
+          "stats": {
+            "score": 2066,
+            "kills": 7,
+            "deaths": 13,
+            "assists": 1,
+            "headshots": 4,
+            "bodyshots": 11,
+            "legshots": 3,
+            "damage": {
+              "dealt": 1270,
+              "received": 2393
+            }
+          },
+          "ability_casts": {
+            "grenade": 2,
+            "ability1": 11,
+            "ability2": 14,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "2ffc86da-479f-0023-1d8a-3581224a88e0",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": "ebc736cd-4b6a-137b-e2b0-1486e31312c9"
+          },
+          "account_level": 54,
+          "session_playtime_in_ms": 6480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 19900,
+              "average": 1421.4286
+            },
+            "loadout_value": {
+              "overall": 40500,
+              "average": 2892.8572
+            }
+          }
+        },
+        {
+          "puuid": "puuid-tracked",
+          "name": "Example",
+          "tag": "EUW",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0007",
+          "agent": {
+            "id": "e370fa57-4757-3604-3648-499e1f642d3f",
+            "name": "Gekko"
+          },
+          "stats": {
+            "score": 2549,
+            "kills": 8,
+            "deaths": 13,
+            "assists": 2,
+            "headshots": 8,
+            "bodyshots": 17,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1859,
+              "received": 2139
+            }
+          },
+          "ability_casts": {
+            "grenade": 12,
+            "ability1": 4,
+            "ability2": 13,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "ad81a15f-4725-b75f-0c8c-519aa97ed3b6",
+            "title": "19b138cf-4137-692c-c6ec-be9da98109be",
+            "preferred_level_border": "6f610ab6-4a21-63fd-ac19-4a9204bc2721"
+          },
+          "account_level": 208,
+          "session_playtime_in_ms": 960000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 34350,
+              "average": 2453.5715
+            },
+            "loadout_value": {
+              "overall": 39050,
+              "average": 2789.2856
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0016",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0011",
+          "agent": {
+            "id": "22697a3d-45bf-8dd7-4fec-84a9e28c69d7",
+            "name": "Chamber"
+          },
+          "stats": {
+            "score": 2739,
+            "kills": 9,
+            "deaths": 8,
+            "assists": 4,
+            "headshots": 6,
+            "bodyshots": 15,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1751,
+              "received": 1431
+            }
+          },
+          "ability_casts": {
+            "grenade": 10,
+            "ability1": 5,
+            "ability2": 5,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "0730dc82-4e93-d339-538e-498891efdb05",
+            "title": "083766c1-4fdf-6602-311c-f6b634ddf564",
+            "preferred_level_border": "5d0d6c6c-4f0a-dc65-e506-b786cc27dbe1"
+          },
+          "account_level": 394,
+          "session_playtime_in_ms": 9480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 27150,
+              "average": 1939.2858
+            },
+            "loadout_value": {
+              "overall": 47150,
+              "average": 3367.8572
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0017",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0012",
+          "agent": {
+            "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+            "name": "Jett"
+          },
+          "stats": {
+            "score": 2932,
+            "kills": 12,
+            "deaths": 6,
+            "assists": 2,
+            "headshots": 10,
+            "bodyshots": 12,
+            "legshots": 3,
+            "damage": {
+              "dealt": 2038,
+              "received": 1319
+            }
+          },
+          "ability_casts": {
+            "grenade": 5,
+            "ability1": 4,
+            "ability2": 14,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 22,
+            "name": "Ascendant 2"
+          },
+          "customization": {
+            "card": "edfb9497-48ca-c3d9-cb0a-109cdedf533c",
+            "title": "00d4d326-4edc-3229-7c28-129d3374e3ad",
+            "preferred_level_border": "5d0d6c6c-4f0a-dc65-e506-b786cc27dbe1"
+          },
+          "account_level": 467,
+          "session_playtime_in_ms": 21240000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 25100,
+              "average": 1792.8572
+            },
+            "loadout_value": {
+              "overall": 54250,
+              "average": 3875.0
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0018",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0013",
+          "agent": {
+            "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+            "name": "Raze"
+          },
+          "stats": {
+            "score": 2395,
+            "kills": 7,
+            "deaths": 14,
+            "assists": 0,
+            "headshots": 6,
+            "bodyshots": 26,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1703,
+              "received": 2488
+            }
+          },
+          "ability_casts": {
+            "grenade": 1,
+            "ability1": 5,
+            "ability2": 14,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "4ae57e72-4b7e-a3ab-1ece-1ebfa0504971",
+            "title": "8e757bd9-4a56-7b66-314f-97a99bf6dd01",
+            "preferred_level_border": "49413ac2-4ed5-6953-5791-db838ccb58f3"
+          },
+          "account_level": 273,
+          "session_playtime_in_ms": 1620000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 33900,
+              "average": 2421.4285
+            },
+            "loadout_value": {
+              "overall": 36000,
+              "average": 2571.4285
+            }
+          }
+        }
+      ],
+      "observers": [],
+      "coaches": [],
+      "teams": [
+        {
+          "team_id": "Red",
+          "rounds": {
+            "won": 13,
+            "lost": 1
+          },
+          "won": true,
+          "premier_roster": null
+        },
+        {
+          "team_id": "Blue",
+          "rounds": {
+            "won": 1,
+            "lost": 13
+          },
+          "won": false,
+          "premier_roster": null
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "match_id": "match-0003",
+        "map": {
+          "id": "756da597-416b-c0f2-f47b-afbdf28670bc",
+          "name": "Summit"
+        },
+        "game_version": "release-13.05-shipping-11-5350494",
+        "game_length_in_ms": 1562023,
+        "started_at": "2026-09-05T21:14:41.674Z",
+        "is_completed": true,
+        "queue": {
+          "id": "competitive",
+          "name": "Competitive",
+          "mode_type": "Standard"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "platform": "pc",
+        "premier": null,
+        "party_rr_penaltys": [
+          {
+            "party_id": "party-0014",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0015",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0016",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0017",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0018",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0019",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0020",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0021",
+            "penalty": 0.0
+          }
+        ],
+        "region": "eu",
+        "cluster": "London"
+      },
+      "players": [
+        {
+          "puuid": "puuid-0019",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0021",
+          "agent": {
+            "id": "a3bfb853-43b2-7238-a4f1-ad90e9e46bcc",
+            "name": "Reyna"
+          },
+          "stats": {
+            "score": 4744,
+            "kills": 17,
+            "deaths": 15,
+            "assists": 2,
+            "headshots": 16,
+            "bodyshots": 19,
+            "legshots": 0,
+            "damage": {
+              "dealt": 3136,
+              "received": 2792
+            }
+          },
+          "ability_casts": {
+            "grenade": 14,
+            "ability1": 4,
+            "ability2": 3,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 0,
+            "name": "Unrated"
+          },
+          "customization": {
+            "card": "714965d1-469f-6661-1012-5d8664ca5e4a",
+            "title": "48570afb-49f6-bc62-1706-f79c7c36ee37",
+            "preferred_level_border": "bd1082ab-462c-3fb8-e049-28a9750acf0f"
+          },
+          "account_level": 206,
+          "session_playtime_in_ms": 5340000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 49300,
+              "average": 2594.7368
+            },
+            "loadout_value": {
+              "overall": 70100,
+              "average": 3689.4736
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0020",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0019",
+          "agent": {
+            "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+            "name": "Jett"
+          },
+          "stats": {
+            "score": 4481,
+            "kills": 15,
+            "deaths": 16,
+            "assists": 2,
+            "headshots": 17,
+            "bodyshots": 14,
+            "legshots": 1,
+            "damage": {
+              "dealt": 3207,
+              "received": 2979
+            }
+          },
+          "ability_casts": {
+            "grenade": 1,
+            "ability1": 0,
+            "ability2": 15,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "38e78d00-4a42-e605-847a-a3a2fc85cbf4",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": null
+          },
+          "account_level": 33,
+          "session_playtime_in_ms": 32160000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 42150,
+              "average": 2218.4211
+            },
+            "loadout_value": {
+              "overall": 59600,
+              "average": 3136.842
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0021",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0016",
+          "agent": {
+            "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+            "name": "Raze"
+          },
+          "stats": {
+            "score": 3745,
+            "kills": 12,
+            "deaths": 13,
+            "assists": 1,
+            "headshots": 12,
+            "bodyshots": 19,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2397,
+              "received": 2476
+            }
+          },
+          "ability_casts": {
+            "grenade": 3,
+            "ability1": 9,
+            "ability2": 4,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 0,
+            "name": "Unrated"
+          },
+          "customization": {
+            "card": "c89194bd-4710-b54e-8d6c-60be6274fbb2",
+            "title": "4ef6afa5-41de-2d89-2bec-adb0feeecfad",
+            "preferred_level_border": null
+          },
+          "account_level": 260,
+          "session_playtime_in_ms": 120000,
+          "behavior": {
+            "afk_rounds": 0.3,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.1
+          },
+          "economy": {
+            "spent": {
+              "overall": 44850,
+              "average": 2360.5264
+            },
+            "loadout_value": {
+              "overall": 65150,
+              "average": 3428.9473
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0022",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0015",
+          "agent": {
+            "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+            "name": "Raze"
+          },
+          "stats": {
+            "score": 3562,
+            "kills": 12,
+            "deaths": 11,
+            "assists": 5,
+            "headshots": 11,
+            "bodyshots": 35,
+            "legshots": 0,
+            "damage": {
+              "dealt": 2555,
+              "received": 2049
+            }
+          },
+          "ability_casts": {
+            "grenade": 9,
+            "ability1": 16,
+            "ability2": 16,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "a6d48dd0-40eb-e2f0-d862-219df87a9583",
+            "title": "161e5df8-477a-7669-ba0e-19884082dcd4",
+            "preferred_level_border": "5d0d6c6c-4f0a-dc65-e506-b786cc27dbe1"
+          },
+          "account_level": 415,
+          "session_playtime_in_ms": 420000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 47500,
+              "average": 2500.0
+            },
+            "loadout_value": {
+              "overall": 74600,
+              "average": 3926.3157
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0023",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0015",
+          "agent": {
+            "id": "dade69b4-4f5a-8528-247b-219e5a1facd6",
+            "name": "Fade"
+          },
+          "stats": {
+            "score": 2550,
+            "kills": 10,
+            "deaths": 12,
+            "assists": 4,
+            "headshots": 8,
+            "bodyshots": 10,
+            "legshots": 2,
+            "damage": {
+              "dealt": 1545,
+              "received": 2104
+            }
+          },
+          "ability_casts": {
+            "grenade": 22,
+            "ability1": 8,
+            "ability2": 15,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 22,
+            "name": "Ascendant 2"
+          },
+          "customization": {
+            "card": "d29e6e34-44bd-21c8-f7bb-b0a73f267e50",
+            "title": "171e2f90-41e0-48d0-bbf5-28a531c7eafb",
+            "preferred_level_border": "ebc736cd-4b6a-137b-e2b0-1486e31312c9"
+          },
+          "account_level": 180,
+          "session_playtime_in_ms": 480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 48950,
+              "average": 2576.3157
+            },
+            "loadout_value": {
+              "overall": 69150,
+              "average": 3639.4736
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0024",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0014",
+          "agent": {
+            "id": "a3bfb853-43b2-7238-a4f1-ad90e9e46bcc",
+            "name": "Reyna"
+          },
+          "stats": {
+            "score": 8827,
+            "kills": 29,
+            "deaths": 14,
+            "assists": 2,
+            "headshots": 29,
+            "bodyshots": 26,
+            "legshots": 3,
+            "damage": {
+              "dealt": 5489,
+              "received": 3426
+            }
+          },
+          "ability_casts": {
+            "grenade": 15,
+            "ability1": 10,
+            "ability2": 8,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "213c4c4a-44e6-12a5-6ab2-ae8282e93e57",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": null
+          },
+          "account_level": 39,
+          "session_playtime_in_ms": 120000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 55350,
+              "average": 2913.158
+            },
+            "loadout_value": {
+              "overall": 76200,
+              "average": 4010.5264
+            }
+          }
+        },
+        {
+          "puuid": "puuid-tracked",
+          "name": "Example",
+          "tag": "EUW",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0020",
+          "agent": {
+            "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+            "name": "Clove"
+          },
+          "stats": {
+            "score": 2956,
+            "kills": 12,
+            "deaths": 15,
+            "assists": 3,
+            "headshots": 10,
+            "bodyshots": 14,
+            "legshots": 2,
+            "damage": {
+              "dealt": 2192,
+              "received": 2791
+            }
+          },
+          "ability_casts": {
+            "grenade": 5,
+            "ability1": 4,
+            "ability2": 34,
+            "ultimate": 3
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "ad81a15f-4725-b75f-0c8c-519aa97ed3b6",
+            "title": "19b138cf-4137-692c-c6ec-be9da98109be",
+            "preferred_level_border": "6f610ab6-4a21-63fd-ac19-4a9204bc2721"
+          },
+          "account_level": 207,
+          "session_playtime_in_ms": 780000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 46950,
+              "average": 2471.0527
+            },
+            "loadout_value": {
+              "overall": 72700,
+              "average": 3826.3157
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0025",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0018",
+          "agent": {
+            "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+            "name": "Clove"
+          },
+          "stats": {
+            "score": 1882,
+            "kills": 6,
+            "deaths": 15,
+            "assists": 3,
+            "headshots": 7,
+            "bodyshots": 13,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1200,
+              "received": 2811
+            }
+          },
+          "ability_casts": {
+            "grenade": 3,
+            "ability1": 5,
+            "ability2": 41,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "4c66dcf7-4504-dfa6-d85c-219ac12586f0",
+            "title": "161e5df8-477a-7669-ba0e-19884082dcd4",
+            "preferred_level_border": "ebc736cd-4b6a-137b-e2b0-1486e31312c9"
+          },
+          "account_level": 233,
+          "session_playtime_in_ms": 0,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 44350,
+              "average": 2334.2104
+            },
+            "loadout_value": {
+              "overall": 67350,
+              "average": 3544.7368
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0026",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0017",
+          "agent": {
+            "id": "22697a3d-45bf-8dd7-4fec-84a9e28c69d7",
+            "name": "Chamber"
+          },
+          "stats": {
+            "score": 2793,
+            "kills": 9,
+            "deaths": 16,
+            "assists": 0,
+            "headshots": 8,
+            "bodyshots": 17,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1880,
+              "received": 2604
+            }
+          },
+          "ability_casts": {
+            "grenade": 19,
+            "ability1": 5,
+            "ability2": 5,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "8314f8d7-4d2a-4042-f961-47b365ea64f0",
+            "title": "8198f12e-4899-0f25-8319-cbad87d9097b",
+            "preferred_level_border": "6694d7f7-4ab9-8545-5921-35a9ea8cec24"
+          },
+          "account_level": 565,
+          "session_playtime_in_ms": 15420000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 46450,
+              "average": 2444.7368
+            },
+            "loadout_value": {
+              "overall": 63150,
+              "average": 3323.6843
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0027",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0020",
+          "agent": {
+            "id": "efba5359-4016-a1e5-7626-b1ae76895940",
+            "name": "Vyse"
+          },
+          "stats": {
+            "score": 3340,
+            "kills": 12,
+            "deaths": 8,
+            "assists": 4,
+            "headshots": 8,
+            "bodyshots": 18,
+            "legshots": 0,
+            "damage": {
+              "dealt": 2001,
+              "received": 1570
+            }
+          },
+          "ability_casts": {
+            "grenade": 18,
+            "ability1": 17,
+            "ability2": 9,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "1fd822e6-4fb2-cc40-8d51-8ba9ff4808a6",
+            "title": "ae54c1ce-42b9-3dc1-5e91-6c9e9161b01a",
+            "preferred_level_border": "ebc736cd-4b6a-137b-e2b0-1486e31312c9"
+          },
+          "account_level": 109,
+          "session_playtime_in_ms": 300000,
+          "behavior": {
+            "afk_rounds": 0.3,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 41950,
+              "average": 2207.8948
+            },
+            "loadout_value": {
+              "overall": 57750,
+              "average": 3039.4736
+            }
+          }
+        }
+      ],
+      "observers": [],
+      "coaches": [],
+      "teams": [
+        {
+          "team_id": "Red",
+          "rounds": {
+            "won": 13,
+            "lost": 6
+          },
+          "won": true,
+          "premier_roster": null
+        },
+        {
+          "team_id": "Blue",
+          "rounds": {
+            "won": 6,
+            "lost": 13
+          },
+          "won": false,
+          "premier_roster": null
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "match_id": "match-0004",
+        "map": {
+          "id": "224b0a95-48b9-f703-1bd8-67aca101a61f",
+          "name": "Abyss"
+        },
+        "game_version": "release-13.04-shipping-20-5340415",
+        "game_length_in_ms": 1352687,
+        "started_at": "2026-08-31T22:56:56.807Z",
+        "is_completed": true,
+        "queue": {
+          "id": "competitive",
+          "name": "Competitive",
+          "mode_type": "Standard"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "platform": "pc",
+        "premier": null,
+        "party_rr_penaltys": [
+          {
+            "party_id": "party-0022",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0023",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0024",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0025",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0026",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0027",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0028",
+            "penalty": 0.0
+          }
+        ],
+        "region": "eu",
+        "cluster": "London"
+      },
+      "players": [
+        {
+          "puuid": "puuid-0028",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0022",
+          "agent": {
+            "id": "117ed9e3-49f3-6512-3ccf-0cada7e3823b",
+            "name": "Cypher"
+          },
+          "stats": {
+            "score": 3564,
+            "kills": 12,
+            "deaths": 6,
+            "assists": 7,
+            "headshots": 6,
+            "bodyshots": 54,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2483,
+              "received": 1216
+            }
+          },
+          "ability_casts": {
+            "grenade": 31,
+            "ability1": 18,
+            "ability2": 14,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "bb5cedcd-4ed9-ee2e-f129-48bf60a8e540",
+            "title": "06478ef0-4dc2-5767-ec02-d190487ed132",
+            "preferred_level_border": "5156a90d-4d65-58d0-f6a8-48a0c003878a"
+          },
+          "account_level": 84,
+          "session_playtime_in_ms": 3480000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 28050,
+              "average": 1753.125
+            },
+            "loadout_value": {
+              "overall": 49850,
+              "average": 3115.625
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0029",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0027",
+          "agent": {
+            "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+            "name": "Jett"
+          },
+          "stats": {
+            "score": 4091,
+            "kills": 16,
+            "deaths": 8,
+            "assists": 0,
+            "headshots": 12,
+            "bodyshots": 22,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2805,
+              "received": 1542
+            }
+          },
+          "ability_casts": {
+            "grenade": 3,
+            "ability1": 1,
+            "ability2": 17,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "edfb9497-48ca-c3d9-cb0a-109cdedf533c",
+            "title": "129190d4-42fa-4e79-75e3-ffb5679d1dc2",
+            "preferred_level_border": null
+          },
+          "account_level": 177,
+          "session_playtime_in_ms": 60000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 28350,
+              "average": 1771.875
+            },
+            "loadout_value": {
+              "overall": 59250,
+              "average": 3703.125
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0030",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0027",
+          "agent": {
+            "id": "7c8a4701-4de6-9355-b254-e09bc2a34b72",
+            "name": "Miks"
+          },
+          "stats": {
+            "score": 5019,
+            "kills": 20,
+            "deaths": 5,
+            "assists": 8,
+            "headshots": 14,
+            "bodyshots": 31,
+            "legshots": 6,
+            "damage": {
+              "dealt": 3384,
+              "received": 1159
+            }
+          },
+          "ability_casts": {
+            "grenade": 7,
+            "ability1": 12,
+            "ability2": 21,
+            "ultimate": 3
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "eb741e28-4545-92a3-cb5a-6a8de025e9b7",
+            "title": "8198f12e-4899-0f25-8319-cbad87d9097b",
+            "preferred_level_border": "49413ac2-4ed5-6953-5791-db838ccb58f3"
+          },
+          "account_level": 174,
+          "session_playtime_in_ms": 120000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 25200,
+              "average": 1575.0
+            },
+            "loadout_value": {
+              "overall": 61750,
+              "average": 3859.375
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0031",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0028",
+          "agent": {
+            "id": "601dbbe7-43ce-be57-2a40-4abd24953621",
+            "name": "KAY/O"
+          },
+          "stats": {
+            "score": 3907,
+            "kills": 14,
+            "deaths": 6,
+            "assists": 8,
+            "headshots": 10,
+            "bodyshots": 25,
+            "legshots": 1,
+            "damage": {
+              "dealt": 2315,
+              "received": 1428
+            }
+          },
+          "ability_casts": {
+            "grenade": 9,
+            "ability1": 13,
+            "ability2": 20,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "2a280896-4e81-c319-ffd3-6b8873042647",
+            "title": "21054634-428a-ec43-e5b7-e99888f137e7",
+            "preferred_level_border": "c8a4abff-4ace-f0a3-c9f3-db936791a697"
+          },
+          "account_level": 538,
+          "session_playtime_in_ms": 14280000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 23850,
+              "average": 1490.625
+            },
+            "loadout_value": {
+              "overall": 57900,
+              "average": 3618.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0032",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0024",
+          "agent": {
+            "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+            "name": "Clove"
+          },
+          "stats": {
+            "score": 2700,
+            "kills": 9,
+            "deaths": 17,
+            "assists": 3,
+            "headshots": 9,
+            "bodyshots": 11,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1576,
+              "received": 3183
+            }
+          },
+          "ability_casts": {
+            "grenade": 4,
+            "ability1": 6,
+            "ability2": 33,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "4d9b68dd-4676-10df-0455-ae8d82dca206",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": "08ab72f1-4fce-ddb5-5fd5-22abd3bc9d49"
+          },
+          "account_level": 479,
+          "session_playtime_in_ms": 28260000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 41750,
+              "average": 2609.375
+            },
+            "loadout_value": {
+              "overall": 47200,
+              "average": 2950.0
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0033",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0023",
+          "agent": {
+            "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+            "name": "Jett"
+          },
+          "stats": {
+            "score": 1582,
+            "kills": 5,
+            "deaths": 14,
+            "assists": 2,
+            "headshots": 5,
+            "bodyshots": 13,
+            "legshots": 2,
+            "damage": {
+              "dealt": 1199,
+              "received": 2576
+            }
+          },
+          "ability_casts": {
+            "grenade": 8,
+            "ability1": 3,
+            "ability2": 15,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "e70e685b-4e42-e14b-dbfc-68957b3b914a",
+            "title": "025b0aaf-4bc6-522c-faae-a484779c5d03",
+            "preferred_level_border": "cbd1914e-43f8-7ae5-38c4-228bcbe58756"
+          },
+          "account_level": 461,
+          "session_playtime_in_ms": 2100000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 40500,
+              "average": 2531.25
+            },
+            "loadout_value": {
+              "overall": 47400,
+              "average": 2962.5
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0034",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0025",
+          "agent": {
+            "id": "eb93336a-449b-9c1b-0a54-a891f7921d69",
+            "name": "Phoenix"
+          },
+          "stats": {
+            "score": 521,
+            "kills": 1,
+            "deaths": 14,
+            "assists": 2,
+            "headshots": 0,
+            "bodyshots": 8,
+            "legshots": 5,
+            "damage": {
+              "dealt": 442,
+              "received": 2375
+            }
+          },
+          "ability_casts": {
+            "grenade": 2,
+            "ability1": 5,
+            "ability2": 7,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "9fb348bc-41a0-91ad-8a3e-818035c4e561",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": null
+          },
+          "account_level": 486,
+          "session_playtime_in_ms": 11400000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 39450,
+              "average": 2465.625
+            },
+            "loadout_value": {
+              "overall": 52000,
+              "average": 3250.0
+            }
+          }
+        },
+        {
+          "puuid": "puuid-tracked",
+          "name": "Example",
+          "tag": "EUW",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0025",
+          "agent": {
+            "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+            "name": "Sova"
+          },
+          "stats": {
+            "score": 5681,
+            "kills": 20,
+            "deaths": 15,
+            "assists": 2,
+            "headshots": 20,
+            "bodyshots": 21,
+            "legshots": 0,
+            "damage": {
+              "dealt": 3540,
+              "received": 2673
+            }
+          },
+          "ability_casts": {
+            "grenade": 2,
+            "ability1": 5,
+            "ability2": 12,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "ad81a15f-4725-b75f-0c8c-519aa97ed3b6",
+            "title": "19b138cf-4137-692c-c6ec-be9da98109be",
+            "preferred_level_border": "6f610ab6-4a21-63fd-ac19-4a9204bc2721"
+          },
+          "account_level": 207,
+          "session_playtime_in_ms": 8640000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 43550,
+              "average": 2721.875
+            },
+            "loadout_value": {
+              "overall": 55900,
+              "average": 3493.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0035",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0022",
+          "agent": {
+            "id": "bb2a4828-46eb-8cd1-e765-15848195d751",
+            "name": "Neon"
+          },
+          "stats": {
+            "score": 3453,
+            "kills": 12,
+            "deaths": 13,
+            "assists": 3,
+            "headshots": 10,
+            "bodyshots": 22,
+            "legshots": 4,
+            "damage": {
+              "dealt": 2356,
+              "received": 2468
+            }
+          },
+          "ability_casts": {
+            "grenade": 2,
+            "ability1": 5,
+            "ability2": 13,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 17,
+            "name": "Platinum 3"
+          },
+          "customization": {
+            "card": "a68c9de4-4d10-dac5-a329-cbaf3141c44c",
+            "title": "daae405e-4fc7-0c3a-0ab6-08bebca1a8dc",
+            "preferred_level_border": null
+          },
+          "account_level": 103,
+          "session_playtime_in_ms": 3600000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 40350,
+              "average": 2521.875
+            },
+            "loadout_value": {
+              "overall": 54650,
+              "average": 3415.625
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0036",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0026",
+          "agent": {
+            "id": "22697a3d-45bf-8dd7-4fec-84a9e28c69d7",
+            "name": "Chamber"
+          },
+          "stats": {
+            "score": 1370,
+            "kills": 3,
+            "deaths": 14,
+            "assists": 3,
+            "headshots": 2,
+            "bodyshots": 18,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1082,
+              "received": 2562
+            }
+          },
+          "ability_casts": {
+            "grenade": 15,
+            "ability1": 4,
+            "ability2": 9,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 17,
+            "name": "Platinum 3"
+          },
+          "customization": {
+            "card": "c5d4cd0b-49fa-0b9c-55c7-9b828f83413f",
+            "title": "f56d6897-4726-f336-77dc-6f82d2f982f2",
+            "preferred_level_border": "5d0d6c6c-4f0a-dc65-e506-b786cc27dbe1"
+          },
+          "account_level": 263,
+          "session_playtime_in_ms": 6660000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 40100,
+              "average": 2506.25
+            },
+            "loadout_value": {
+              "overall": 46800,
+              "average": 2925.0
+            }
+          }
+        }
+      ],
+      "observers": [],
+      "coaches": [],
+      "teams": [
+        {
+          "team_id": "Red",
+          "rounds": {
+            "won": 3,
+            "lost": 13
+          },
+          "won": false,
+          "premier_roster": null
+        },
+        {
+          "team_id": "Blue",
+          "rounds": {
+            "won": 13,
+            "lost": 3
+          },
+          "won": true,
+          "premier_roster": null
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "match_id": "match-0005",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "game_version": "release-13.04-shipping-20-5340415",
+        "game_length_in_ms": 1484700,
+        "started_at": "2026-08-31T22:28:37.83Z",
+        "is_completed": true,
+        "queue": {
+          "id": "competitive",
+          "name": "Competitive",
+          "mode_type": "Standard"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "platform": "pc",
+        "premier": null,
+        "party_rr_penaltys": [
+          {
+            "party_id": "party-0029",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0030",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0025",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0031",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0032",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0033",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0034",
+            "penalty": 0.0
+          },
+          {
+            "party_id": "party-0035",
+            "penalty": 0.0
+          }
+        ],
+        "region": "eu",
+        "cluster": "London"
+      },
+      "players": [
+        {
+          "puuid": "puuid-0037",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0031",
+          "agent": {
+            "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+            "name": "Clove"
+          },
+          "stats": {
+            "score": 2217,
+            "kills": 6,
+            "deaths": 14,
+            "assists": 5,
+            "headshots": 6,
+            "bodyshots": 15,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1655,
+              "received": 2393
+            }
+          },
+          "ability_casts": {
+            "grenade": 2,
+            "ability1": 3,
+            "ability2": 30,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "f67a7c8f-4d3f-b76f-2921-478a4da44109",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": "e6238102-425c-a647-6685-e6af7f8982d9"
+          },
+          "account_level": 124,
+          "session_playtime_in_ms": 15780000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 33500,
+              "average": 2093.75
+            },
+            "loadout_value": {
+              "overall": 49100,
+              "average": 3068.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0034",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0025",
+          "agent": {
+            "id": "bb2a4828-46eb-8cd1-e765-15848195d751",
+            "name": "Neon"
+          },
+          "stats": {
+            "score": 2110,
+            "kills": 7,
+            "deaths": 15,
+            "assists": 3,
+            "headshots": 6,
+            "bodyshots": 25,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1368,
+              "received": 2663
+            }
+          },
+          "ability_casts": {
+            "grenade": 2,
+            "ability1": 10,
+            "ability2": 16,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 18,
+            "name": "Diamond 1"
+          },
+          "customization": {
+            "card": "9fb348bc-41a0-91ad-8a3e-818035c4e561",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": null
+          },
+          "account_level": 486,
+          "session_playtime_in_ms": 9720000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 35850,
+              "average": 2240.625
+            },
+            "loadout_value": {
+              "overall": 41950,
+              "average": 2621.875
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0038",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0034",
+          "agent": {
+            "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+            "name": "Raze"
+          },
+          "stats": {
+            "score": 2614,
+            "kills": 8,
+            "deaths": 14,
+            "assists": 1,
+            "headshots": 8,
+            "bodyshots": 34,
+            "legshots": 2,
+            "damage": {
+              "dealt": 1710,
+              "received": 2589
+            }
+          },
+          "ability_casts": {
+            "grenade": 8,
+            "ability1": 7,
+            "ability2": 9,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "9fb348bc-41a0-91ad-8a3e-818035c4e561",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": null
+          },
+          "account_level": 24,
+          "session_playtime_in_ms": 0,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 38050,
+              "average": 2378.125
+            },
+            "loadout_value": {
+              "overall": 47400,
+              "average": 2962.5
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0039",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0035",
+          "agent": {
+            "id": "569fdd95-4d10-43ab-ca70-79becc718b46",
+            "name": "Sage"
+          },
+          "stats": {
+            "score": 3021,
+            "kills": 11,
+            "deaths": 5,
+            "assists": 9,
+            "headshots": 10,
+            "bodyshots": 12,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1749,
+              "received": 1196
+            }
+          },
+          "ability_casts": {
+            "grenade": 10,
+            "ability1": 12,
+            "ability2": 12,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "03f88215-41f1-d3a2-7983-67b56517eb72",
+            "title": "703cd95a-4624-16f3-fdd9-f4a881993577",
+            "preferred_level_border": null
+          },
+          "account_level": 312,
+          "session_playtime_in_ms": 11400000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 31400,
+              "average": 1962.5
+            },
+            "loadout_value": {
+              "overall": 61600,
+              "average": 3850.0
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0040",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0032",
+          "agent": {
+            "id": "1e58de9c-4950-5125-93e9-a0aee9f98746",
+            "name": "Killjoy"
+          },
+          "stats": {
+            "score": 6221,
+            "kills": 21,
+            "deaths": 6,
+            "assists": 4,
+            "headshots": 17,
+            "bodyshots": 62,
+            "legshots": 5,
+            "damage": {
+              "dealt": 4366,
+              "received": 1254
+            }
+          },
+          "ability_casts": {
+            "grenade": 19,
+            "ability1": 12,
+            "ability2": 7,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "e70e685b-4e42-e14b-dbfc-68957b3b914a",
+            "title": "4f4e1150-4da1-8b9a-c447-28a205d36bbb",
+            "preferred_level_border": "6c1fb61e-46e5-2908-5048-d4866cb64c3d"
+          },
+          "account_level": 364,
+          "session_playtime_in_ms": 2040000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 31900,
+              "average": 1993.75
+            },
+            "loadout_value": {
+              "overall": 62700,
+              "average": 3918.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-tracked",
+          "name": "Example",
+          "tag": "EUW",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0025",
+          "agent": {
+            "id": "e370fa57-4757-3604-3648-499e1f642d3f",
+            "name": "Gekko"
+          },
+          "stats": {
+            "score": 3881,
+            "kills": 13,
+            "deaths": 13,
+            "assists": 2,
+            "headshots": 11,
+            "bodyshots": 21,
+            "legshots": 0,
+            "damage": {
+              "dealt": 2503,
+              "received": 2562
+            }
+          },
+          "ability_casts": {
+            "grenade": 8,
+            "ability1": 5,
+            "ability2": 15,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 21,
+            "name": "Ascendant 1"
+          },
+          "customization": {
+            "card": "ad81a15f-4725-b75f-0c8c-519aa97ed3b6",
+            "title": "19b138cf-4137-692c-c6ec-be9da98109be",
+            "preferred_level_border": "6f610ab6-4a21-63fd-ac19-4a9204bc2721"
+          },
+          "account_level": 207,
+          "session_playtime_in_ms": 6900000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 38050,
+              "average": 2378.125
+            },
+            "loadout_value": {
+              "overall": 49100,
+              "average": 3068.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0041",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Blue",
+          "platform": "pc",
+          "party_id": "party-0034",
+          "agent": {
+            "id": "22697a3d-45bf-8dd7-4fec-84a9e28c69d7",
+            "name": "Chamber"
+          },
+          "stats": {
+            "score": 2037,
+            "kills": 5,
+            "deaths": 14,
+            "assists": 3,
+            "headshots": 6,
+            "bodyshots": 24,
+            "legshots": 1,
+            "damage": {
+              "dealt": 1538,
+              "received": 2263
+            }
+          },
+          "ability_casts": {
+            "grenade": 17,
+            "ability1": 5,
+            "ability2": 8,
+            "ultimate": 0
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "9fb348bc-41a0-91ad-8a3e-818035c4e561",
+            "title": "d13e579c-435e-44d4-cec2-6eae5a3c5ed4",
+            "preferred_level_border": null
+          },
+          "account_level": 24,
+          "session_playtime_in_ms": 60000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 34600,
+              "average": 2162.5
+            },
+            "loadout_value": {
+              "overall": 41300,
+              "average": 2581.25
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0042",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0029",
+          "agent": {
+            "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+            "name": "Raze"
+          },
+          "stats": {
+            "score": 3094,
+            "kills": 11,
+            "deaths": 12,
+            "assists": 2,
+            "headshots": 8,
+            "bodyshots": 26,
+            "legshots": 5,
+            "damage": {
+              "dealt": 2030,
+              "received": 2561
+            }
+          },
+          "ability_casts": {
+            "grenade": 8,
+            "ability1": 9,
+            "ability2": 16,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "ec50c37c-455a-ae63-353f-c399f36e55d6",
+            "title": "c3b8609d-46cf-e290-868a-e4852a85704f",
+            "preferred_level_border": null
+          },
+          "account_level": 327,
+          "session_playtime_in_ms": 19320000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 42400,
+              "average": 2650.0
+            },
+            "loadout_value": {
+              "overall": 61100,
+              "average": 3818.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0043",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0030",
+          "agent": {
+            "id": "8e253930-4c05-31dd-1b6c-968525494517",
+            "name": "Omen"
+          },
+          "stats": {
+            "score": 1910,
+            "kills": 8,
+            "deaths": 8,
+            "assists": 4,
+            "headshots": 7,
+            "bodyshots": 9,
+            "legshots": 0,
+            "damage": {
+              "dealt": 1333,
+              "received": 1892
+            }
+          },
+          "ability_casts": {
+            "grenade": 8,
+            "ability1": 12,
+            "ability2": 35,
+            "ultimate": 1
+          },
+          "tier": {
+            "id": 19,
+            "name": "Diamond 2"
+          },
+          "customization": {
+            "card": "d05c6fc8-42ee-ac9c-d002-1a90b1f8c9cc",
+            "title": "98b7a8a1-4f7d-798c-7b1c-14b285c9c4d3",
+            "preferred_level_border": "e05371e3-4ec4-a53e-168a-c49346a75c19"
+          },
+          "account_level": 103,
+          "session_playtime_in_ms": 1620000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 32400,
+              "average": 2025.0
+            },
+            "loadout_value": {
+              "overall": 57900,
+              "average": 3618.75
+            }
+          }
+        },
+        {
+          "puuid": "puuid-0044",
+          "name": "Player",
+          "tag": "0000",
+          "team_id": "Red",
+          "platform": "pc",
+          "party_id": "party-0033",
+          "agent": {
+            "id": "0e38b510-41a8-5780-5e8f-568b2a4f2d6c",
+            "name": "Iso"
+          },
+          "stats": {
+            "score": 4405,
+            "kills": 18,
+            "deaths": 8,
+            "assists": 4,
+            "headshots": 14,
+            "bodyshots": 21,
+            "legshots": 4,
+            "damage": {
+              "dealt": 2925,
+              "received": 1804
+            }
+          },
+          "ability_casts": {
+            "grenade": 6,
+            "ability1": 8,
+            "ability2": 14,
+            "ultimate": 2
+          },
+          "tier": {
+            "id": 20,
+            "name": "Diamond 3"
+          },
+          "customization": {
+            "card": "bc4c264d-4105-228b-3b3c-09b15c4f8e71",
+            "title": "48570afb-49f6-bc62-1706-f79c7c36ee37",
+            "preferred_level_border": "37a36996-41f3-6e26-c00b-46bf7c037482"
+          },
+          "account_level": 232,
+          "session_playtime_in_ms": 8400000,
+          "behavior": {
+            "afk_rounds": 0.0,
+            "friendly_fire": {
+              "incoming": 0.0,
+              "outgoing": 0.0
+            },
+            "rounds_in_spawn": 0.0
+          },
+          "economy": {
+            "spent": {
+              "overall": 33600,
+              "average": 2100.0
+            },
+            "loadout_value": {
+              "overall": 61100,
+              "average": 3818.75
+            }
+          }
+        }
+      ],
+      "observers": [],
+      "coaches": [],
+      "teams": [
+        {
+          "team_id": "Red",
+          "rounds": {
+            "won": 13,
+            "lost": 3
+          },
+          "won": true,
+          "premier_roster": null
+        },
+        {
+          "team_id": "Blue",
+          "rounds": {
+            "won": 3,
+            "lost": 13
+          },
+          "won": false,
+          "premier_roster": null
+        }
+      ]
+    }
+  ]
+}

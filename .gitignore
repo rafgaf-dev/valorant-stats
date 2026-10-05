@@ -24,6 +24,7 @@ frontend/dist/
 *.tsbuildinfo
 
 # Python / collector
+collector/.fixture-cache/
 __pycache__/
 *.py[cod]
 .venv/
