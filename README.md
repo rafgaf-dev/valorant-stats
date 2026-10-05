@@ -172,8 +172,8 @@ costs, and teardown. In short:
 - Merging frontend changes into `main` deploys the site through GitHub Actions,
   assuming an AWS role through OIDC that can only update the site bucket and refresh
   CloudFront's cache.
-- Infrastructure and collector changes are applied locally with a reviewed
-  `make infra-plan` and `make infra-apply`.
+- Infrastructure and collector changes are applied locally with `make deploy`, which
+  shows the Terraform plan, applies it once you confirm, and runs the collector.
 
 ## License
 

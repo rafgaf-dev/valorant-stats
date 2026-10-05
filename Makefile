@@ -1,4 +1,4 @@
-.PHONY: help install dev lint format typecheck test build validate-infra check capture-fixtures collect-local infra-bootstrap infra-init infra-plan infra-apply set-api-key invoke deploy-frontend upload-photos delete-player clean
+.PHONY: help install dev lint format typecheck test build validate-infra check capture-fixtures collect-local infra-bootstrap infra-init infra-plan infra-apply deploy set-api-key invoke deploy-frontend upload-photos delete-player clean
 
 PYTHON ?= python3
 NPM ?= corepack npm
@@ -34,7 +34,7 @@ help:
 		'make infra-bootstrap   Create the Terraform state bucket once and write infrastructure/backend.hcl' \
 		'make infra-init        Initialise Terraform against the state bucket' \
 		'make infra-plan        Show what would change in AWS and save the plan' \
-		'make infra-apply       Apply the saved plan' \
+		'make infra-apply       Apply the saved plan' 		'make deploy            Init, plan, apply after confirming, then run the collector (YES=1: no prompt)' \
 		'make set-api-key       Store HENRIKDEV_API_KEY in Secrets Manager' \
 		'make invoke            Run the collector Lambda once and show its result' \
 		'make deploy-frontend   Build and publish the frontend (CI does this on merge to main)' \
@@ -99,6 +99,9 @@ infra-plan:
 
 infra-apply:
 	$(TERRAFORM) -chdir=infrastructure apply tfplan
+
+deploy:
+	TERRAFORM="$(TERRAFORM)" scripts/deploy.sh
 
 # The key is piped through stdin so it never appears in the process list or shell history.
 set-api-key:

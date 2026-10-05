@@ -14,12 +14,26 @@ in GitHub environment secrets.
 | Change | How it reaches AWS |
 | --- | --- |
 | `frontend/` | The Deploy workflow, on merge to `main` (or `make deploy-frontend`) |
-| `infrastructure/`, `collector/`, `config/players.json` | `make infra-plan` and `make infra-apply`, run locally and reviewed |
+| `infrastructure/`, `collector/`, `config/players.json` | `make deploy`, run locally: it plans, applies after you confirm, and runs the collector |
 | `config/photos/<player-id>.webp` | `make upload-photos`, run locally (photos never enter git) |
 | The HenrikDev key | `make set-api-key`, run locally |
 
 Terraform stays a local, reviewed step because it needs the gitignored players file and
 settings, and because a CI role able to apply it would need near-administrator access.
+
+## Everyday deploys
+
+After changing the infrastructure, the collector, or `config/players.json`:
+
+```bash
+make deploy
+```
+
+It initialises Terraform (installing any new providers), shows the plan, applies it
+once you answer `y`, and then runs the collector so the summary is up to date. With no
+changes it skips straight to the collector run. `YES=1` skips the question, and the
+individual steps (`make infra-init`, `infra-plan`, `infra-apply`, `invoke`) still work
+on their own.
 
 ## First deployment
 
