@@ -32,6 +32,9 @@ def configure_logging(level: int = logging.INFO) -> None:
     root = logging.getLogger()
     root.handlers = [handler]  # replaces the Lambda runtime's plain-text handler
     root.setLevel(level)
+    # AWS SDK internals ("Found credentials in environment variables.") aren't useful here.
+    for noisy in ("boto3", "botocore", "urllib3"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
 def emit_metrics(values: dict[str, int], stream: TextIO | None = None) -> None:
