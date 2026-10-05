@@ -272,6 +272,7 @@ tested without AWS or the network.
 ```text
 collector/src/collector/
   henrikdev.py HTTP client: auth header, timeouts, rate limits, error mapping
+  records.py   MatchRecord, Result, Source (shared data types)
   parse.py     v4 match / stored record JSON → MatchRecord (pure)
   metrics.py   list[MatchRecord] → windows (pure)
   store.py     DynamoDB reads and writes
