@@ -57,8 +57,14 @@ describe("getPlayerSummary", () => {
 		expect((await failure()).kind).toBe("unavailable");
 	});
 
+	it.each([1, 2])("accepts schema version %i", async (version) => {
+		stubFetch(json({ ...contract, schemaVersion: version }));
+
+		await expect(getPlayerSummary("neon-main")).resolves.toMatchObject({ schemaVersion: version });
+	});
+
 	it("rejects other schema versions as unsupported", async () => {
-		stubFetch(json({ ...contract, schemaVersion: 2 }));
+		stubFetch(json({ ...contract, schemaVersion: 3 }));
 
 		expect((await failure()).kind).toBe("unsupported");
 	});
