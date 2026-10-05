@@ -332,10 +332,17 @@ so the site always shows the last good data.
 
 ### Data deletion
 
-`make delete-player PLAYER=<id>` runs a script that deletes the player's
-DynamoDB items and their objects under `data/players/<id>/`, then invalidates
-`/data/players/<id>/*` in CloudFront. Removing the player from
-`config/players.json` stops future collection.
+`make delete-player PLAYER=<id>` runs `collector/scripts/delete_player.py`,
+which asks for the player id again, then deletes:
+
+- every DynamoDB item in the player's partition (matches and import runs);
+- **every version** and delete marker under `data/players/<id>/` (summaries and
+  the photo), because the data bucket is versioned and old versions would
+  otherwise keep the data;
+- CloudFront's cached copies (`/data/players/<id>/*`).
+
+It warns when the player is still in `config/players.json`: remove them there
+and apply Terraform, or the next scheduled run recreates the data.
 
 ## 8. Frontend plan
 
@@ -428,6 +435,7 @@ collector/
     fixtures/henrikdev/   pseudonymized real API responses + expected summary
   scripts/
     capture_fixtures.py   saves the fixtures (make capture-fixtures)
+    delete_player.py      removes a player's data (make delete-player)
 config/
   players.example.json    committed; players.json is gitignored
 frontend/
@@ -443,9 +451,9 @@ infrastructure/
   scheduler.tf            schedule + its IAM role
   frontend.tf             CloudFront, OAC, bucket policies, cache/headers policies
   monitoring.tf           SNS, alarms, budget
-  github_oidc.tf          OIDC provider + deploy role scoped to this repo's main branch
+  github_oidc.tf          OIDC provider + deploy role for the production environment
 scripts/
-  delete_player.py
+  deploy-frontend.sh      publishes frontend/dist (CI and make deploy-frontend)
 LICENSE                   MIT
 Makefile
 README.md
@@ -575,8 +583,8 @@ Each milestone is one or more small PRs that pass CI.
    environment, which accepts `main` alone. Terraform stays a reviewed local
    apply: it needs the gitignored players file, and a CI role able to apply it
    would need near-administrator access.
-7. **Operations:** the delete-player script, and any alarm tuning after the
-   first weeks of scheduled runs.
+7. **Operations:** the delete-player script. Revisit the alarm thresholds
+   after the first weeks of scheduled runs.
 8. **README:** architecture diagram, screenshot, how to run locally, how to
    deploy, cost, data source, disclaimer. Get the friend's consent, and
    re-check Riot's fan-content policy and HenrikDev's terms, before sharing the

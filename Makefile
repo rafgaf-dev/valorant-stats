@@ -1,4 +1,4 @@
-.PHONY: help install dev lint format typecheck test build validate-infra check capture-fixtures collect-local infra-bootstrap infra-init infra-plan infra-apply set-api-key invoke deploy-frontend upload-photos clean
+.PHONY: help install dev lint format typecheck test build validate-infra check capture-fixtures collect-local infra-bootstrap infra-init infra-plan infra-apply set-api-key invoke deploy-frontend upload-photos delete-player clean
 
 PYTHON ?= python3
 NPM ?= corepack npm
@@ -38,7 +38,8 @@ help:
 		'make set-api-key       Store HENRIKDEV_API_KEY in Secrets Manager' \
 		'make invoke            Run the collector Lambda once and show its result' \
 		'make deploy-frontend   Build and publish the frontend (CI does this on merge to main)' \
-		'make upload-photos     Publish config/photos/<player-id>.webp next to each summary'
+		'make upload-photos     Publish config/photos/<player-id>.webp next to each summary' \
+		'make delete-player     Delete all stored data for PLAYER=<id> (asks for confirmation)'
 
 install: $(VENV_STAMP) $(NODE_STAMP)
 
@@ -130,6 +131,13 @@ upload-photos:
 			--paths "/data/players/$$id/photo.webp" --query Invalidation.Id --output text; \
 	done; \
 	[ "$$found" = 1 ] || echo "No photos in config/photos/ (expected <player-id>.webp)."
+
+# Asks for the player id again before deleting anything.
+delete-player: $(VENV_STAMP)
+	@test -n "$(PLAYER)" || { echo "Usage: make delete-player PLAYER=<id>" >&2; exit 1; }
+	PYTHONPATH=collector/src $(VENV_BIN)/python collector/scripts/delete_player.py --player "$(PLAYER)" \
+		--table "$$($(TF_OUTPUT) table_name)" --bucket "$$($(TF_OUTPUT) data_bucket)" \
+		--distribution "$$($(TF_OUTPUT) distribution_id)"
 
 clean:
 	rm -rf frontend/dist frontend/node_modules $(VENV) collector/.pytest_cache collector/.ruff_cache collector/.coverage collector/.fixture-cache collector/.local

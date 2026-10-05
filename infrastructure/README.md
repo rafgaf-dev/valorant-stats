@@ -84,6 +84,17 @@ settings, and because a CI role able to apply it would need near-administrator a
 8. **Schedule.** Set `schedule_enabled = true` in `terraform.tfvars`, then plan and
    apply again. This also turns on the "no successful run in 12 hours" alarm.
 
+## Removing a player
+
+```bash
+make delete-player PLAYER=<id>
+```
+
+It asks for the id again, then deletes the player's DynamoDB items, every version of
+their summaries and photo, and CloudFront's cached copies. Remove them from
+`config/players.json` and plan and apply as well, or the next scheduled run recreates
+the data.
+
 ## The site
 
 CloudFront serves the built frontend from the site bucket and `/data/*` (summaries and
