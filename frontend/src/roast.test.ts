@@ -78,8 +78,8 @@ describe("comments", () => {
 	});
 
 	it("names the player and agent in the action items", () => {
-		expect(actionItems("Omar", "Neon")[0]).toBe(
-			"Schedule a one-to-one with Omar to find out what he thinks Neon's abilities do.",
+		expect(actionItems("Alex", "Neon")[0]).toBe(
+			"Schedule a one-to-one with Alex to find out what he thinks Neon's abilities do.",
 		);
 	});
 });
